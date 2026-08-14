@@ -391,32 +391,21 @@ const STORE = {
 /* ================================================================
    ADMIN — ubah Nama Toko, Alamat & Nomor WhatsApp lewat menu di dalam app
    ================================================================
-   Nilai default di atas (STORE.nama / STORE.whatsapp) dipakai kalau belum
-   pernah diubah lewat menu Admin. Begitu admin simpan perubahan lewat menu
-   "Pengaturan Toko (Admin)" di tab Akun, nilainya ditimpa & disimpan di
-   localStorage BROWSER INI SAJA (per perangkat/browser, bukan ke server),
-   supaya tetap kepakai tiap app dibuka lagi di perangkat yang sama.
+   Nilai default di atas (STORE.nama / STORE.whatsapp) cuma fallback SAAT
+   PERTAMA KALI app dibuka, sebelum sempat kontak server (atau kalau server
+   lagi gak bisa dihubungi). Begitu admin simpan lewat menu "Pengaturan
+   Toko (Admin)" di tab Akun, nilai baru DIKIRIM & DISIMPAN DI SERVER (lewat
+   action 'updatePengaturanToko') - jadi HP/laptop lain yang buka link yang
+   sama otomatis kebaca nilai terbaru pas mereka load app (loadPengaturanToko()),
+   bukan cuma tersimpan di 1 device kayak versi localStorage sebelumnya.
 
-   PIN di bawah ini cuma proteksi ringan sisi client (kode sumbernya tetap
-   kebaca lewat "view source" siapa pun) - bukan pengganti login admin
-   sungguhan di server. Ganti ke PIN rahasia sendiri sebelum dipakai beneran. */
+   PIN di bawah ini cuma gerbang cepat sisi client (kode sumbernya tetap
+   kebaca lewat "view source" siapa pun, jadi BUKAN proteksi sungguhan) -
+   validasi PIN yang sebenarnya (menentukan boleh/gaknya simpan) dilakukan
+   ULANG di server saat updatePengaturanToko dipanggil. Ganti PIN di sini
+   DAN di server (lihat catatan Apps Script) - dua-duanya, bukan cuma salah
+   satu. */
 const ADMIN_PIN = '190625';
-const STORE_SETTINGS_KEY = 'ainiMartStoreSettingsOverride';
-function loadStoreSettingsOverride(){
-  try{
-    const raw = localStorage.getItem(STORE_SETTINGS_KEY);
-    if(!raw) return;
-    const s = JSON.parse(raw);
-    if(s && s.nama) STORE.nama = s.nama;
-    if(s && s.whatsapp) STORE.whatsapp = s.whatsapp;
-    if(s && s.alamat) STORE.alamat = s.alamat;
-    if(s && s.logo) STORE.logo = s.logo;
-  }catch(e){}
-}
-function saveStoreSettingsOverride(nama, whatsapp, alamat, logo){
-  try{ localStorage.setItem(STORE_SETTINGS_KEY, JSON.stringify({ nama, whatsapp, alamat, logo })); }catch(e){}
-}
-loadStoreSettingsOverride(); // terapkan perubahan tersimpan sebelum apa pun lain dirender
 
 /** Katalog TIDAK LAGI hardcode di sini — diambil live dari backend ERP
  * (apiKatalogProdukPublik) supaya stok & harga selalu sinkron sama toko.
@@ -495,6 +484,45 @@ async function loadKatalog() {
   updateStatusPill();
   renderTabContent();
   renderMiniCart();
+}
+
+/**
+ * Terapkan STORE.nama/logo/whatsapp terbaru ke elemen header yang sudah
+ * ada di DOM, tanpa render ulang seluruh shell (biar dialog/tab yang lagi
+ * kebuka gak keganggu). Dipanggil setelah loadPengaturanToko() sukses, dan
+ * juga dipanggil ulang oleh submitAdminSave() begitu simpan berhasil.
+ */
+function applyStoreBranding(){
+  const mark = document.getElementById('store-mark');
+  if(mark) mark.innerHTML = STORE.logo ? '<img src="'+esc(STORE.logo)+'" alt="'+esc(STORE.nama)+'">' : esc(STORE.nama.charAt(0));
+  const nameEl = document.getElementById('store-name');
+  if(nameEl) nameEl.textContent = STORE.nama;
+  const waLink = document.getElementById('wa-link');
+  if(waLink) waLink.href = 'https://wa.me/'+STORE.whatsapp+'?text='+encodeURIComponent('Halo '+STORE.nama+', saya mau tanya-tanya.');
+  updateStatusPill();
+  renderTabContent(); // tab Akun/Beranda nampilin alamat & FAQ metode bayar yang baca STORE juga
+}
+
+/**
+ * Ambil pengaturan toko TERBARU dari server (Sheet/Properties di Apps
+ * Script - lihat action 'pengaturanTokoPublik'). Dipanggil sekali tiap app
+ * dibuka, SETELAH renderShell() supaya user tetap lihat sesuatu (nilai
+ * default/cache) duluan sebelum data server sampai - baru begitu server
+ * jawab, header ditimpa ke nilai terkini. Kalau server gak bisa dihubungi
+ * (offline dsb), app tetap jalan pakai nilai default di STORE, gak nge-block.
+ */
+async function loadPengaturanToko(){
+  try{
+    const s = await api('pengaturanTokoPublik', {});
+    if(!s) return;
+    if(s.nama) STORE.nama = s.nama;
+    if(s.whatsapp) STORE.whatsapp = s.whatsapp;
+    if(s.alamat) STORE.alamat = s.alamat;
+    STORE.logo = s.logo || ''; // logo boleh kosong (admin hapus logo) beda dari "belum ada data"
+    applyStoreBranding();
+  }catch(e){
+    console.warn('Gagal muat pengaturan toko dari server, pakai nilai default:', e.message);
+  }
 }
 
 
@@ -607,6 +635,7 @@ const state = {
   adminOpen: false,
   adminStep: 'pin',        // 'pin' | 'form'
   adminForm: { pin:'', nama:'', whatsapp:'', alamat:'', logo:'' },
+  adminSaving: false,
   adminError: null,
   toast: null
 };
@@ -684,9 +713,9 @@ function renderShell(){
     <header class="chalkboard">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
         <div style="display:flex;align-items:center;gap:10px;min-width:0">
-          <div class="store-mark">${STORE.logo ? '<img src="'+STORE.logo+'" alt="'+esc(STORE.nama)+'">' : esc(STORE.nama.charAt(0))}</div>
+          <div class="store-mark" id="store-mark">${STORE.logo ? '<img src="'+STORE.logo+'" alt="'+esc(STORE.nama)+'">' : esc(STORE.nama.charAt(0))}</div>
           <div style="min-width:0">
-            <div class="font-chalk" style="font-size:22px;line-height:1">${esc(STORE.nama)}</div>
+            <div class="font-chalk" id="store-name" style="font-size:22px;line-height:1">${esc(STORE.nama)}</div>
             <span class="status-pill" id="status-pill"></span>
           </div>
         </div>
@@ -1785,7 +1814,7 @@ function renderAdminBody(){
 
   body.innerHTML = `
     <h2>Pengaturan Toko</h2>
-    <div class="admin-note">Perubahan berlaku langsung di app ini (header, tombol WhatsApp, dll). Tersimpan di perangkat/browser ini.</div>
+    <div class="admin-note">Perubahan disimpan di server dan otomatis berlaku di semua perangkat yang buka link toko ini (header, tombol WhatsApp, dll) — bukan cuma di HP/browser ini.</div>
     ${state.adminError ? '<div class="auth-error">'+esc(state.adminError)+'</div>' : ''}
     <div class="field">
       <label>Logo Toko</label>
@@ -1802,7 +1831,7 @@ function renderAdminBody(){
     <div class="field"><label for="admin-wa">Nomor WhatsApp Toko</label><input id="admin-wa" type="tel" placeholder="62xxxxxxxxxx" value="${esc(f.whatsapp)}"></div>
     <div class="admin-note" style="margin-top:-6px">Format: diawali <strong>62</strong>, tanpa spasi/strip/tanda plus. Contoh: 6281234567890.</div>
     <div class="field"><label for="admin-alamat">Alamat Toko</label><textarea id="admin-alamat" rows="2" placeholder="Jalan, nomor, patokan">${esc(f.alamat)}</textarea></div>
-    <button class="submit-btn" data-action="submit-admin-save">Simpan Perubahan</button>
+    <button class="submit-btn" data-action="submit-admin-save" ${state.adminSaving?'disabled':''}>${state.adminSaving?'Menyimpan…':'Simpan Perubahan'}</button>
     <div class="guest-link-row">atau <button class="link-btn" data-action="close-admin">Batal</button></div>
   `;
   ['nama','whatsapp','alamat'].forEach(key=>{
@@ -1838,7 +1867,7 @@ function submitAdminPin(){
   renderAdminBody();
 }
 
-function submitAdminSave(){
+async function submitAdminSave(){
   const nama = state.adminForm.nama.trim();
   const whatsapp = state.adminForm.whatsapp.trim().replace(/[\s\-+]/g,'');
   const alamat = state.adminForm.alamat.trim();
@@ -1846,14 +1875,31 @@ function submitAdminSave(){
   if(!/^62[0-9]{8,13}$/.test(whatsapp)){ state.adminError='Nomor WhatsApp harus diawali 62 dan hanya angka (contoh: 6281234567890).'; renderAdminBody(); return; }
   if(!alamat){ state.adminError='Alamat toko wajib diisi.'; renderAdminBody(); return; }
 
-  STORE.nama = nama;
-  STORE.whatsapp = whatsapp;
-  STORE.alamat = alamat;
-  STORE.logo = state.adminForm.logo || '';
-  saveStoreSettingsOverride(nama, whatsapp, alamat, STORE.logo);
-  closeAdmin();
-  renderShell(); // rebuild header/hero/wa-link biar perubahan langsung kepakai
-  showToast('Pengaturan toko berhasil disimpan.');
+  state.adminSaving = true;
+  state.adminError = null;
+  renderAdminBody();
+  try{
+    // BARU: simpan ke server (bukan localStorage) - PIN dikirim ulang di sini
+    // biar server yang jadi penentu akhir boleh/gaknya perubahan tersimpan
+    // (lihat catatan ADMIN_PIN di atas + fungsi updatePengaturanToko di Apps Script).
+    const saved = await api('updatePengaturanToko', {
+      pin: state.adminForm.pin,
+      nama, whatsapp, alamat,
+      logo: state.adminForm.logo || ''
+    });
+    STORE.nama = saved.nama || nama;
+    STORE.whatsapp = saved.whatsapp || whatsapp;
+    STORE.alamat = saved.alamat || alamat;
+    STORE.logo = saved.logo || '';
+    state.adminSaving = false;
+    closeAdmin();
+    applyStoreBranding(); // update header dsb di device INI juga, tanpa nunggu reload
+    showToast('Pengaturan toko disimpan & langsung berlaku di semua perangkat.');
+  }catch(e){
+    state.adminSaving = false;
+    state.adminError = e.message || 'Gagal menyimpan ke server. Coba lagi.';
+    renderAdminBody();
+  }
 }
 
 function showToast(msg){
@@ -2300,6 +2346,7 @@ if(restoredSession){
 state.orders = loadGuestOrders();
 renderShell();
 loadKatalog();
+loadPengaturanToko(); // BARU: tarik Nama/Logo/Alamat/WA toko terbaru dari server, bukan localStorage
 if(restoredSession){
   loadRiwayatPelanggan();
   loadPoinMember();
