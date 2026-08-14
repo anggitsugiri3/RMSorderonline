@@ -203,6 +203,18 @@ input,textarea{font-family:inherit}
 .faq-item[data-open="true"] .faq-q .icon{transform:rotate(180deg)}
 .faq-a{padding:0 16px 14px;font-size:12.5px;color:hsl(var(--ink-soft));line-height:1.6}
 
+/* ---------- Legal (Syarat & Ketentuan / Kebijakan Refund) ---------- */
+.akun-menu{background:hsl(var(--card));border:1px solid hsl(var(--paper-line));border-radius:14px;margin:14px 16px 0;overflow:hidden}
+.akun-menu-btn{width:100%;display:flex;align-items:center;gap:10px;padding:13px 14px;border:none;background:none;font-size:13px;font-weight:500;color:hsl(var(--ink));text-align:left;border-bottom:1px solid hsl(var(--paper-line))}
+.akun-menu-btn:last-child{border-bottom:none}
+.akun-menu-btn .chev{margin-left:auto;color:hsl(var(--ink-soft))}
+.legal-text{font-size:12.5px;line-height:1.7;color:hsl(var(--ink-soft))}
+.legal-text h3{font-size:13px;color:hsl(var(--ink));margin:16px 0 6px}
+.legal-text h3:first-child{margin-top:0}
+.legal-text ul,.legal-text ol{margin:4px 0;padding-left:18px}
+.legal-text li{margin:3px 0}
+.legal-text .legal-updated{font-size:11px;color:hsl(var(--ink-soft));margin-bottom:10px}
+
 /* #tab-content butuh jarak bawah karena bottom-nav (dan mini-cart) sekarang
    position:fixed - tidak lagi makan ruang di alur dokumen seperti sticky dulu. */
 #tab-content{padding-bottom:76px}
@@ -319,20 +331,6 @@ input,textarea{font-family:inherit}
 .admin-logo-upload{display:inline-block;cursor:pointer}
 .toast{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;bottom:18px;z-index:80;background:hsl(var(--ink));color:#fff;text-align:center;font-size:12.5px;font-weight:600;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-md);opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity var(--dur),transform var(--dur)}
 .toast[data-open="true"]{opacity:1;transform:translateY(0)}
-
-/* ---------- Kartu panduan "Add to Home Screen" khusus iOS/Safari ----------
-   iOS tidak punya event beforeinstallprompt kayak Chrome/Android, jadi install
-   PWA di iPhone/iPad WAJIB manual lewat Share -> Tambah ke Layar Utama. Kartu
-   ini nongol otomatis buat nuntun langkahnya - lihat maybeShowIosInstallCard(). */
-.ios-install-card{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;bottom:88px;z-index:45;background:hsl(var(--card));border:1px solid hsl(var(--paper-line));border-radius:var(--r-md);box-shadow:var(--shadow-md);padding:14px 16px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity var(--dur),transform var(--dur)}
-.ios-install-card[data-open="true"]{opacity:1;transform:translateY(0);pointer-events:auto}
-.ios-install-close{position:absolute;top:8px;right:8px;border:none;background:hsl(var(--paper-mid));width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;color:hsl(var(--ink-soft));flex:none}
-.ios-install-close .icon{width:14px;height:14px}
-.ios-install-row{display:flex;align-items:flex-start;gap:10px;padding-right:22px}
-.ios-install-copy strong{display:block;font-size:13.5px;margin-bottom:4px}
-.ios-install-copy p{margin:6px 0 0;font-size:12px;color:hsl(var(--ink-soft));line-height:1.65}
-.ios-install-copy p.ios-install-warn{color:hsl(var(--red));margin-top:4px}
-.ios-install-copy .icon{width:14px;height:14px;vertical-align:-3px;color:hsl(var(--red));margin:0 1px}
 
 .riwayat-toolbar{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0}
 .riwayat-toolbar h2{margin:0}
@@ -530,8 +528,7 @@ const ICONS = {
   bank:'<path d="M3 22h18"/><path d="M6 18v-7"/><path d="M10 18v-7"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M2 11h20L12 3z"/>',
   coin:'<circle cx="12" cy="12" r="8"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 1.5-2.5 1.5-2.5 3"/><path d="M12 15h.01"/>',
   crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7Z"/><path d="M5 20h14"/>',
-  share:'<path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M20 15v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5"/>',
-  squarePlus:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8"/><path d="M8 12h8"/>'
+  fileText:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
 };
 function icon(name, cls){
   return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
@@ -642,7 +639,6 @@ function loadAuthSession(){
  * termasuk detail item buat re-open receipt, beda dari riwayatPelanggan server yang
  * cuma ringkasan). */
 const GUEST_ORDERS_STORAGE_KEY = 'ainiMartGuestOrders';
-const IOS_INSTALL_DISMISS_KEY = 'ainiMartIosInstallDismissedAt';
 function saveGuestOrders(){
   try{ localStorage.setItem(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(state.orders.slice(-30))); }catch(e){}
 }
@@ -754,9 +750,12 @@ function renderShell(){
       <div class="dialog" id="member-barcode-body"></div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="overlay" id="legal-overlay">
+      <div class="overlay-backdrop" data-action="close-legal"></div>
+      <div class="dialog" id="legal-body"></div>
+    </div>
 
-    <div class="ios-install-card" id="ios-install-card" data-open="false"></div>
+    <div class="toast" id="toast"></div>
   `;
 
   document.getElementById('wa-link').href = 'https://wa.me/'+STORE.whatsapp+'?text='+encodeURIComponent('Halo '+STORE.nama+', saya mau tanya-tanya.');
@@ -1192,8 +1191,107 @@ function tabAkun(){
           ${state.faqOpen===i ? '<div class="faq-a">'+esc(f.a)+'</div>' : ''}
         </div>`).join('')}
     </div>
+    <div class="akun-menu">
+      <button class="akun-menu-btn" data-action="open-legal" data-legal="tnc">${icon('fileText')}Syarat &amp; Ketentuan<span class="chev">${icon('chevronRight')}</span></button>
+      <button class="akun-menu-btn" data-action="open-legal" data-legal="refund">${icon('fileText')}Kebijakan Pengembalian Dana (Refund)<span class="chev">${icon('chevronRight')}</span></button>
+    </div>
     <div class="admin-entry-row"><button class="link-btn" data-action="open-admin">⚙ Pengaturan Toko (Admin)</button></div>
   `;
+}
+
+/* ================================================================
+   LEGAL — Syarat & Ketentuan + Kebijakan Refund
+   (item 2 & 3 daftar kelengkapan verifikasi iPaymu: FAQ sudah ada di
+   atas (tabAkun), dua ini nyusul supaya toko lolos review iPaymu)
+   ================================================================ */
+const LEGAL_UPDATED = '14 Agustus 2026'; // BARU: ganti tanggal tiap isi kebijakan ini diubah
+
+const LEGAL_CONTENT = {
+  tnc: {
+    title: 'Syarat & Ketentuan',
+    body: () => `
+      <div class="legal-updated">Terakhir diperbarui: ${LEGAL_UPDATED}</div>
+      <h3>1. Tentang Layanan</h3>
+      <p>Halaman ini adalah layanan pemesanan online milik <strong>${esc(STORE.nama)}</strong>, beralamat di ${esc(STORE.alamat)}. Dengan melakukan pemesanan lewat halaman ini, kamu dianggap sudah membaca dan menyetujui Syarat &amp; Ketentuan berikut.</p>
+      <h3>2. Akun Tamu &amp; Member</h3>
+      <ul>
+        <li>Belanja bisa dilakukan sebagai Tamu (tanpa akun) atau sebagai Member.</li>
+        <li>Data yang diminta saat checkout (nama &amp; nomor WhatsApp) dipakai toko untuk konfirmasi dan koordinasi pesanan, bukan untuk tujuan lain.</li>
+        <li>Member bertanggung jawab menjaga kerahasiaan nomor WhatsApp yang didaftarkan karena dipakai sebagai identitas login.</li>
+      </ul>
+      <h3>3. Pemesanan</h3>
+      <ul>
+        <li>Produk, harga, dan stok yang tampil mengikuti data terbaru dari toko dan bisa berubah sewaktu-waktu tanpa pemberitahuan sebelumnya.</li>
+        <li>Pesanan dianggap sah setelah kamu menekan tombol "Kirim Pesanan" dan menerima nomor pesanan di halaman struk.</li>
+        <li>Toko berhak membatalkan atau menyesuaikan pesanan bila stok ternyata habis atau ada kesalahan input harga/produk, dan akan menghubungi pemesan lewat WhatsApp.</li>
+      </ul>
+      <h3>4. Pembayaran</h3>
+      <ul>
+        <li><strong>Bayar di Tempat</strong> — dibayar tunai saat barang diambil/diterima.</li>
+        <li><strong>QRIS</strong> — dibayar via QR dinamis yang diproses melalui payment gateway iPaymu; status pembayaran terverifikasi otomatis, tidak perlu kirim bukti transfer manual.</li>
+        ${STORE.metodePembayaran.length ? `<li>Metode lain yang tersedia: ${esc(STORE.metodePembayaran.join(', '))}.</li>` : ''}
+      </ul>
+      <h3>5. Pengambilan &amp; Pengantaran</h3>
+      <p>Pesanan bisa diambil sendiri di toko sesuai jam operasional (${STORE.jamBuka}–${STORE.jamTutup}) atau diantar ke alamat yang diisi saat checkout. Ongkos kirim (jika ada) dan estimasi waktu antar dikonfirmasi toko lewat WhatsApp.</p>
+      <h3>6. Pembatalan Pesanan</h3>
+      <p>Pesanan berstatus "Baru" masih bisa dibatalkan sendiri lewat menu Pesanan. Pesanan yang sudah diproses toko hanya bisa dibatalkan lewat koordinasi WhatsApp, mengikuti ketentuan pada Kebijakan Pengembalian Dana.</p>
+      <h3>7. Poin Member</h3>
+      <p>Poin didapat dari transaksi yang berhasil dan bisa ditukar sebagai potongan belanja sesuai rasio yang berlaku saat checkout. Poin tidak dapat diuangkan dan bisa dibatalkan toko bila ditemukan indikasi kecurangan.</p>
+      <h3>8. Perubahan Ketentuan</h3>
+      <p>Toko dapat mengubah Syarat &amp; Ketentuan ini sewaktu-waktu. Perubahan berlaku sejak dipublikasikan di halaman ini.</p>
+      <h3>9. Kontak</h3>
+      <p>Pertanyaan seputar Syarat &amp; Ketentuan bisa disampaikan lewat WhatsApp toko di nomor ${esc(STORE.whatsapp)}.</p>
+    `
+  },
+  refund: {
+    title: 'Kebijakan Pengembalian Dana',
+    body: () => `
+      <div class="legal-updated">Terakhir diperbarui: ${LEGAL_UPDATED}</div>
+      <h3>1. Kapan Refund Berlaku</h3>
+      <ul>
+        <li>Barang yang diterima tidak sesuai pesanan (salah produk/jumlah).</li>
+        <li>Barang diterima dalam kondisi rusak atau tidak layak (kedaluwarsa, bocor, dsb).</li>
+        <li>Pesanan sudah dibayar (QRIS) tapi ternyata tidak bisa dipenuhi toko karena stok habis.</li>
+        <li>Pesanan dibatalkan toko sebelum diproses/dikirim.</li>
+      </ul>
+      <h3>2. Kapan Refund Tidak Berlaku</h3>
+      <ul>
+        <li>Pesanan sudah diterima dalam kondisi baik dan sesuai, lalu berubah pikiran (bukan cacat/salah kirim).</li>
+        <li>Klaim diajukan lewat batas waktu pelaporan di poin 3.</li>
+        <li>Kerusakan terjadi setelah barang diterima dan berada di luar tanggung jawab toko.</li>
+      </ul>
+      <h3>3. Cara Mengajukan</h3>
+      <ol>
+        <li>Hubungi WhatsApp toko di nomor <strong>${esc(STORE.whatsapp)}</strong> maksimal 1x24 jam sejak barang diterima (atau segera setelah tahu pesanan bermasalah).</li>
+        <li>Sertakan nomor pesanan, foto/video bukti produk, dan alasan pengajuan.</li>
+        <li>Toko akan memverifikasi klaim maksimal 1x24 jam kerja setelah laporan diterima lengkap.</li>
+      </ol>
+      <h3>4. Metode &amp; Waktu Pengembalian Dana</h3>
+      <ul>
+        <li><strong>Pembayaran QRIS (iPaymu)</strong> — dana dikembalikan ke rekening/e-wallet sumber pembayaran, estimasi 3–7 hari kerja setelah klaim disetujui.</li>
+        <li><strong>Bayar di Tempat</strong> — dikembalikan tunai saat serah terima barang pengganti, atau transfer bank sesuai kesepakatan dengan toko.</li>
+        <li>Alternatif lain (di luar refund tunai) adalah penggantian barang atau kompensasi Poin Member, sesuai kesepakatan pemesan dan toko.</li>
+      </ul>
+      <h3>5. Kontak</h3>
+      <p>Semua proses refund dikoordinasikan langsung lewat WhatsApp toko di nomor ${esc(STORE.whatsapp)} agar bisa dipantau kedua pihak.</p>
+    `
+  }
+};
+
+function openLegal(kind){
+  const c = LEGAL_CONTENT[kind];
+  if(!c) return;
+  document.getElementById('legal-body').innerHTML = `
+    <h2>${esc(c.title)}</h2>
+    <div class="legal-text">${c.body()}</div>
+    <div class="guest-link-row"><button class="link-btn" data-action="close-legal">Tutup</button></div>
+  `;
+  document.getElementById('legal-overlay').setAttribute('data-open','true');
+  document.body.style.overflow='hidden';
+}
+function closeLegal(){
+  document.getElementById('legal-overlay').setAttribute('data-open','false');
+  document.body.style.overflow='';
 }
 
 function attachFaqListeners(){
@@ -1556,7 +1654,6 @@ function closeAuth(){
   state.authOpen = false;
   document.getElementById('auth-overlay').setAttribute('data-open','false');
   document.body.style.overflow='';
-  setTimeout(maybeShowIosInstallCard, 400);
 }
 function setAuthMode(mode){ state.authMode = mode; state.authError = null; renderAuthBody(); }
 
@@ -2185,10 +2282,11 @@ document.addEventListener('click', function(e){
   else if(a==='retry-poin') loadPoinMember();
   else if(a==='open-member-barcode') openMemberBarcode();
   else if(a==='close-member-barcode') closeMemberBarcode();
-  else if(a==='close-ios-install') closeIosInstallCard();
+  else if(a==='open-legal') openLegal(t.dataset.legal);
+  else if(a==='close-legal') closeLegal();
 });
 document.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){ closeCart(); closeCheckout(); closeReceipt(); closeAuth(); closeAdmin(); closeMemberBarcode(); }
+  if(e.key==='Escape'){ closeCart(); closeCheckout(); closeReceipt(); closeAuth(); closeAdmin(); closeMemberBarcode(); closeLegal(); }
 });
 
 /* ================================================================
@@ -2257,69 +2355,6 @@ function renderInstallButton(){
   };
   document.body.appendChild(btn);
 }
-
-/* ================================================================
-   PWA — panduan install khusus iOS/Safari
-   ================================================================
-   iOS TIDAK PERNAH fire event beforeinstallprompt (Apple sengaja tidak
-   mendukungnya di WebKit), jadi tombol install custom di atas tidak akan
-   pernah muncul buat user iPhone/iPad. Satu-satunya cara install di iOS
-   adalah manual: Share -> Tambah ke Layar Utama. Kartu di bawah ini nuntun
-   langkah itu otomatis begitu kebuka di Safari iOS (dan belum ke-install). */
-function isIosDevice_(){
-  const ua = navigator.userAgent || '';
-  const isIphoneIpod = /iPhone|iPod/.test(ua);
-  // iPadOS 13+ nyamar jadi "Macintosh" di UA, satu-satunya pembeda dari Mac
-  // beneran adalah dukungan multi-touch (Mac desktop maxTouchPoints = 0).
-  const isIpad = /iPad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  return isIphoneIpod || isIpad;
-}
-function isStandaloneMode_(){
-  // navigator.standalone = properti khusus Safari iOS. matchMedia = fallback umum.
-  return window.navigator.standalone === true ||
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
-}
-function isInAppBrowser_(){
-  // Best-effort saja — banyak in-app browser (WhatsApp/Line dll di iOS) tidak
-  // selalu nambah penanda khusus di UA-nya. Kalau ke-detect, kita kasih step
-  // tambahan "buka di Safari dulu"; kalau tidak ke-detect, tetap aman karena
-  // instruksi utamanya (tap Share) sama saja di Safari.
-  const ua = navigator.userAgent || '';
-  return /FBAN|FBAV|Instagram|Line\/|MicroMessenger|TikTok|; wv\)/i.test(ua);
-}
-function buildIosInstallCardHtml_(){
-  const warn = isInAppBrowser_()
-    ? '<p class="ios-install-warn">Kelihatannya link ini kebuka di dalam aplikasi lain (bukan Safari) — tap <strong>⋯</strong> atau <strong>↗</strong> di pojok kanan atas dulu, pilih <strong>"Buka di Safari"</strong>. Baru lanjut langkah ini:</p>'
-    : '';
-  return ''+
-    '<button class="ios-install-close" data-action="close-ios-install" aria-label="Tutup">'+icon('x')+'</button>'+
-    '<div class="ios-install-row">'+
-      '<div class="store-mark">'+(STORE.logo ? '<img src="'+STORE.logo+'" alt="">' : esc(STORE.nama.charAt(0)))+'</div>'+
-      '<div class="ios-install-copy">'+
-        '<strong>Install '+esc(STORE.nama)+' di iPhone kamu</strong>'+
-        warn+
-        '<p>Tap tombol Share '+icon('share')+' di bar bawah Safari, lalu pilih <strong>Tambah ke Layar Utama</strong> '+icon('squarePlus')+'.</p>'+
-      '</div>'+
-    '</div>';
-}
-function maybeShowIosInstallCard(){
-  const card = document.getElementById('ios-install-card');
-  if(!card) return;
-  if(state.authOpen) return; // jangan numpuk di atas modal masuk/tamu
-  if(!isIosDevice_() || isStandaloneMode_()) return;
-  try{
-    const dismissedAt = Number(localStorage.getItem(IOS_INSTALL_DISMISS_KEY) || 0);
-    if(dismissedAt && (Date.now() - dismissedAt) < 14*24*60*60*1000) return; // sudah ditutup < 14 hari lalu
-  }catch(e){}
-  card.innerHTML = buildIosInstallCardHtml_();
-  card.setAttribute('data-open','true');
-}
-function closeIosInstallCard(){
-  const card = document.getElementById('ios-install-card');
-  if(card) card.setAttribute('data-open','false');
-  try{ localStorage.setItem(IOS_INSTALL_DISMISS_KEY, String(Date.now())); }catch(e){}
-}
-setTimeout(maybeShowIosInstallCard, 1200);
 </script>
 </body>
 </html>
