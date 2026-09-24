@@ -998,7 +998,7 @@ async function api(action, params) {
 
 /**
  * Emoji fallback kalau produk belum punya Foto di server. Produk retail biasa tetap
- * 🛒; produk kategori Jajanan ditebak dari nama (seblak/sate bakar/kopi/es teh).
+ * 🛒; produk kategori Jajanan (Seblak/Bakaran/Kopi/Es Teh/dll) ditebak dari nama produk.
  */
 function emojiProduk(nama, kategori) {
   if (!isJajananKategori(kategori)) return '🛒';
@@ -1199,7 +1199,13 @@ function isStoreOpen(){
   const nowMin = now.getHours()*60+now.getMinutes();
   return nowMin >= (oh*60+om) && nowMin < (ch*60+cm);
 }
-function isJajananKategori(k){ return /jajanan/i.test(String(k||'')); }
+/* Kategori jajanan = nama kategori mengandung: jajanan, seblak, bakaran, kopi, es teh / esteh.
+   Kategori Topping SENGAJA dikecualikan (topping bukan menu sendiri, lihat isToppingKategori).
+   Kata kunci WAJIB sama dgn ProdukPage_JAJANAN_RE di Produk.html (admin kasir). */
+function isJajananKategori(k){
+  k = String(k||'');
+  return /jajanan|seblak|bakaran|kopi|\bes\s*teh|esteh/i.test(k) && !isToppingKategori(k);
+}
 /* ---- Topping Seblak: topping = produk biasa di kasir (kategori yang namanya mengandung
    "topping"), jadi harga & stoknya divalidasi server seperti produk lain. Produk kategori
    topping tidak ditampilkan sebagai menu sendiri, cuma muncul sebagai pilihan di detail Seblak. ---- */
@@ -1359,7 +1365,7 @@ function filteredProducts(){
   return list;
 }
 /** Daftar kategori di tab Jajanan (pola sama categoriesFromProducts() milik Belanja):
- *  cuma kategori server yang namanya mengandung "jajanan". */
+ *  cuma kategori server yang lolos isJajananKategori() (jajanan/seblak/bakaran/kopi/es teh). */
 function categoriesJajanan(){
   const set = new Set(produkTampil().filter(p=>isJajananKategori(p.kategori)).map(p=>p.kategori));
   return ['Semua', ...Array.from(set)];
@@ -1373,15 +1379,16 @@ function jajananKategoriAktif(){
 function jajananChipLabel(c){
   return c==='Semua' ? c : (String(c).replace(/^\s*jajanan\s*[-\u2013:&]*\s*/i,'').trim() || c);
 }
-/** Produk tab Jajanan (terpisah dari Belanja) - semua kategori yang namanya mengandung "jajanan". */
+/** Produk tab Jajanan (terpisah dari Belanja) - semua kategori yang lolos isJajananKategori().
+ *  Pencarian cocok ke nama produk ATAU nama kategori, abaikan spasi ("es teh" = kategori "Esteh"),
+ *  biar pintasan Beranda (Seblak/Bakaran/Kopi/Es Teh) tetap kena walau nama produknya tidak memuat kata itu. */
 function filteredJajanan(){
   let list = produkTampil().filter(p=>isJajananKategori(p.kategori));
   const cat = jajananKategoriAktif();
   if(cat!=='Semua') list = list.filter(p=>p.kategori===cat);
-  if(state.search.trim()){
-    const q = state.search.trim().toLowerCase();
-    list = list.filter(p=>p.nama.toLowerCase().includes(q));
-  }
+  const norm = s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const q = norm(state.search);
+  if(q) list = list.filter(p=>norm(p.nama).includes(q) || norm(p.kategori).includes(q));
   return list;
 }
 function cartLines(){
