@@ -14,6 +14,9 @@
 <meta name="apple-mobile-web-app-title" content="A'ini Mart">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Apps Script: POST ke script.google.com lalu di-redirect ke script.googleusercontent.com - sambungkan dua-duanya lebih awal -->
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <!-- Ikon Material Symbols (subset 54 ikon). Tambah ikon baru = tambahkan namanya di &icon_names (urut abjad). -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=add,add_shopping_cart,arrow_back,arrow_forward,bakery_dining,bolt,call,category,chat,check,check_circle,chevron_right,child_care,cleaning_services,close,cloud_off,confirmation_number,cookie,delete,eco,event_available,favorite,grid_view,grocery,home,info,inventory_2,local_cafe,local_drink,local_fire_department,local_mall,local_offer,local_shipping,location_on,loyalty,medical_services,monetization_on,outdoor_grill,person,price_check,print,ramen_dining,receipt_long,recommend,redeem,remove,remove_shopping_cart,schedule,search,sell,share,shopping_bag,shopping_basket,shopping_cart,skillet,spa,stars,storefront,sync,timer,tune,verified&display=block" rel="stylesheet">
 <style>
@@ -972,9 +975,17 @@ const HOME_HERO_IMG = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAs27i
    ================================================================ */
 const BACKEND_URL = 'https://script.google.com/macros/s/AKfycbxlyManslLRkZdiuxkHGcQCJa3Efpgqc_Zn1vFfdPqtmkzRFOvoby8hcGOB4LfHQjGK/exec';
 
-async function api(action, params) {
+/* Opsi untuk aksi BACA (aman diulang): katalog, tebus, pengaturan toko. Apps Script kadang
+   lambat bangun (cold start), balas halaman error HTML, atau menolak karena terlalu banyak
+   eksekusi paralel - itu penyebab "kadang error / kadang lama". Diulang otomatis, timeout
+   per percobaan lebih pendek biar percobaan berikutnya cepat jalan. JANGAN dipakai untuk aksi
+   TULIS (buat pesanan, login, daftar, batal) - default api() TIDAK mengulang. */
+const API_READ = { retries: 2, timeoutMs: 15000 };
+const API_RETRY_DELAY_MS = [500, 1500];
+
+async function apiOnce_(action, params, timeoutMs) {
   const controller = new AbortController();
-  const timeoutId = setTimeout(function () { controller.abort(); }, 25000);
+  const timeoutId = setTimeout(function () { controller.abort(); }, timeoutMs);
   let res;
   try {
     res = await fetch(BACKEND_URL, {
@@ -984,16 +995,40 @@ async function api(action, params) {
       signal: controller.signal
     });
   } catch (e) {
-    if (e.name === 'AbortError') throw new Error('Server tidak merespon (timeout). Coba lagi.');
-    throw new Error('Gagal terhubung ke server. Cek koneksi internet kamu.');
+    const err = new Error(e.name === 'AbortError'
+      ? 'Server tidak merespon (timeout). Coba lagi.'
+      : 'Gagal terhubung ke server. Cek koneksi internet kamu.');
+    err.retryable = navigator.onLine !== false; // offline beneran = jangan buang waktu mengulang
+    throw err;
   } finally {
     clearTimeout(timeoutId);
   }
   let json;
   try { json = await res.json(); }
-  catch (e) { throw new Error('Server mengembalikan respon tidak valid.'); }
-  if (!json.success) throw new Error(json.message || 'Terjadi kesalahan pada server.');
+  catch (e) {
+    const err = new Error('Server mengembalikan respon tidak valid.');
+    err.retryable = true; // biasanya halaman error/kuota Apps Script sesaat
+    throw err;
+  }
+  if (!json.success) throw new Error(json.message || 'Terjadi kesalahan pada server.'); // error bisnis: tidak diulang
   return json.data;
+}
+
+async function api(action, params, opts) {
+  opts = opts || {};
+  const retries = opts.retries || 0;
+  const timeoutMs = opts.timeoutMs || 25000;
+  let lastErr;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    if (attempt > 0) await new Promise(function (r) { setTimeout(r, API_RETRY_DELAY_MS[attempt - 1] || 1500); });
+    try {
+      return await apiOnce_(action, params, timeoutMs);
+    } catch (e) {
+      lastErr = e;
+      if (!e.retryable) throw e;
+    }
+  }
+  throw lastErr;
 }
 
 /**
@@ -1038,18 +1073,45 @@ function mapProdukPublik(p) {
  * "Coba lagi".
  */
 async function loadTebus(){
-  state.tebusError = null; TEBUS = [];
+  state.tebusError = null;   // daftar TEBUS lama sengaja TIDAK dikosongkan di sini - tetap tampil sampai data baru datang
   try{
-    const td = await api('apiTebusMurahPublik', {});
+    const td = await api('apiTebusMurahPublik', {}, API_READ);
     const arr = Array.isArray(td) ? td : (td && Array.isArray(td.data) ? td.data : []);
     TEBUS = arr.map(mapTebus).filter(t=>t.id && t.harga>0);
-  }catch(e){ state.tebusError = e.message || 'tidak diketahui'; console.warn('apiTebusMurahPublik gagal:', e); }
+  }catch(e){
+    console.warn('apiTebusMurahPublik gagal:', e);
+    if(!TEBUS.length) state.tebusError = e.message || 'tidak diketahui';   // punya data lama = diam-diam pakai itu
+  }
 }
 
 /* Waktu terakhir katalog sukses ditarik dari server (ms epoch) - dipakai throttle
    refreshKatalogSenyap(). */
 let katalogTerakhirMs = 0, katalogSenyapBusy = false;
 const KATALOG_SENYAP_MIN_MS = 30000;
+
+/* Cache katalog di device (stale-while-revalidate): buka app -> katalog TERAKHIR langsung
+   tampil dari sini (tanpa nunggu Apps Script), lalu ditimpa data segar begitu server jawab.
+   Yang disimpan data mentah server (bukan hasil mapProdukPublik) supaya aturan kategori/emoji
+   selalu ikut versi kode terbaru. Kadaluarsa 3 hari; localStorage penuh/diblok = diabaikan. */
+const KATALOG_CACHE_KEY = 'ainiMartKatalogV1';
+const KATALOG_CACHE_MAX_AGE_MS = 3 * 24 * 3600 * 1000;
+function bacaKatalogCache_() {
+  try {
+    const o = JSON.parse(localStorage.getItem(KATALOG_CACHE_KEY) || 'null');
+    if (o && Array.isArray(o.data) && o.data.length && (Date.now() - o.t) < KATALOG_CACHE_MAX_AGE_MS) return o;
+  } catch (e) {}
+  return null;
+}
+function simpanKatalogCache_(data) {
+  try { localStorage.setItem(KATALOG_CACHE_KEY, JSON.stringify({ t: Date.now(), data: data })); } catch (e) {}
+}
+/** Pasang data katalog dari server sebagai PRODUCTS + simpan cache. */
+function terapkanKatalog_(data) {
+  data = Array.isArray(data) ? data : [];
+  PRODUCTS = data.map(mapProdukPublik);
+  katalogTerakhirMs = Date.now();
+  simpanKatalogCache_(data);
+}
 
 /**
  * Tarik ulang katalog dari server kasir TANPA layar "Memuat..." - dipanggil tiap tab
@@ -1062,9 +1124,7 @@ async function refreshKatalogSenyap() {
   if (Date.now() - katalogTerakhirMs < KATALOG_SENYAP_MIN_MS) return;
   katalogSenyapBusy = true;
   try {
-    const data = await api('apiKatalogProdukPublik', {});
-    PRODUCTS = (data || []).map(mapProdukPublik);
-    katalogTerakhirMs = Date.now();
+    terapkanKatalog_(await api('apiKatalogProdukPublik', {}, { retries: 1, timeoutMs: 15000 }));
     renderTabContent();
     renderMiniCart();
   } catch (e) {
@@ -1075,26 +1135,46 @@ async function refreshKatalogSenyap() {
 }
 
 /**
- * Load katalog produk publik dari backend. Dipanggil sekali saat init, dan
- * boleh dipanggil ulang manual (retry) kalau gagal.
+ * Load katalog produk publik dari backend. Dipanggil sekali saat init, setelah pesanan
+ * sukses, dan boleh dipanggil ulang manual (retry) kalau gagal.
+ *
+ * Urutan (supaya terasa cepat):
+ * 1. Kalau PRODUCTS masih kosong tapi ada cache di device -> tampilkan cache SEKARANG juga.
+ *    Layar "Memuat katalog..." cuma muncul kalau memang belum ada data sama sekali
+ *    (kunjungan pertama).
+ * 2. Katalog & Tebus Murah diminta BARENGAN (dulu Tebus menunggu katalog selesai dulu, jadi
+ *    waktu tunggu dobel, dan katalog baru tampil setelah dua-duanya kelar).
+ * 3. Katalog langsung dirender begitu datang; Tebus dirender menyusul kapan pun selesai.
+ * 4. Gagal + sudah ada data (cache/sebelumnya) = diam-diam pakai data itu, tanpa layar error.
  */
 async function loadKatalog() {
-  state.katalogLoading = true;
   state.katalogError = null;
+  if (!PRODUCTS.length) {
+    const cache = bacaKatalogCache_();
+    if (cache) PRODUCTS = cache.data.map(mapProdukPublik);
+  }
+  state.katalogLoading = PRODUCTS.length === 0;
   renderTabContent();
+  if (PRODUCTS.length) renderMiniCart();
+
+  const tebusP = loadTebus();
   try {
-    const data = await api('apiKatalogProdukPublik', {});
-    PRODUCTS = (data || []).map(mapProdukPublik);
-    katalogTerakhirMs = Date.now();
+    terapkanKatalog_(await api('apiKatalogProdukPublik', {}, API_READ));
     state.katalogLoading = false;
-    await loadTebus();
   } catch (e) {
     state.katalogLoading = false;
-    state.katalogError = e.message || 'Gagal memuat katalog produk.';
+    if (PRODUCTS.length) console.warn('Katalog gagal diperbarui, pakai data yang ada:', e.message);
+    else state.katalogError = e.message || 'Gagal memuat katalog produk.';
   }
   updateStatusPill();
   renderTabContent();
   renderMiniCart();
+
+  tebusP.then(function () {
+    renderTabContent();
+    renderMiniCart();
+    if (state.cartOpen) renderCartBody();
+  });
 }
 
 /**
@@ -1124,7 +1204,7 @@ function applyStoreBranding(){
  */
 async function loadPengaturanToko(){
   try{
-    const s = await api('pengaturanTokoPublik', {});
+    const s = await api('pengaturanTokoPublik', {}, API_READ);
     if(!s) return;
     if(s.nama) STORE.nama = s.nama;
     if(s.whatsapp) STORE.whatsapp = s.whatsapp;
@@ -1406,8 +1486,14 @@ function mapTebus(t){
     selesai: t.tanggalSelesai ? (new Date(t.tanggalSelesai).getTime()||0) : 0 };  // ms epoch, 0 = tidak diketahui
 }
 function belanjaBiasa(){ return cartLines().reduce((s,l)=>s+l.qty*hargaAkhir(l.produk),0); }
+/* Jajanan & topping (seblak/bakaran/kopi/es teh/topping/...) TIDAK dihitung ke syarat Tebus Murah -
+   cuma belanjaan retail biasa. belanjaBiasa() tetap total SEMUA item (dipakai total bayar);
+   belanjaSyaratTebus() khusus untuk cek syarat minimal. WAJIB sama dgn server
+   (PesananOnlineService._resolveItemsTebus -> KategoriService.isJajananNama). */
+function isJajananLine(l){ const k = l.produk.kategori; return isJajananKategori(k) || isToppingKategori(k); }
+function belanjaSyaratTebus(){ return cartLines().filter(l=>!isJajananLine(l)).reduce((s,l)=>s+l.qty*hargaAkhir(l.produk),0); }
 function tebusMin(){ return TEBUS.length ? Math.min.apply(null, TEBUS.map(t=>t.min)) : TEBUS_MIN_DEFAULT; }
-function tebusEligible(t){ return belanjaBiasa() >= t.min; }
+function tebusEligible(t){ return belanjaSyaratTebus() >= t.min; }
 function tebusPicked(){ return TEBUS.filter(t=>state.tebus.includes(t.id) && tebusEligible(t)); }
 function pruneTebus(){ state.tebus = state.tebus.filter(id=>{ const t=TEBUS.find(x=>x.id===id); return t && tebusEligible(t); }); }
 function toggleTebus(id){
@@ -1634,7 +1720,7 @@ function updateCartBadge(){
   if(db){ db.textContent = n; db.style.display = n>0 ? 'flex' : 'none'; }
 }
 function tebusProgressHtml(){
-  const min = tebusMin(), b = belanjaBiasa();
+  const min = tebusMin(), b = belanjaSyaratTebus();
   const pct = Math.min(100, Math.floor(b/min*100));
   const picked = tebusPicked().length;
   const txt = b<min ? 'Belanja <b>'+rupiah(min-b)+' lagi</b> untuk Tebus Murah'
@@ -1642,14 +1728,14 @@ function tebusProgressHtml(){
   const act = b<min ? pct+'%' : (!TEBUS.length ? '100%' : (picked===0 ? 'Pilih' : 'Ubah'));
   return '<span class="mc-tebus" data-action="open-tebus"><span class="mc-row"><span class="mc-txt">'+msym('redeem','fill')+'<span>'+txt+'</span></span><b>'+act+'</b></span>'
     + '<span class="mc-bar"><i style="width:'+pct+'%"></i></span>'
-    + '<span class="mc-sub">Terkumpul '+rupiah(b)+' • Target '+rupiah(min)+'</span></span>';
+    + '<span class="mc-sub">Terkumpul '+rupiah(b)+' • Target '+rupiah(min)+(cartLines().some(isJajananLine) ? ' • jajanan tidak dihitung' : '')+'</span></span>';
 }
 
 function renderMiniCart(){
   const mount = document.getElementById('mini-cart-mount');
   const tabContent = document.getElementById('tab-content');
   const n = cartCount();
-  const show = n>0 && (state.tab==='beranda' || state.tab==='belanja' || state.tab==='promo');
+  const show = n>0 && (state.tab==='beranda' || state.tab==='belanja' || state.tab==='jajanan' || state.tab==='promo');
   if(show){
     mount.innerHTML = `
       <button class="mini-cart" data-action="open-cart">
@@ -1942,7 +2028,6 @@ function tabBeranda(){
   const terdaftar = !!(isMember && m && m.terdaftar);
   const diskon = PRODUCTS.filter(p=>p.diskonPersen>0).slice(0,6);
   const promoCount = PRODUCTS.filter(p=>p.diskonPersen>0).length + PROMOS.length;
-  const nCart = cartCount();
   const cats = categoriesFromProducts().filter(c=>c!=='Semua').slice(0,8);
 
   // --- 2. kartu member / poin / promo ---
@@ -1990,9 +2075,9 @@ function tabBeranda(){
         <span class="hm-q-ic" style="background:#d91a2a;color:#fff">${msym('local_fire_department')}${promoCount>0 ? '<span class="hm-q-badge pulse" style="background:#f6bf22;color:#251a00">HOT</span>' : ''}</span>
         <span class="hm-q-lbl">Promo</span>
       </button>
-      <button class="hm-q" data-action="open-cart">
-        <span class="hm-q-ic" style="background:#ffdf99;color:#5a4300">${msym('shopping_cart')}${nCart>0 ? '<span class="hm-q-badge" style="background:#b0001a;color:#fff">'+nCart+'</span>' : ''}</span>
-        <span class="hm-q-lbl">Keranjang</span>
+      <button class="hm-q" data-action="open-jajanan">
+        <span class="hm-q-ic" style="background:#ffdf99;color:#5a4300">${msym('local_fire_department')}</span>
+        <span class="hm-q-lbl">Jajanan</span>
       </button>
       <button class="hm-q" data-action="shop-category" data-category="Semua">
         <span class="hm-q-ic" style="background:#d5e3ff;color:#001c3b">${msym('shopping_bag')}</span>
@@ -2026,7 +2111,7 @@ function tabBeranda(){
   const catHtml = cats.length ? `
     <section class="hm-sec">
       <div class="hm-sec-head">
-        <h3>Kategori Pilihan</h3>
+        <h3>Belanja Kebutuhan Harian</h3>
         <button class="hm-more" data-action="shop-category" data-category="Semua">Semua Kategori</button>
       </div>
       <div class="hm-cats">
@@ -2180,14 +2265,14 @@ function promoChipsHtml(diskon){
 }
 
 function promoTrackerHtml(){
-  const b = belanjaBiasa(), min = tebusMin(), ok = b>=min;
+  const b = belanjaSyaratTebus(), min = tebusMin(), ok = b>=min;
   const pct = Math.min(100, Math.round(b/min*100));
   return `<section class="pm-sec">
     <div class="pm-track">
       <h2>${msym('redeem','fill')}<span>Tebus Murah Serba Hemat</span></h2>
-      <p>Cukup belanja min. <b>${rupiah(min)}</b> produk apa saja, langsung bisa pilih maks. ${TEBUS_MAX} produk tebus murah di bawah!</p>
+      <p>Cukup belanja min. <b>${rupiah(min)}</b> produk belanja apa saja (jajanan tidak dihitung), langsung bisa pilih maks. ${TEBUS_MAX} produk tebus murah di bawah!</p>
       <div class="pm-track-card">
-        <div class="pm-track-row"><span>${msym('shopping_bag')}Total Belanja Keranjang:</span><b>${rupiah(b)}</b></div>
+        <div class="pm-track-row"><span>${msym('shopping_bag')}Belanja terhitung (tanpa jajanan):</span><b>${rupiah(b)}</b></div>
         <div class="pm-bar"><i style="width:${pct}%"></i></div>
         <div class="pm-track-st${ok?' ok':''}">${msym(ok?'check_circle':'info','fill')}<span>${ok
           ? 'Syarat Tebus Murah terpenuhi! Silakan pilih maks. '+TEBUS_MAX+' produk tebus.'
@@ -2222,7 +2307,7 @@ function promoCatalogHtml(diskon){
 }
 
 function promoTebusItemHtml(t){
-  const b = belanjaBiasa(), full = state.tebus.length>=TEBUS_MAX;
+  const b = belanjaSyaratTebus(), full = state.tebus.length>=TEBUS_MAX;
   const on = state.tebus.includes(t.id), ok = b>=t.min, id = esc(t.id);
   const btn = on ? '<button class="pm-btn on" data-action="tebus-toggle" data-id="'+id+'">'+msym('check')+'<span>Dipilih</span></button>'
     : (!ok ? '<button class="pm-btn off" disabled>Belanja '+rupiah(t.min-b)+' lagi</button>'
@@ -2629,11 +2714,11 @@ function openCart(){ state.cartOpen=true; document.getElementById('cart-overlay'
 function closeCart(){ state.cartOpen=false; document.getElementById('cart-overlay').setAttribute('data-open','false'); document.body.style.overflow=''; }
 
 function tebusSectionHtml(){
-  const b = belanjaBiasa(), full = state.tebus.length>=TEBUS_MAX;
+  const b = belanjaSyaratTebus(), full = state.tebus.length>=TEBUS_MAX;
   return `<section class="tb" id="ct-tebus">
     <div class="tb-banner">
       <span class="tb-ic">${msym('redeem','fill')}</span>
-      <div><i>Promo Spesial</i><p>Tebus Murah Serba Hemat!</p><small>Belanja min. ${rupiah(tebusMin())}, pilih maks. ${TEBUS_MAX} item tebus murah:</small></div>
+      <div><i>Promo Spesial</i><p>Tebus Murah Serba Hemat!</p><small>Belanja min. ${rupiah(tebusMin())} (jajanan tidak dihitung), pilih maks. ${TEBUS_MAX} item tebus murah:</small></div>
     </div>
     ${TEBUS.length ? '' : '<div class="tb-empty">'+(state.tebusError ? 'Gagal memuat produk tebus: '+esc(state.tebusError)+'<br><small>Server: …'+esc(BACKEND_URL.slice(-14))+'</small> <button class="link-btn" data-action="retry-tebus">Coba lagi</button>' : 'Belum ada produk Tebus Murah yang tersedia dari toko saat ini.')+'</div>'}
     <div class="tb-row">${TEBUS.map(t=>{
@@ -4070,7 +4155,7 @@ function detailPromoHtml(p){
   if(p.diskonPersen>0) cards.push(card('Harga Spesial','sell','<div><b>Beli 1: '+homeRp(hargaAkhir(p))+'/'+sat+'</b><small>Minimal pembelian 1 '+sat+'</small></div>'));
   const t = TEBUS.find(x=>String(x.id)===String(p.id));
   if(t){
-    const b = belanjaBiasa(), on = state.tebus.includes(t.id), id = esc(t.id);
+    const b = belanjaSyaratTebus(), on = state.tebus.includes(t.id), id = esc(t.id);
     const btn = on ? '<button class="dt-tbtn on" data-action="tebus-toggle" data-id="'+id+'">Dipilih</button>'
       : (b<t.min ? '<button class="dt-tbtn" disabled>Belanja '+homeRp(t.min-b)+' lagi</button>'
       : (state.tebus.length>=TEBUS_MAX ? '<button class="dt-tbtn" disabled>Maks. '+TEBUS_MAX+' item</button>'
