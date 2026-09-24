@@ -1326,6 +1326,15 @@ const state = {
   cartOpen: false,
   checkoutOpen: false,
   shareLokasi: true,   // centang "Bagikan lokasi ke kurir" di checkout Diantar
+  // PREFETCH lokasi (fix "Kirim Pesanan lama") - Promise getLokasi_() yang dimulai
+  // SEDINI mungkin (checkout dibuka/metode diganti ke Diantar/checkbox dicentang),
+  // BUKAN ditunda sampai klik Kirim Pesanan. GPS (enableHighAccuracy) bisa makan
+  // sampai 8 detik sendiri - dulu itu semua nunggu SEBELUM request ke server mulai
+  // sama sekali, jadi Total delay = ambil lokasi + request server, DIJUMLAH. Sekarang
+  // jalan BARENGAN selagi customer masih isi Nama/WhatsApp/Alamat, submitOrder()
+  // tinggal `await` Promise yang (biasanya) sudah selesai duluan. null = belum ada
+  // percobaan aktif untuk sesi checkout ini.
+  lokasiPrefetch: null,
   receiptOrder: null,
   method: 'ambil',
   payment: 'cod', // BARU: 'cod' (Bayar di Tempat) | 'qris' | 'va'
@@ -2857,7 +2866,7 @@ function openCheckout(){
   document.body.style.overflow='hidden';
   if(state.auth.status==='member') loadPoinMember(); // saldo terbaru
 }
-function closeCheckout(){ state.checkoutOpen=false; document.getElementById('checkout-overlay').setAttribute('data-open','false'); document.body.style.overflow=''; }
+function closeCheckout(){ state.checkoutOpen=false; state.lokasiPrefetch=null; document.getElementById('checkout-overlay').setAttribute('data-open','false'); document.body.style.overflow=''; }
 function setMethod(m){ state.method=m; renderCheckoutBody(); renderTabContent(); }
 function setPayment(p){ state.payment=p; renderCheckoutBody(); }
 
@@ -3068,7 +3077,7 @@ function renderCheckoutBody(){
     <div class="field"><label for="inp-nama">Nama Pelanggan</label><input id="inp-nama" type="text" placeholder="Nama kamu" value="${esc(state.form.nama)}"></div>
     <div class="field"><label for="inp-wa">Nomor WhatsApp</label><input id="inp-wa" type="tel" placeholder="08xx-xxxx-xxxx" value="${esc(state.form.wa)}"></div>
     <div id="poin-section">${isMember ? poinRedeemSection() : ''}</div>
-    ${state.method==='antar' ? `<div class="field"><label for="inp-alamat">Alamat Pengantaran</label><textarea id="inp-alamat" rows="2" placeholder="Jalan, nomor rumah, patokan">${esc(state.form.alamat)}</textarea></div><label class="loc-opt"><input type="checkbox" id="inp-lokasi" ${state.shareLokasi?'checked':''}><span>Bagikan lokasi saya ke kurir toko<small>Browser akan minta izin lokasi saat kamu klik Kirim Pesanan.</small></span></label>` : ''}
+    ${state.method==='antar' ? `<div class="field"><label for="inp-alamat">Alamat Pengantaran</label><textarea id="inp-alamat" rows="2" placeholder="Jalan, nomor rumah, patokan">${esc(state.form.alamat)}</textarea></div><label class="loc-opt"><input type="checkbox" id="inp-lokasi" ${state.shareLokasi?'checked':''}><span>Bagikan lokasi saya ke kurir toko<small>Browser akan minta izin lokasi sekarang, biar Kirim Pesanan nanti lebih cepat.</small></span></label>` : ''}
     <div class="field"><label for="inp-catatan">Catatan (opsional)</label><textarea id="inp-catatan" rows="2" placeholder="Mis. ganti merk lain jika habis">${esc(state.form.catatan)}</textarea></div>
     <div class="field-label-plain">Metode Pembayaran</div>
     <div class="method-toggle">
@@ -3082,8 +3091,9 @@ function renderCheckoutBody(){
     <button class="submit-btn" id="submit-order-btn" data-action="submit-order" ${isSubmitEnabled()?'':'disabled'}>Kirim Pesanan</button>
     <div class="submit-hint">Toko akan mengonfirmasi pesananmu lewat WhatsApp ke nomor yang kamu isi.</div>
   `;
+  prefetchLokasi_();   // mulai ambil lokasi sedini mungkin - lihat catatan state.lokasiPrefetch
   const lokChk = document.getElementById('inp-lokasi');
-  if(lokChk) lokChk.addEventListener('change', e=>{ state.shareLokasi = e.target.checked; });
+  if(lokChk) lokChk.addEventListener('change', e=>{ state.shareLokasi = e.target.checked; prefetchLokasi_(); });
   ['nama','wa','alamat','catatan'].forEach(key=>{
     const elm = document.getElementById('inp-'+key);
     if(!elm) return;
@@ -3123,10 +3133,18 @@ async function submitOrder(){
 
   try{
     // Lokasi otomatis ikut pesanan (masuk Catatan -> terbaca kasir & kurir). Gagal/ditolak = pesanan tetap dikirim.
+    // FIX (lama banget pas Kirim Pesanan): dulu getLokasi_() BARU dipanggil di sini,
+    // SETELAH klik Kirim Pesanan - GPS (`enableHighAccuracy`) bisa makan sampai 8 detik
+    // sendiri, DIJUMLAH ke waktu request server (bukan bareng), jadi "Mengirim..."
+    // nyangkut lama padahal server-nya sendiri belum tentu lambat. Sekarang `getLokasi_()`
+    // sudah dimulai lebih awal lewat prefetchLokasi_() (saat checkout dibuka/metode
+    // Diantar/checkbox dicentang) - di sini tinggal `await` Promise yang biasanya SUDAH
+    // selesai duluan sambil customer isi Nama/WhatsApp/Alamat. `|| getLokasi_()` cuma
+    // jaring pengaman kalau prefetch entah kenapa belum sempat jalan sama sekali.
     let lokasi = null;
     if(state.method==='antar' && state.shareLokasi){
       if(btn) btn.textContent = 'Mengambil lokasi...';
-      lokasi = await getLokasi_();
+      lokasi = await (state.lokasiPrefetch || getLokasi_());
       if(btn) btn.textContent = 'Mengirim...';
     }
     const saved = await api('apiBuatPesananOnlinePublik', {
@@ -3198,6 +3216,7 @@ async function submitOrder(){
     state.method = 'ambil';
     state.payment = 'cod';
     state.vaBank = '';
+    state.lokasiPrefetch = null;   // reset - checkout berikutnya ambil lokasi baru, bukan bekas pesanan ini
     state.submitting = false;
     closeCheckout();
     refresh();
@@ -3820,6 +3839,18 @@ function getLokasi_(){
       ()=>res(null),
       { enableHighAccuracy:true, timeout:8000, maximumAge:60000 });
   });
+}
+/**
+ * Mulai ambil lokasi SEDINI mungkin (bukan nunggu klik Kirim Pesanan) - lihat catatan
+ * `state.lokasiPrefetch`. Aman dipanggil berkali-kali (checkbox dicentang-lepas-centang
+ * lagi, render ulang checkout, dst) - `state.lokasiPrefetch` yang sudah ada TIDAK
+ * ditimpa selama masih 'antar'+dicentang, supaya tidak minta GPS ulang percuma.
+ * TIDAK dipanggil kalau method bukan 'antar' atau checkbox tidak dicentang (customer
+ * Ambil di Toko/tidak mau share lokasi tidak perlu ditanya izin lokasi sama sekali).
+ */
+function prefetchLokasi_(){
+  if(state.method!=='antar' || !state.shareLokasi){ return; }
+  if(!state.lokasiPrefetch) state.lokasiPrefetch = getLokasi_();
 }
 function lokasiUrl_(l){ return 'https://www.google.com/maps?q='+l.lat.toFixed(6)+','+l.lng.toFixed(6); }
 function lokasiLine_(l){ return '\uD83D\uDCCD Lokasi pelanggan: '+lokasiUrl_(l)+' (akurasi \u00B1'+l.acc+' m)'; }
