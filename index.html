@@ -15,7 +15,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- Ikon Material Symbols (subset 54 ikon). Tambah ikon baru = tambahkan namanya di &icon_names (urut abjad). -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=add,add_shopping_cart,arrow_back,arrow_forward,bakery_dining,bolt,call,category,chat,check,check_circle,chevron_right,child_care,cleaning_services,close,cloud_off,confirmation_number,cookie,delete,eco,event_available,favorite,grid_view,grocery,home,info,inventory_2,local_drink,local_fire_department,local_mall,local_offer,local_shipping,location_on,loyalty,medical_services,monetization_on,person,price_check,print,receipt_long,recommend,redeem,remove,remove_shopping_cart,schedule,search,sell,share,shopping_bag,shopping_basket,shopping_cart,skillet,spa,stars,storefront,sync,timer,tune,verified&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=add,add_shopping_cart,arrow_back,arrow_forward,bakery_dining,bolt,call,category,chat,check,check_circle,chevron_right,child_care,cleaning_services,close,cloud_off,confirmation_number,cookie,delete,eco,event_available,favorite,grid_view,grocery,home,info,inventory_2,local_cafe,local_drink,local_fire_department,local_mall,local_offer,local_shipping,location_on,loyalty,medical_services,monetization_on,outdoor_grill,person,price_check,print,ramen_dining,receipt_long,recommend,redeem,remove,remove_shopping_cart,schedule,search,sell,share,shopping_bag,shopping_basket,shopping_cart,skillet,spa,stars,storefront,sync,timer,tune,verified&display=block" rel="stylesheet">
 <style>
 /* ============================================================
    DESIGN TOKENS — warna & tipografi khas "warung/kraft paper"
@@ -236,6 +236,20 @@ input,textarea{font-family:inherit}
 .hm-dots i{width:6px;height:6px;border-radius:999px;background:rgba(255,255,255,.4)}
 .hm-dots i.on{width:20px;background:#fff}
 
+/* 4.5 Jajanan & Minuman */
+.hm-jj{margin:0 16px 20px;padding:14px 14px 16px;background:linear-gradient(180deg,#fff4f3,#fffaf9 60%);border:1px solid rgba(255,218,215,.8);border-radius:16px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.hm-jj-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.hm-jj-title{display:flex;align-items:center;gap:10px;min-width:0}
+.hm-jj-ic{width:36px;height:36px;flex:none;border-radius:999px;background:#ffdad7;display:flex;align-items:center;justify-content:center;font-size:19px;line-height:1}
+.hm-jj-title h3{margin:0;font-size:14px;font-weight:800;color:var(--z-ink);line-height:1.3}
+.hm-jj-title p{margin:1px 0 0;font-size:10.5px;color:var(--z-muted);line-height:1.3}
+.hm-jj-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.hm-jj-item{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;border:none;background:none;padding:0;color:inherit;text-align:center}
+.hm-jj-item-ic{width:44px;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.06);transition:transform var(--dur)}
+.hm-jj-item:hover .hm-jj-item-ic{transform:scale(1.05)}
+.hm-jj-item-ic .msym{font-size:21px}
+.hm-jj-item span{max-width:100%;font-size:10px;font-weight:600;line-height:1.25;color:var(--z-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 /* 5. Kejar Diskon (scroll horizontal) + countdown */
 .hm-count{display:flex;align-items:center;gap:4px;font-family:var(--f-mono);font-size:11px;font-weight:700;color:#fff}
 .hm-count b{padding:2px 4px;border-radius:4px;background:var(--z-red);font-weight:700;line-height:1}
@@ -429,8 +443,15 @@ input,textarea{font-family:inherit}
 /* ---------- Akun member / login-daftar ---------- */
 .account-card{background:hsl(var(--card));border:1px solid hsl(var(--paper-line));border-radius:14px;padding:16px;margin:14px 16px 0}
 .account-card .who{display:flex;align-items:center;gap:12px}
-.account-avatar{width:44px;height:44px;border-radius:999px;background:hsl(var(--green)/.15);color:hsl(var(--green));display:flex;align-items:center;justify-content:center;flex:none}
+.account-avatar{width:44px;height:44px;border-radius:999px;background:hsl(var(--green)/.15);color:hsl(var(--green));display:flex;align-items:center;justify-content:center;flex:none;position:relative}
 .account-avatar .icon{width:22px;height:22px}
+.account-avatar img{width:100%;height:100%;object-fit:cover;border-radius:999px}
+.avatar-upload{width:48px;height:48px}
+.avatar-hero{background:rgba(255,255,255,.18);color:#fff}
+.avatar-edit-btn{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:999px;background:hsl(var(--red));color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid hsl(var(--card));cursor:pointer}
+.avatar-edit-btn .icon{width:10px;height:10px}
+.avatar-edit-btn input{display:none}
+.poin-hi-row{display:flex;align-items:center;gap:10px}
 .account-name{font-weight:700;font-size:14.5px}
 .account-sub{font-size:11.5px;color:hsl(var(--ink-soft));margin-top:1px}
 .account-guest-note{font-size:12.5px;color:hsl(var(--ink-soft));line-height:1.55;margin-top:2px}
@@ -752,6 +773,20 @@ input,textarea{font-family:inherit}
 .dt-cta{flex:1;height:48px;border:none;border-radius:8px;background:var(--z-blue);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
 .dt-cta small{font-size:12px;font-weight:600;opacity:.9}
 .dt-cta:disabled{background:#c9c9c9}
+.dt-cta.alt{flex:none;padding:0 16px;background:#fff;color:var(--z-blue);border:1px solid var(--z-blue);font-size:15px}
+#dt-topping:empty{display:none}
+.dt-sec h2 small{font-size:12px;font-weight:500;color:#666}
+.tp-list{display:flex;flex-direction:column;gap:8px}
+.tp-row{display:flex;align-items:center;gap:10px;width:100%;padding:12px;border:1px solid #e3e3e3;border-radius:10px;background:#fff;text-align:left;font-size:14px}
+.tp-row.on{border-color:var(--z-blue);background:#eef4ff}
+.tp-row:disabled{opacity:.5}
+.tp-chk{flex:none;width:22px;height:22px;border:2px solid #b8c2d3;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff}
+.tp-chk .msym{font-size:18px}
+.tp-row.on .tp-chk{background:var(--z-blue);border-color:var(--z-blue)}
+.tp-nm{flex:1;min-width:0;font-weight:600}
+.tp-nm em{font-style:normal;font-weight:500;color:#999}
+.tp-row b{flex:none;font-size:13px;color:var(--z-blue)}
+.ct-top{margin:2px 0 4px;font-size:12px;line-height:1.4;color:#666}
 .dt-step{flex:none;display:flex;align-items:center;gap:4px;height:48px;padding:0 6px;border:1px solid #cfd8e6;border-radius:8px}
 .dt-step button{width:34px;height:34px;border:none;background:none;color:var(--z-blue);display:flex;align-items:center;justify-content:center}
 .dt-step button:disabled{opacity:.3}
@@ -766,6 +801,12 @@ input,textarea{font-family:inherit}
 .admin-promo{margin-bottom:10px;padding:10px;border:1px solid var(--z-line);border-radius:10px;background:var(--z-bg)}
 .admin-promo-h{display:flex;justify-content:space-between;align-items:center;font-size:12px}
 .admin-promo input{display:block;width:100%;margin-top:6px}
+.admin-jj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
+.admin-jj-item{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px;border:1px solid var(--z-line);border-radius:10px;background:var(--z-bg);text-align:center}
+.admin-jj-prev{width:48px;height:48px;flex:none;border-radius:999px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.admin-jj-prev img{width:100%;height:100%;object-fit:cover}
+.admin-jj-prev .msym{font-size:24px}
+.admin-jj-item b{font-size:11.5px;font-weight:700;color:var(--z-ink)}
 .poin-row{display:flex;gap:8px;align-items:center}
 .poin-row input{flex:1;min-width:0}
 .poin-row .btn-outline{flex:none;white-space:nowrap}
@@ -956,6 +997,20 @@ async function api(action, params) {
 }
 
 /**
+ * Emoji fallback kalau produk belum punya Foto di server. Produk retail biasa tetap
+ * 🛒; produk kategori Jajanan ditebak dari nama (seblak/sate bakar/kopi/es teh).
+ */
+function emojiProduk(nama, kategori) {
+  if (!isJajananKategori(kategori)) return '🛒';
+  const n = String(nama || '').toLowerCase();
+  if (/seblak|mie|bakso|soto|ramen/.test(n)) return '🍲';
+  if (/sate|bakar|tusuk/.test(n)) return '🍢';
+  if (/kopi|latte|espresso|cappuccino/.test(n)) return '☕';
+  if (/teh|es |jus|susu|cokelat|coklat/.test(n)) return '🧊';
+  return '🍜';
+}
+
+/**
  * Ubah bentuk produk dari backend (apiKatalogProdukPublik: Id/Nama/HargaJual/
  * Stok/KategoriNama/Satuan/Foto) ke bentuk yang dipakai render di file ini.
  * @param {Object} p
@@ -968,7 +1023,7 @@ function mapProdukPublik(p) {
     harga: Number(p.HargaJual) || 0,
     satuan: p.Satuan || '',
     stok: Number(p.Stok) || 0,
-    emoji: '🛒',
+    emoji: emojiProduk(p.Nama, p.KategoriNama),
     gambar: p.Foto || null,
     diskonPersen: 0,
     unggulan: false
@@ -991,6 +1046,34 @@ async function loadTebus(){
   }catch(e){ state.tebusError = e.message || 'tidak diketahui'; console.warn('apiTebusMurahPublik gagal:', e); }
 }
 
+/* Waktu terakhir katalog sukses ditarik dari server (ms epoch) - dipakai throttle
+   refreshKatalogSenyap(). */
+let katalogTerakhirMs = 0, katalogSenyapBusy = false;
+const KATALOG_SENYAP_MIN_MS = 30000;
+
+/**
+ * Tarik ulang katalog dari server kasir TANPA layar "Memuat..." - dipanggil tiap tab
+ * Jajanan dibuka (menu & stok jajanan gampang berubah). Tampilan lama tetap kelihatan,
+ * baru diganti begitu server jawab. Gagal = diam-diam pakai data lama. Dibatasi 1x per
+ * 30 detik supaya bolak-balik tab tidak membanjiri Apps Script.
+ */
+async function refreshKatalogSenyap() {
+  if (katalogSenyapBusy || state.katalogLoading || state.katalogError) return;
+  if (Date.now() - katalogTerakhirMs < KATALOG_SENYAP_MIN_MS) return;
+  katalogSenyapBusy = true;
+  try {
+    const data = await api('apiKatalogProdukPublik', {});
+    PRODUCTS = (data || []).map(mapProdukPublik);
+    katalogTerakhirMs = Date.now();
+    renderTabContent();
+    renderMiniCart();
+  } catch (e) {
+    console.warn('Refresh katalog Jajanan gagal, pakai data lama:', e.message);
+  } finally {
+    katalogSenyapBusy = false;
+  }
+}
+
 /**
  * Load katalog produk publik dari backend. Dipanggil sekali saat init, dan
  * boleh dipanggil ulang manual (retry) kalau gagal.
@@ -1002,6 +1085,7 @@ async function loadKatalog() {
   try {
     const data = await api('apiKatalogProdukPublik', {});
     PRODUCTS = (data || []).map(mapProdukPublik);
+    katalogTerakhirMs = Date.now();
     state.katalogLoading = false;
     await loadTebus();
   } catch (e) {
@@ -1047,7 +1131,14 @@ async function loadPengaturanToko(){
     if(s.alamat) STORE.alamat = s.alamat;
     STORE.logo = s.logo || ''; // logo boleh kosong (admin hapus logo) beda dari "belum ada data"
     if(s.promo != null){ const pr = normPromos(s.promo); setPromos(pr); savePromosLocal(pr); }
+    if(s.jajananIcons != null){
+      try{
+        const obj = typeof s.jajananIcons==='string' ? JSON.parse(s.jajananIcons) : s.jajananIcons;
+        if(obj && typeof obj==='object'){ JAJANAN_ICONS = obj; saveJajananIconsLocal(obj); }
+      }catch(e){}
+    }
     applyStoreBranding();
+    if(state.tab==='beranda') renderTabContent(); // icon jajanan bisa berubah dari server, refresh kalau lagi kelihatan
   }catch(e){
     console.warn('Gagal muat pengaturan toko dari server, pakai nilai default:', e.message);
   }
@@ -1084,7 +1175,8 @@ const ICONS = {
   bank:'<path d="M3 22h18"/><path d="M6 18v-7"/><path d="M10 18v-7"/><path d="M14 18v-7"/><path d="M18 18v-7"/><path d="M2 11h20L12 3z"/>',
   coin:'<circle cx="12" cy="12" r="8"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 1.5-2.5 1.5-2.5 3"/><path d="M12 15h.01"/>',
   crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7Z"/><path d="M5 20h14"/>',
-  fileText:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>'
+  fileText:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>'
 };
 function icon(name, cls){
   return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
@@ -1107,8 +1199,19 @@ function isStoreOpen(){
   const nowMin = now.getHours()*60+now.getMinutes();
   return nowMin >= (oh*60+om) && nowMin < (ch*60+cm);
 }
+function isJajananKategori(k){ return /jajanan/i.test(String(k||'')); }
+/* ---- Topping Seblak: topping = produk biasa di kasir (kategori yang namanya mengandung
+   "topping"), jadi harga & stoknya divalidasi server seperti produk lain. Produk kategori
+   topping tidak ditampilkan sebagai menu sendiri, cuma muncul sebagai pilihan di detail Seblak. ---- */
+function isToppingKategori(k){ return /topping/i.test(String(k||'')); }
+function produkTampil(){ return PRODUCTS.filter(p=>!isToppingKategori(p.kategori)); }
+function toppingList(){ return PRODUCTS.filter(p=>isToppingKategori(p.kategori)); }
+function isSeblak(p){ return !!p && /seblak/i.test(p.nama) && !isToppingKategori(p.kategori); }
+/** Seblak bisa ditambah topping cuma kalau di kasir sudah ada produk kategori topping. */
+function punyaTopping(p){ return isSeblak(p) && toppingList().length>0; }
+function pickedToppings(){ return toppingList().filter(t=>state.toppingPick.includes(t.id) && t.stok>0); }
 function categoriesFromProducts(){
-  const set = new Set(PRODUCTS.map(p=>p.kategori));
+  const set = new Set(produkTampil().filter(p=>!isJajananKategori(p.kategori)).map(p=>p.kategori));
   return ['Semua', ...Array.from(set)];
 }
 const CATEGORY_ICONS = {
@@ -1123,6 +1226,9 @@ const state = {
   tab: 'beranda',
   promoIdx: 0,   // indeks banner PROMOS yang tampil di beranda
   category: 'Semua',
+  toppingPick: [],   // id produk topping yang lagi dicentang di detail Seblak
+  porsi: [],         // catatan tiap porsi seblak + topping-nya ({produkId, toppingIds}), dipakai buat Catatan pesanan
+  jajananCategory: 'Semua',   // filter kategori tab Jajanan (terpisah dari state.category milik Belanja)
   promoKat: 'all',   // filter kategori Katalog Diskon di tab Promo
   tebusError: null,
   tebus: [],   // id produk Tebus Murah yang dipilih (maks. TEBUS_MAX)
@@ -1245,7 +1351,33 @@ function loadGuestOrders(){
 }
 
 function filteredProducts(){
-  let list = state.category==='Semua' ? PRODUCTS : PRODUCTS.filter(p=>p.kategori===state.category);
+  let list = state.category==='Semua' ? produkTampil().filter(p=>!isJajananKategori(p.kategori)) : produkTampil().filter(p=>p.kategori===state.category);
+  if(state.search.trim()){
+    const q = state.search.trim().toLowerCase();
+    list = list.filter(p=>p.nama.toLowerCase().includes(q));
+  }
+  return list;
+}
+/** Daftar kategori di tab Jajanan (pola sama categoriesFromProducts() milik Belanja):
+ *  cuma kategori server yang namanya mengandung "jajanan". */
+function categoriesJajanan(){
+  const set = new Set(produkTampil().filter(p=>isJajananKategori(p.kategori)).map(p=>p.kategori));
+  return ['Semua', ...Array.from(set)];
+}
+/** Kategori aktif tab Jajanan; balik ke 'Semua' kalau kategori itu sudah hilang dari server. */
+function jajananKategoriAktif(){
+  return categoriesJajanan().includes(state.jajananCategory) ? state.jajananCategory : 'Semua';
+}
+/** Label chip: buang awalan "Jajanan" biar tidak redundan di dalam tab Jajanan
+ *  ("Jajanan Seblak" -> "Seblak"). Nilai filter tetap nama kategori lengkap. */
+function jajananChipLabel(c){
+  return c==='Semua' ? c : (String(c).replace(/^\s*jajanan\s*[-\u2013:&]*\s*/i,'').trim() || c);
+}
+/** Produk tab Jajanan (terpisah dari Belanja) - semua kategori yang namanya mengandung "jajanan". */
+function filteredJajanan(){
+  let list = produkTampil().filter(p=>isJajananKategori(p.kategori));
+  const cat = jajananKategoriAktif();
+  if(cat!=='Semua') list = list.filter(p=>p.kategori===cat);
   if(state.search.trim()){
     const q = state.search.trim().toLowerCase();
     list = list.filter(p=>p.nama.toLowerCase().includes(q));
@@ -1291,6 +1423,66 @@ function changeQty(id, delta){
   pruneTebus();
   refresh();
 }
+/** Tambah 1 porsi Seblak + topping yang dicentang. Topping masuk keranjang sebagai produk
+ *  biasa (harga & stok dicek server), pilihan per porsi dicatat di state.porsi. */
+function addPorsi(id){
+  const p = productById(id); if(!p || !punyaTopping(p)) return;
+  const tops = pickedToppings();
+  if((state.cart[p.id]||0) >= p.stok){ showToast('Stok '+p.nama+' tidak cukup'); return; }
+  const kurang = tops.find(t=>(state.cart[t.id]||0) >= t.stok);
+  if(kurang){ showToast('Stok topping '+kurang.nama+' tidak cukup'); return; }
+  state.cart[p.id] = (state.cart[p.id]||0) + 1;
+  tops.forEach(t=>{ state.cart[t.id] = (state.cart[t.id]||0) + 1; });
+  state.porsi.push({ produkId:p.id, toppingIds:tops.map(t=>t.id) });
+  state.toppingPick = [];
+  pruneTebus();
+  refresh();
+  showToast('Ditambahkan ke keranjang');
+}
+function toggleTopping(id){
+  id = String(id);
+  state.toppingPick = state.toppingPick.includes(id) ? state.toppingPick.filter(x=>x!==id) : state.toppingPick.concat(id);
+  if(state.detailId!=null) renderDetailDynamic();
+}
+/** Kelompokkan porsi Seblak di keranjang -> [{produkId, qty, toppings:[nama]}] untuk tampilan
+ *  keranjang & Catatan pesanan. Dicocokkan dengan isi keranjang SEKARANG (customer bisa
+ *  kurangi/hapus qty setelah pilih topping), jadi topping yang sudah tidak ada di keranjang
+ *  tidak ikut ditulis. Seblak tanpa catatan porsi (mis. ditambah lewat tombol +) dianggap tanpa topping. */
+function porsiGrup_(){
+  const sisa = {};
+  Object.keys(state.cart).forEach(id=>{ sisa[id] = state.cart[id]||0; });
+  const grup = {}, urut = [];
+  const tambah = (produkId, names)=>{
+    const key = produkId+'|'+names.join(',');
+    if(!grup[key]){ grup[key] = { produkId:produkId, qty:0, toppings:names }; urut.push(key); }
+    grup[key].qty++;
+  };
+  state.porsi.forEach(po=>{
+    if((sisa[po.produkId]||0) < 1) return;
+    sisa[po.produkId]--;
+    const names = [];
+    po.toppingIds.forEach(tid=>{
+      if((sisa[tid]||0) < 1) return;
+      sisa[tid]--;
+      const t = productById(tid); if(t) names.push(t.nama);
+    });
+    tambah(po.produkId, names);
+  });
+  Object.keys(sisa).forEach(id=>{
+    if(!isSeblak(productById(id))) return;
+    while(sisa[id] > 0){ sisa[id]--; tambah(id, []); }
+  });
+  return urut.map(k=>grup[k]);
+}
+/** Teks Catatan pesanan (terbaca kasir & kurir). Kosong kalau tidak ada seblak bertopping. */
+function porsiCatatan_(){
+  const g = porsiGrup_();
+  if(!g.some(x=>x.toppings.length>0)) return '';
+  return 'Topping seblak:\n' + g.map(x=>{
+    const p = productById(x.produkId);
+    return '- ' + x.qty + 'x ' + (p ? p.nama : 'Seblak') + ': ' + (x.toppings.length ? x.toppings.join(', ') : 'tanpa topping');
+  }).join('\n');
+}
 
 /* ================================================================
    RENDER — kerangka aplikasi (dibangun sekali)
@@ -1330,6 +1522,7 @@ function renderShell(){
     <nav class="bottom-nav">
       <button class="nav-btn" data-action="set-tab" data-tab="beranda">${msym('home')}<span class="lbl">Beranda</span></button>
       <button class="nav-btn" data-action="set-tab" data-tab="belanja">${msym('shopping_bag')}<span class="lbl">Belanja</span></button>
+      <button class="nav-btn" data-action="set-tab" data-tab="jajanan">${msym('local_fire_department')}<span class="lbl">Jajanan</span></button>
       <button class="nav-btn" data-action="set-tab" data-tab="promo">${msym('local_offer')}<span class="lbl">Promo</span></button>
       <button class="nav-btn" data-action="set-tab" data-tab="pesanan">${msym('receipt_long')}<span class="lbl">Pesanan</span></button>
       <button class="nav-btn" data-action="set-tab" data-tab="akun">${msym('person')}<span class="lbl">Akun</span></button>
@@ -1484,8 +1677,11 @@ function setTab(tab){
   // perubahan status (mis. kasir baru tandai Selesai) langsung kelihatan tanpa perlu
   // logout-login lagi. Non-blocking, tampilan lama tetap muncul dulu sambil nunggu.
   if(tab==='pesanan' && state.auth.status==='member') loadRiwayatPelanggan();
+  // Tab Jajanan dibuka -> tarik menu & stok terbaru dari server kasir (senyap, non-blocking).
+  if(tab==='jajanan') refreshKatalogSenyap();
 }
 function setCategory(cat){ state.category = cat; renderTabContent(); }
+function setJajananCategory(cat){ state.jajananCategory = cat; renderTabContent(); }
 function clearSearch(){
   state.search='';
   document.getElementById('search-input').value='';
@@ -1515,7 +1711,9 @@ function productCard(p){
         : '<div class="price">'+rupiah(p.harga)+'</div>'}
       ${habis
         ? '<div class="stock-out">Stok habis</div>'
-        : (qty===0
+        : (punyaTopping(p)
+          ? '<button class="btn-add" data-action="open-topping" data-id="'+esc(p.id)+'">Pilih Topping'+(qty>0?' ('+qty+')':'')+'</button>'
+          : qty===0
           ? '<button class="btn-add" data-action="qty" data-id="'+p.id+'" data-delta="1">'+icon('plus')+' Tambah</button>'
           : '<div class="qty-stepper"><button data-action="qty" data-id="'+p.id+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><span>'+qty+'</span><button data-action="qty" data-id="'+p.id+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>')
       }
@@ -1537,12 +1735,14 @@ function renderTabContent(){
   const hsLeft = hs ? hs.scrollLeft : 0;
   if(state.tab==='beranda') el.innerHTML = tabBeranda();
   else if(state.tab==='belanja') el.innerHTML = tabBelanja();
+  else if(state.tab==='jajanan') el.innerHTML = tabJajanan();
   else if(state.tab==='promo') el.innerHTML = tabPromo();
   else if(state.tab==='pesanan') el.innerHTML = tabPesanan();
   else if(state.tab==='akun') el.innerHTML = tabAkun();
   if(hsLeft){ const hs2 = el.querySelector('.hm-hscroll'); if(hs2) hs2.scrollLeft = hsLeft; }
   updateStatusPill.length; // no-op guard
   attachFaqListeners();
+  attachFotoProfilListener();
 }
 
 /* ---------- Beranda (gaya Alfagift) ---------- */
@@ -1554,6 +1754,7 @@ const HOME_CAT_COLORS = [
 const HOME_CAT_ICONS = [
   [/bayi|anak/, 'child_care'],
   [/segar|sayur|buah/, 'eco'],
+  [/jajanan|seblak|bakar/, 'local_fire_department'],
   [/minum|kopi|teh/, 'local_drink'],
   [/snack|ringan|camilan/, 'cookie'],
   [/susu|sarapan|roti|kue/, 'bakery_dining'],
@@ -1627,6 +1828,7 @@ function homeAddControl(p, big){
   if(p.stok<=0) return '<div class="hm-out">Stok habis</div>';
   const qty = state.cart[p.id]||0;
   const id = esc(p.id);
+  if(punyaTopping(p)) return '<button class="hm-add" data-action="open-topping" data-id="'+id+'">'+(big ? msym('add_shopping_cart')+'<span>Pilih Topping'+(qty>0?' ('+qty+')':'')+'</span>' : 'Pilih Topping'+(qty>0?' ('+qty+')':''))+'</button>';
   if(qty===0){
     return '<button class="hm-add" data-action="qty" data-id="'+id+'" data-delta="1">'
       + (big ? msym('add_shopping_cart')+'<span>+ Keranjang</span>' : '+ Keranjang') + '</button>';
@@ -1674,6 +1876,57 @@ function homeEmptyCard(iconName, title, text, btnLabel, btnAction, isErr){
       <p>${esc(text)}</p>
       ${btnLabel ? '<button data-action="'+btnAction+'">'+esc(btnLabel)+'</button>' : ''}
     </div>`;
+}
+
+/* Kartu "Jajanan & Minuman" di Beranda - 6 pintasan jenis jajanan, tiap tap
+   isi state.search dgn kata kunci lalu buka tab Jajanan (filteredJajanan()
+   sudah cocokkan by nama produk, lihat filteredJajanan()). */
+const JAJANAN_ITEMS = [
+  { key:'seblak',  label:'Seblak',  q:'seblak', icon:'ramen_dining',  bg:'#ffdad7', fg:'#b0001a' },
+  { key:'bakaran', label:'Bakaran', q:'bakar',  icon:'outdoor_grill', bg:'#ffe3c2', fg:'#a8460a' },
+  { key:'kopi',    label:'Kopi',    q:'kopi',   icon:'local_cafe',    bg:'#e6d6c2', fg:'#5a3b1e' },
+  { key:'esteh',   label:'Es Teh',  q:'es teh', icon:'local_drink',   bg:'#d5e3ff', fg:'#0c5fae' }
+];
+/* Icon custom per item Jajanan (diisi admin lewat Pengaturan Toko -> galeri).
+   key JAJANAN_ITEMS -> data URL gambar. Kosong = pakai icon bawaan (msym) di atas.
+   Disimpan di server lewat 4 field terpisah di apiUpdatePengaturanToko (satu item = satu
+   cell Sheet_Config, lihat JAJANAN_ICON_CONFIG_KEYS_ di PengaturanTokoPublikController.js
+   backend - SENGAJA gak digabung 1 field JSON biar gak lewat batas ~50.000 karakter per
+   cell). Dicache juga di localStorage (pola sama PROMOS_KEY) murni biar render pertama di
+   device ini instan tanpa nunggu round-trip server, BUKAN sumber data utama - nilai server
+   dari loadPengaturanToko() tetap yang menang & dipakai semua device. */
+let JAJANAN_ICONS = {};
+const JAJANAN_ICONS_KEY = 'ainiMartJajananIcons';
+function loadJajananIconsLocal(){
+  try{ const o = JSON.parse(localStorage.getItem(JAJANAN_ICONS_KEY)||'{}'); return (o && typeof o==='object') ? o : {}; }catch(e){ return {}; }
+}
+function saveJajananIconsLocal(obj){ try{ localStorage.setItem(JAJANAN_ICONS_KEY, JSON.stringify(obj||{})); }catch(e){} }
+function jajananHomeHtml(){
+  if(!PRODUCTS.some(p=>isJajananKategori(p.kategori))) return '';
+  return `
+    <section class="hm-jj">
+      <div class="hm-jj-head">
+        <div class="hm-jj-title">
+          <span class="hm-jj-ic" aria-hidden="true">🍜</span>
+          <div>
+            <h3>Jajanan &amp; Minuman</h3>
+            <p>Favorit pelanggan, selalu segar dan enak!</p>
+          </div>
+        </div>
+        <button class="hm-more red" data-action="open-jajanan"><span>Lihat Semua</span>${msym('chevron_right')}</button>
+      </div>
+      <div class="hm-jj-row">
+        ${JAJANAN_ITEMS.map(it=>{
+          const img = JAJANAN_ICONS[it.key];
+          const icHtml = img
+            ? '<img src="'+esc(img)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:999px">'
+            : msym(it.icon);
+          return '<button class="hm-jj-item" data-action="jajanan-cat" data-q="'+esc(it.q)+'">'
+            + '<span class="hm-jj-item-ic" style="background:'+it.bg+';color:'+it.fg+'">'+icHtml+'</span>'
+            + '<span>'+esc(it.label)+'</span></button>';
+        }).join('')}
+      </div>
+    </section>`;
 }
 
 function tabBeranda(){
@@ -1781,7 +2034,7 @@ function tabBeranda(){
 
   // --- 7. rekomendasi spesial ---
   const diskonIds = new Set(diskon.map(p=>p.id));
-  const rekom = PRODUCTS
+  const rekom = produkTampil()
     .filter(p=>!diskonIds.has(p.id))
     .sort((a,b)=> (b.unggulan?1:0)-(a.unggulan?1:0) || (b.stok>0?1:0)-(a.stok>0?1:0))
     .slice(0,4);
@@ -1817,6 +2070,7 @@ function tabBeranda(){
       ${walletHtml}
       ${quickHtml}
       <section class="hm-hero" id="hm-hero">${homeHeroInner()}</section>
+      ${jajananHomeHtml()}
       ${katalogHtml}
       ${diskonHtml}
       ${catHtml}
@@ -1841,6 +2095,29 @@ function tabBelanja(){
     body = state.search
       ? emptyState('search','Produk "'+esc(state.search)+'" tidak ditemukan. Coba kata kunci lain.','')
       : emptyState('boxEmpty','Belum ada produk di kategori ini.','');
+  } else {
+    body = `<div class="grid-2">${list.map(productCard).join('')}</div>`;
+  }
+  return chips + body;
+}
+
+/* ---------- Tab Jajanan (terpisah dari Belanja - seblak/kopi/es teh/bakaran dll,
+   dibuat/disiapkan pas dipesan, beda ritme dari produk retail di Belanja) ---------- */
+function tabJajanan(){
+  const cats = categoriesJajanan();
+  const aktif = jajananKategoriAktif();
+  const list = filteredJajanan();
+  const chips = cats.length>1 ? `<div class="h-scroll">${cats.map(c=>`<button class="chip" data-action="set-jajanan-category" data-category="${esc(c)}" data-active="${c===aktif}">${esc(jajananChipLabel(c))}</button>`).join('')}</div>` : '';
+  let body;
+  if(state.katalogLoading){
+    body = emptyState('boxEmpty','Memuat menu jajanan...','');
+  } else if(state.katalogError){
+    body = `<div class="empty-state">${icon('boxEmpty')}<p>Gagal memuat menu: ${esc(state.katalogError)}</p>
+      <button class="btn-primary" data-action="retry-katalog">Coba Lagi</button></div>`;
+  } else if(list.length===0){
+    body = state.search
+      ? emptyState('search','Menu "'+esc(state.search)+'" tidak ditemukan. Coba kata kunci lain.','')
+      : emptyState('boxEmpty', aktif==='Semua' ? 'Menu jajanan belum tersedia.' : 'Belum ada menu di kategori ini.','');
   } else {
     body = `<div class="grid-2">${list.map(productCard).join('')}</div>`;
   }
@@ -2113,7 +2390,7 @@ function poinMemberCard(){
   }
   if(state.poinError){
     return `<div class="poin-card poin-card-plain">
-      <div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div>
+      <div class="poin-hi-row">${profileAvatarBadge_(false)}<div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div></div>
       <div class="poin-error" style="margin-top:8px">Gagal memuat poin: ${esc(state.poinError)} <button class="link-btn" data-action="retry-poin">Coba lagi</button></div>
       <div class="account-actions"><button class="btn-outline danger" data-action="logout">Keluar</button></div>
     </div>`;
@@ -2121,7 +2398,7 @@ function poinMemberCard(){
   const m = state.poinMember;
   if(!m || !m.terdaftar){
     return `<div class="poin-card poin-card-plain">
-      <div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div>
+      <div class="poin-hi-row">${profileAvatarBadge_(false)}<div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div></div>
       <div class="account-guest-note" style="margin-top:8px">Nomor WhatsApp kamu belum terdaftar sebagai member poin toko. Datang & belanja ke toko, minta kasir daftarkan pakai nomor ini biar mulai kumpul poin.</div>
       <div class="account-actions"><button class="btn-outline danger" data-action="logout">Keluar</button></div>
     </div>`;
@@ -2129,8 +2406,13 @@ function poinMemberCard(){
   return `
     <div class="poin-card">
       <div class="poin-hero">
-        <div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div>
-        <div class="poin-tier-badge">${icon('crown')}${esc(MEMBER_TIER_LABEL[m.tier] || m.tier)} Member</div>
+        <div class="poin-hi-row">
+          ${profileAvatarBadge_(true)}
+          <div>
+            <div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div>
+            <div class="poin-tier-badge">${icon('crown')}${esc(MEMBER_TIER_LABEL[m.tier] || m.tier)} Member</div>
+          </div>
+        </div>
       </div>
       <div class="poin-stats">
         <div class="poin-stat">
@@ -2314,6 +2596,24 @@ function attachFaqListeners(){
     });
   });
 }
+/** Input file "Ganti foto profil" di tab Akun - pilih gambar dari galeri HP, kompres, simpan per akun (lihat blok FOTO PROFIL). */
+function attachFotoProfilListener(){
+  document.querySelectorAll('[data-action-file="profil-foto"]').forEach(elm=>{
+    elm.addEventListener('change', async e=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!file.type.startsWith('image/')){ showToast('File harus berupa gambar.'); return; }
+      try{
+        const dataUrl = await compressImage(file, 400);
+        simpanFotoProfilMember_(dataUrl);
+        renderTabContent();
+        showToast('Foto profil diperbarui.');
+      }catch(err){
+        showToast(err.message || 'Gagal memuat foto. Coba lagi.');
+      }
+    });
+  });
+}
 
 /* ================================================================
    CART SHEET
@@ -2394,6 +2694,7 @@ function renderCartBody(){
   const hematTebusVal = picked.reduce((sum,t)=>sum+Math.max(0,t.asli-t.harga),0);
   const asli = asliReg + picked.reduce((sum,t)=>sum+t.asli,0);
   const hemat = diskonProduk + hematTebusVal + estimasiPoinDiskon();
+  const pg = porsiGrup_();
   const qb = (id,d,ic,dis)=>'<button data-action="qty" data-id="'+id+'" data-delta="'+d+'" '+(dis?'disabled ':'')+'aria-label="'+(d>0?'Tambah':'Kurangi')+'">'+msym(ic)+'</button>';
   body.innerHTML = `
     <div class="ct-store">${msym('storefront','fill')}<b>${esc(STORE.nama)}</b></div>
@@ -2406,6 +2707,7 @@ function renderCartBody(){
           <div${pAttr(p.id)}>
             ${p.satuan?'<span class="ct-pkg">per '+esc(p.satuan)+'</span>':''}
             <h5>${esc(p.nama)}</h5>
+            ${(()=>{ const gs = pg.filter(x=>x.produkId===p.id); return gs.some(x=>x.toppings.length) ? '<div class="ct-top">'+gs.map(x=>esc(x.qty+'x '+(x.toppings.length?x.toppings.join(', '):'tanpa topping'))).join('<br>')+'</div>' : ''; })()}
             <div class="ct-pr"><b>${rupiah(hargaAkhir(p))}</b>${p.diskonPersen?'<s>'+rupiah(p.harga)+'</s>':''}</div>
           </div>
           <div class="ct-act">
@@ -2510,6 +2812,33 @@ function muatAlamatMember_(){
 function simpanAlamatMember_(v){
   if(state.auth.status!=='member' || !state.auth.pelanggan) return;
   try{ localStorage.setItem(alamatKey_(), String(v||'').trim()); }catch(e){}
+}
+/* ================================================================
+   FOTO PROFIL — foto profil konsumen (member: tersimpan per akun di
+   perangkat ini, sama seperti pola Alamat di atas). Dipilih dari galeri
+   HP lewat <input type="file" accept="image/*">, dikompres di sisi
+   klien (compressImage()) lalu disimpan sebagai data URL di localStorage.
+   ================================================================ */
+function fotoProfilKey_(){ return 'ainiMartFotoProfil:'+state.auth.pelanggan.id; }
+function muatFotoProfilMember_(){
+  if(state.auth.status!=='member' || !state.auth.pelanggan) return '';
+  try{ return localStorage.getItem(fotoProfilKey_()) || ''; }catch(e){ return ''; }
+}
+function simpanFotoProfilMember_(dataUrl){
+  if(state.auth.status!=='member' || !state.auth.pelanggan) return;
+  try{
+    if(dataUrl) localStorage.setItem(fotoProfilKey_(), dataUrl);
+    else localStorage.removeItem(fotoProfilKey_());
+  }catch(e){}
+}
+/** Avatar member + badge kamera buat ganti foto. hero=true dipakai di poin-hero (bg merah). */
+function profileAvatarBadge_(hero){
+  const foto = muatFotoProfilMember_();
+  return '<div class="account-avatar avatar-upload'+(hero?' avatar-hero':'')+'">'
+    + (foto ? '<img src="'+esc(foto)+'" alt="Foto profil">' : icon('user'))
+    + '<label class="avatar-edit-btn" title="Ganti foto profil dari galeri">'+icon('camera')
+    + '<input type="file" accept="image/*" data-action-file="profil-foto" style="display:none"></label>'
+    + '</div>';
 }
 function homeAlamatHtml_(){
   if(state.method==='antar'){
@@ -2714,7 +3043,7 @@ async function submitOrder(){
       tipe: state.method==='antar' ? 'Delivery' : 'Pickup',
       alamat: state.method==='antar' ? state.form.alamat.trim() : '',
       items: lines.map(l=>({ produkId: l.produk.id, qty: l.qty })).concat(tebusPicked().map(t=>({ produkId: t.id, qty: 1, tebus: true }))),  // harga tebus dihitung ulang server (PesananOnlineService._resolveItemsTebus)
-      catatan: [state.form.catatan.trim(), lokasi ? lokasiLine_(lokasi) : ''].filter(Boolean).join('\n'),
+      catatan: [state.form.catatan.trim(), porsiCatatan_(), lokasi ? lokasiLine_(lokasi) : ''].filter(Boolean).join('\n'),
       // Kalau lagi masuk sebagai member, pesanan dipasang ke akun ini biar
       // muncul di Riwayat Pesanan server. Tamu = null (behavior lama).
       pelangganId: state.auth.status==='member' ? state.auth.pelanggan.id : null,
@@ -2765,6 +3094,7 @@ async function submitOrder(){
     state.orders.push(order);
     saveGuestOrders();
     state.cart = {};
+    state.porsi = [];
     state.tebus = [];
     // Member: cuma Nama yang keisi otomatis buat checkout berikutnya, No WhatsApp
     // sengaja dikosongin (isi manual tiap kali) - lihat catatan di loginSuccess().
@@ -2945,7 +3275,7 @@ function logout(){
 function openAdmin(){
   state.adminOpen = true;
   state.adminStep = 'pin';
-  state.adminForm = { pin:'', nama: STORE.nama, whatsapp: STORE.whatsapp, alamat: STORE.alamat, logo: STORE.logo, promos: PROMOS.map(x=>Object.assign({}, x)) };
+  state.adminForm = { pin:'', nama: STORE.nama, whatsapp: STORE.whatsapp, alamat: STORE.alamat, logo: STORE.logo, promos: PROMOS.map(x=>Object.assign({}, x)), jajananIcons: Object.assign({}, JAJANAN_ICONS) };
   state.adminError = null;
   document.getElementById('admin-overlay').setAttribute('data-open','true');
   renderAdminBody();
@@ -2997,6 +3327,7 @@ function renderAdminBody(){
     <div class="field"><label for="admin-wa">Nomor WhatsApp Toko</label><input id="admin-wa" type="tel" placeholder="62xxxxxxxxxx" value="${esc(f.whatsapp)}"></div>
     <div class="admin-note" style="margin-top:-6px">Format: diawali <strong>62</strong>, tanpa spasi/strip/tanda plus. Contoh: 6281234567890.</div>
     <div class="field"><label for="admin-alamat">Alamat Toko</label><textarea id="admin-alamat" rows="2" placeholder="Jalan, nomor, patokan">${esc(f.alamat)}</textarea></div>
+    ${adminJajananHtml(f)}
     ${adminPromoHtml(f)}
     <button class="submit-btn" data-action="submit-admin-save" ${state.adminSaving?'disabled':''}>${state.adminSaving?'Menyimpan…':'Simpan Perubahan'}</button>
     <div class="guest-link-row">atau <button class="link-btn" data-action="close-admin">Batal</button></div>
@@ -3012,6 +3343,14 @@ function renderAdminBody(){
     if(!file || !q) return;
     if(!file.type.startsWith('image/')){ state.adminError = 'File harus berupa gambar.'; renderAdminBody(); return; }
     try{ q.gambar = await compressImage(file, 720); state.adminError = null; }
+    catch(err){ state.adminError = err.message; }
+    renderAdminBody();
+  }));
+  body.querySelectorAll('[data-jjfile]').forEach(el=>el.addEventListener('change', async e=>{
+    const file = e.target.files && e.target.files[0], key = el.dataset.jjfile;
+    if(!file || !key) return;
+    if(!file.type.startsWith('image/')){ state.adminError = 'File harus berupa gambar.'; renderAdminBody(); return; }
+    try{ state.adminForm.jajananIcons[key] = await compressImage(file, 160, 36000); state.adminError = null; }
     catch(err){ state.adminError = err.message; }
     renderAdminBody();
   }));
@@ -3052,6 +3391,8 @@ async function submitAdminSave(){
   if(!alamat){ state.adminError='Alamat toko wajib diisi.'; renderAdminBody(); return; }
   const promos = (state.adminForm.promos||[]).map(x=>({ judul:x.judul.trim(), sub:x.sub.trim(), periode:x.periode.trim(), gambar:x.gambar||'' }));
   if(promos.some(x=>!x.judul && !x.gambar)){ state.adminError='Tiap banner butuh judul atau gambar (atau hapus banner yang kosong).'; renderAdminBody(); return; }
+  const jajananIcons = {};
+  JAJANAN_ITEMS.forEach(it=>{ if(state.adminForm.jajananIcons && state.adminForm.jajananIcons[it.key]) jajananIcons[it.key] = state.adminForm.jajananIcons[it.key]; });
 
   state.adminSaving = true;
   state.adminError = null;
@@ -3060,11 +3401,15 @@ async function submitAdminSave(){
     // BARU: simpan ke server (bukan localStorage) - PIN dikirim ulang di sini
     // biar server yang jadi penentu akhir boleh/gaknya perubahan tersimpan
     // (lihat catatan ADMIN_PIN di atas + fungsi updatePengaturanToko di Apps Script).
+    // "jajananIcons" disimpan server per-item ke 4 cell Sheet_Config terpisah (lihat
+    // JAJANAN_ICON_CONFIG_KEYS_ di PengaturanTokoPublikController.js) - jadi sama kayak
+    // Nama/Logo/dll di atas, langsung berlaku di semua device begitu tersimpan.
     const saved = await api('updatePengaturanToko', {
       pin: state.adminForm.pin,
       nama, whatsapp, alamat,
       logo: state.adminForm.logo || '',
-      promo: JSON.stringify(promos)
+      promo: JSON.stringify(promos),
+      jajananIcons: JSON.stringify(jajananIcons)
     });
     STORE.nama = saved.nama || nama;
     STORE.whatsapp = saved.whatsapp || whatsapp;
@@ -3073,9 +3418,14 @@ async function submitAdminSave(){
     const serverPromo = !!saved && saved.promo !== undefined; // server lama (belum update Apps Script) tidak mengembalikan field promo
     const promoChanged = JSON.stringify(promos) !== JSON.stringify(PROMOS);
     setPromos(promos); savePromosLocal(promos);
+    // Pakai balikan server kalau ada (itu yang beneran tersimpan & divalidasi ulang server-side) -
+    // fallback ke objek lokal cuma buat server lama yang belum kirim field ini balik.
+    const savedJajananIcons = (saved && saved.jajananIcons && typeof saved.jajananIcons==='object') ? saved.jajananIcons : jajananIcons;
+    JAJANAN_ICONS = savedJajananIcons; saveJajananIconsLocal(savedJajananIcons);
     state.adminSaving = false;
     closeAdmin();
     applyStoreBranding(); // update header dsb di device INI juga, tanpa nunggu reload
+    if(state.tab==='beranda') renderTabContent(); // icon jajanan baru langsung kelihatan tanpa reload
     showToast((!serverPromo && (promos.length || promoChanged))
       ? 'Tersimpan. Promo banner baru berlaku di perangkat ini saja (server belum mendukung).'
       : 'Pengaturan toko disimpan & langsung berlaku di semua perangkat.');
@@ -3101,7 +3451,8 @@ function normPromos(raw){
 }
 function setPromos(arr){ PROMOS.splice(0, PROMOS.length, ...arr); state.promoIdx = 0; }
 function savePromosLocal(arr){ try{ localStorage.setItem(PROMOS_KEY, JSON.stringify(arr)); }catch(e){} }
-function compressImage(file, maxW){
+function compressImage(file, maxW, maxLen){
+  maxLen = maxLen || 60000;
   return new Promise((res, rej)=>{
     const fr = new FileReader();
     fr.onerror = ()=>rej(new Error('Gagal membaca gambar.'));
@@ -3113,13 +3464,30 @@ function compressImage(file, maxW){
         const c = document.createElement('canvas'); c.width = w; c.height = h;
         const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0,0,w,h); cx.drawImage(im,0,0,w,h);
         let q = .8, out = c.toDataURL('image/jpeg', q);
-        while(out.length > 60000 && q > .4){ q -= .1; out = c.toDataURL('image/jpeg', q); }
+        while(out.length > maxLen && q > .4){ q -= .1; out = c.toDataURL('image/jpeg', q); }
         res(out);
       };
       im.src = fr.result;
     };
     fr.readAsDataURL(file);
   });
+}
+function adminJajananHtml(f){
+  const obj = f.jajananIcons || {};
+  return '<div class="field"><label>Icon Jajanan &amp; Minuman</label>'
+    + '<div class="admin-note" style="margin:0 0 8px">Opsional. Ganti icon bawaan tiap menu di kartu "Jajanan &amp; Minuman" (Beranda) pakai foto dari galeri — otomatis dipotong bulat &amp; ukurannya ngikutin ukuran icon. Kosongkan buat pakai icon bawaan.</div>'
+    + '<div class="admin-jj-grid">'
+    + JAJANAN_ITEMS.map(it=>{
+        const img = obj[it.key];
+        const prev = img ? '<img src="'+esc(img)+'" alt="'+esc(it.label)+'">' : msym(it.icon);
+        return '<div class="admin-jj-item">'
+          + '<div class="admin-jj-prev" style="background:'+it.bg+';color:'+it.fg+'">'+prev+'</div>'
+          + '<b>'+esc(it.label)+'</b>'
+          + '<label class="btn-outline admin-logo-upload">'+(img?'Ganti':'Pilih dari Galeri')+'<input type="file" accept="image/*" data-jjfile="'+it.key+'" style="display:none"></label>'
+          + (img ? '<button type="button" class="link-btn" data-action="admin-jj-img-del" data-key="'+it.key+'">Hapus</button>' : '')
+          + '</div>';
+      }).join('')
+    + '</div></div>';
 }
 function adminPromoHtml(f){
   const list = f.promos || [];
@@ -3705,9 +4073,25 @@ function detailPromoHtml(p){
   return cards.length ? '<h2>Promo pada Produk ini</h2>'+cards.join('') : '';
 }
 
+function toppingSectionHtml(p){
+  if(!punyaTopping(p)) return '';
+  const rows = toppingList().map(t=>{
+    const on = state.toppingPick.includes(t.id), habis = t.stok<=0;
+    return '<button class="tp-row'+(on?' on':'')+'" data-action="topping-toggle" data-id="'+esc(t.id)+'"'+(habis?' disabled':'')+'>'
+      + '<span class="tp-chk">'+(on?msym('check'):'')+'</span>'
+      + '<span class="tp-nm">'+esc(t.nama)+(habis?' <em>(habis)</em>':'')+'</span>'
+      + '<b>+'+rupiah(t.harga)+'</b></button>';
+  }).join('');
+  return '<h2>Pilih Topping <small>(opsional)</small></h2><div class="tp-list">'+rows+'</div>';
+}
 function detailBarHtml(p){
   if(p.stok<=0) return '<button class="dt-cta" disabled>Stok Habis</button>';
   const id = esc(p.id), qty = state.cart[p.id]||0;
+  if(punyaTopping(p)){
+    const total = hargaAkhir(p) + pickedToppings().reduce((sum,t)=>sum+t.harga,0);
+    return (qty>0 ? '<button class="dt-cta alt" data-action="open-cart">Keranjang ('+qty+')</button>' : '')
+      + '<button class="dt-cta" data-action="add-porsi" data-id="'+id+'"'+(qty>=p.stok?' disabled':'')+'>+ Keranjang<small>'+rupiah(total)+'</small></button>';
+  }
   if(qty===0) return '<button class="dt-cta" data-action="qty" data-id="'+id+'" data-delta="1">+ Keranjang</button>';
   return '<div class="dt-step"><button data-action="qty" data-id="'+id+'" data-delta="-1" aria-label="Kurangi">'+msym('remove')+'</button><b>'+qty+'</b>'
     + '<button data-action="qty" data-id="'+id+'" data-delta="1" '+(qty>=p.stok?'disabled ':'')+'aria-label="Tambah">'+msym('add')+'</button></div>'
@@ -3725,6 +4109,7 @@ function renderDetailBody(p){
       <div class="dt-pricerow"><b>${homeRp(hargaAkhir(p))}</b>${p.diskonPersen ? '<i>'+p.diskonPersen+'%</i><s>'+homeRp(p.harga)+'</s>' : ''}</div>
     </section>
     <section class="dt-promo" id="dt-promo"></section>
+    <section class="dt-sec" id="dt-topping"></section>
     <section class="dt-sec"><h2>Informasi Produk</h2><dl>
       <dt>Kategori</dt><dd>${esc(p.kategori)}</dd>
       <dt>Kemasan</dt><dd>${esc(p.satuan || 'Pcs')}</dd>
@@ -3735,11 +4120,13 @@ function renderDetailBody(p){
 function renderDetailDynamic(){
   const p = productById(state.detailId); if(!p) return;
   document.getElementById('dt-promo').innerHTML = detailPromoHtml(p);
+  const tpEl = document.getElementById('dt-topping'); if(tpEl) tpEl.innerHTML = toppingSectionHtml(p);
   document.getElementById('detail-bar').innerHTML = detailBarHtml(p);
   updateCartBadge();
 }
 function openProduct(id){
   const p = productById(id); if(!p) return;
+  state.toppingPick = [];
   if(state.cartOpen) closeCart();
   const wasOpen = state.detailId!=null;
   state.detailId = p.id;
@@ -3777,8 +4164,12 @@ document.addEventListener('click', function(e){
   const a = t.dataset.action;
   if(a==='set-tab') setTab(t.dataset.tab);
   else if(a==='set-category'){ setCategory(t.dataset.category); }
+  else if(a==='set-jajanan-category'){ setJajananCategory(t.dataset.category); }
   else if(a==='set-promo-kat'){ state.promoKat = t.dataset.kat; renderTabContent(); }
   else if(a==='qty') changeQty(t.dataset.id, parseInt(t.dataset.delta,10));
+  else if(a==='open-topping') openProduct(t.dataset.id);
+  else if(a==='topping-toggle') toggleTopping(t.dataset.id);
+  else if(a==='add-porsi') addPorsi(t.dataset.id);
   else if(a==='open-product'){ if(e.target.closest('.hm-add,.hm-step,.hm-out,.btn-add,.qty-stepper,.pm-card-add,.stock-out')) return; openProduct(t.dataset.id); }
   else if(a==='close-product') closeProduct();
   else if(a==='toggle-fav') toggleFav(t.dataset.id);
@@ -3820,6 +4211,7 @@ document.addEventListener('click', function(e){
   else if(a==='admin-promo-add'){ if(state.adminForm.promos.length<PROMO_MAX){ state.adminForm.promos.push({judul:'',sub:'',periode:'',gambar:''}); renderAdminBody(); } }
   else if(a==='admin-promo-img-del'){ state.adminForm.promos[+t.dataset.i].gambar=''; renderAdminBody(); }
   else if(a==='admin-promo-del'){ state.adminForm.promos.splice(+t.dataset.i,1); renderAdminBody(); }
+  else if(a==='admin-jj-img-del'){ delete state.adminForm.jajananIcons[t.dataset.key]; renderAdminBody(); }
   else if(a==='retry-poin') loadPoinMember();
   else if(a==='poin-pakai-nomor'){ state.form.wa = state.auth.pelanggan.wa; const w = document.getElementById('inp-wa'); if(w) w.value = state.form.wa; updateSubmitEnabled(); renderPoinSection(); }
   else if(a==='poin-pakai-semua'){ state.form.poinDigunakan = String(poinMaks()); ['cart-inp-poin','inp-poin'].forEach(id=>{ const i = document.getElementById(id); if(i) i.value = state.form.poinDigunakan; }); updateCartPoinDisplay(); updatePoinDisplay(); }
@@ -3828,6 +4220,20 @@ document.addEventListener('click', function(e){
   else if(a==='open-legal') openLegal(t.dataset.legal);
   else if(a==='close-legal') closeLegal();
   else if(a==='shop-category'){ state.category = t.dataset.category || 'Semua'; setTab('belanja'); }
+  else if(a==='jajanan-cat'){
+    state.jajananCategory = 'Semua'; // pintasan Beranda = cari lintas kategori
+    state.search = t.dataset.q || '';
+    const si = document.getElementById('search-input'); if(si) si.value = state.search;
+    const sc = document.getElementById('search-clear'); if(sc) sc.style.display = state.search ? 'flex' : 'none';
+    setTab('jajanan');
+  }
+  else if(a==='open-jajanan'){
+    state.jajananCategory = 'Semua';
+    state.search = '';
+    const si = document.getElementById('search-input'); if(si) si.value = '';
+    const sc = document.getElementById('search-clear'); if(sc) sc.style.display = 'none';
+    setTab('jajanan');
+  }
   else if(a==='edit-alamat') openAlamat_();
   else if(a==='close-alamat') closeAlamat_();
   else if(a==='save-alamat') saveAlamat_();
@@ -3849,6 +4255,7 @@ if(restoredSession){
 state.orders = loadGuestOrders();
 try{ setPromos(normPromos(localStorage.getItem(PROMOS_KEY))); }catch(e){}
 try{ const f = JSON.parse(localStorage.getItem(FAV_KEY)||'[]'); state.fav = Array.isArray(f) ? f.map(String) : []; }catch(e){}
+JAJANAN_ICONS = loadJajananIconsLocal();
 renderShell();
 loadKatalog();
 loadPengaturanToko(); // BARU: tarik Nama/Logo/Alamat/WA toko terbaru dari server, bukan localStorage
