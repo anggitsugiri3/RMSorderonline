@@ -128,18 +128,22 @@ input,textarea{font-family:inherit}
 /* price-tag product card: rounded bottom, punch-hole circle on top */
 .price-tag{position:relative;background:hsl(var(--card));border:1px solid hsl(var(--paper-line));border-radius:6px 6px 14px 14px;padding:22px 12px 12px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
 .price-tag:before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:999px;background:hsl(var(--paper-deep));border:2px solid hsl(var(--paper-line))}
-.price-tag .thumb{font-size:38px;text-align:center;line-height:1;margin-bottom:8px}
+.price-tag .thumb{width:100%;aspect-ratio:1/1;border-radius:8px;margin-bottom:8px;background:hsl(var(--paper-mid));display:flex;align-items:center;justify-content:center;font-size:38px;line-height:1}
 .price-tag .thumb-wrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:8px;margin-bottom:8px;overflow:hidden;background:hsl(var(--paper-mid))}
 .price-tag .thumb-bg{position:absolute;inset:-12%;background-size:cover;background-position:center;filter:blur(16px) saturate(1.15);transform:scale(1.2);opacity:.55}
 .price-tag img.thumb-img{position:relative;display:block;width:100%;height:100%;object-fit:contain}
-.price-tag .name{font-size:13px;font-weight:600;line-height:1.35;min-height:2.5em}
-.price-tag .unit{font-size:11px;color:hsl(var(--ink-soft));margin-top:2px}
-.price-tag .price{font-family:var(--f-sans);font-weight:700;color:hsl(var(--red));margin-top:8px;font-size:15px}
-.price-tag .price-old{font-family:var(--f-sans);font-size:11px;color:hsl(var(--ink-soft));text-decoration:line-through}
-.discount-flag{position:absolute;top:8px;right:8px;background:hsl(var(--red));color:#fff;font-size:10px;font-weight:700;border-radius:999px;padding:2px 7px}
+.price-tag .name{font-size:14px;font-weight:600;line-height:1.3}
+.price-tag .price{font-family:var(--f-sans);font-weight:800;color:hsl(var(--ink));margin-top:8px;font-size:18px}
+.price-tag .price-old{font-family:var(--f-sans);font-size:12px;color:hsl(var(--ink-soft));text-decoration:line-through}
+.price-tag .promo-row{display:flex;align-items:center;gap:6px;margin-top:4px}
+.discount-flag{display:inline-flex;align-items:center;background:hsl(var(--red));color:#fff;font-size:10px;font-weight:700;border-radius:6px;padding:2px 6px;flex:none}
+.price-tag .hemat-badge{display:inline-flex;align-items:center;gap:3px;align-self:flex-start;margin-top:6px;padding:3px 8px;border-radius:999px;background:hsl(var(--gold)/.32);color:hsl(var(--red));font-size:10.5px;font-weight:700}
+.price-tag .hemat-badge .msym{font-size:13px}
 .stock-flag{margin-top:6px;align-self:flex-start;font-size:10px;font-weight:600;color:hsl(var(--red));border:1px solid hsl(var(--red));border-radius:999px;padding:2px 8px}
+.instant-tag{display:flex;align-items:center;gap:3px;margin-top:4px;font-size:11px;font-weight:600;color:hsl(var(--red))}
+.instant-tag .msym{font-size:13px}
 .stock-out{margin-top:10px;text-align:center;font-size:11px;font-weight:600;color:hsl(var(--ink-soft));background:hsl(var(--paper-mid));border-radius:8px;padding:9px}
-.btn-add{margin-top:10px;border:none;border-radius:8px;padding:8px 0;font-size:12.5px;font-weight:600;background:hsl(var(--green));color:#fff;display:flex;align-items:center;justify-content:center;gap:5px;transition:filter var(--dur)}
+.btn-add{margin-top:10px;border:none;border-radius:8px;padding:8px 0;font-size:12.5px;font-weight:600;background:var(--z-blue);color:#fff;display:flex;align-items:center;justify-content:center;gap:5px;transition:filter var(--dur)}
 .btn-add:hover{filter:brightness(1.06)}
 .btn-add:active{transform:scale(.97)}
 .qty-stepper{margin-top:10px;display:flex;align-items:center;justify-content:space-between;background:hsl(var(--paper-mid));border:1px solid hsl(var(--paper-line));border-radius:8px}
@@ -534,10 +538,12 @@ input,textarea{font-family:inherit}
 .store-mark{font-size:14px}
 .poin-hi strong{font-size:16px;font-weight:800}
 .chip,.btn-add,.btn-primary,.wa-btn,.order-cancel-btn,.btn-outline,.auth-tab,.method-btn,.submit-btn,.qty-stepper span,.cart-line-name,.field label,.field-label-plain,.toast{font-size:12px;font-weight:700}
-.price-tag .name{font-size:12px;font-weight:700;line-height:1.25}
-.price-tag .unit,.price-tag .price-old,.cart-line-sub{font-size:10px}
-.price-tag .price,.cart-line-total,.order-total{font-size:12px;font-weight:800}
-.discount-flag{font-size:9px}
+.price-tag .name{font-size:14px;font-weight:600;line-height:1.3}
+.price-tag .price-old{font-size:12px}
+.cart-line-sub{font-size:10px}
+.price-tag .price{font-size:18px;font-weight:800}
+.cart-line-total,.order-total{font-size:12px;font-weight:800}
+.discount-flag{font-size:10px}
 .empty-state p,.info-row,.faq-q,.akun-menu-btn,.faq-a,.legal-text,.account-guest-note,.retention-notice,.field input,.field textarea{font-size:12px}
 
 /* ===== Keranjang & Checkout = tampilan CartScreen di zip ===== */
@@ -1950,14 +1956,15 @@ function productCard(p){
   if(p.gambar) applyTrimmedThumb(p.gambar);
   return `
     <div class="price-tag"${pAttr(p.id)}>
-      ${p.diskonPersen ? '<span class="discount-flag">-'+p.diskonPersen+'%</span>' : ''}
       ${thumb}
       <div class="name">${esc(p.nama)}</div>
-      <div class="unit">per ${esc(p.satuan)}</div>
       ${rendahStok ? '<span class="stock-flag">Sisa '+p.stok+'</span>' : ''}
       ${p.diskonPersen
-        ? '<div><div class="price-old">'+rupiah(p.harga)+'</div><div class="price">'+rupiah(hargaAkhir(p))+'</div></div>'
+        ? '<div class="price">'+rupiah(hargaAkhir(p))+'</div>'
+          +'<div class="promo-row"><span class="discount-flag">-'+p.diskonPersen+'%</span><span class="price-old">'+rupiah(p.harga)+'</span></div>'
+          +'<div class="hemat-badge">'+msym('sell')+'<span>Hemat '+rupiah(p.harga-hargaAkhir(p))+'</span>'+msym('chevron_right')+'</div>'
         : '<div class="price">'+rupiah(p.harga)+'</div>'}
+      ${habis ? '' : '<div class="instant-tag">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>'}
       ${habis
         ? '<div class="stock-out">Stok habis</div>'
         : (punyaTopping(p)
@@ -2452,8 +2459,9 @@ function promoCatalogHtml(diskon){
         : '<div class="qty-stepper"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><span>'+qty+'</span><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>');
     return `<article class="pm-card"><div${pAttr(p.id)}>
         <div class="pm-card-im">${im}<i>Hemat ${p.diskonPersen}%</i></div>
-        <small>per ${esc(p.satuan)}</small><h3>${esc(p.nama)}</h3>
+        <h3>${esc(p.nama)}</h3>
         <div class="pm-card-pr"><b>${rupiah(hargaAkhir(p))}</b><s>${rupiah(p.harga)}</s></div>
+        ${habis ? '' : '<div class="instant-tag">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>'}
         <div class="pm-card-st">Sisa ${p.stok}</div>
       </div>${act}</article>`;
   };
