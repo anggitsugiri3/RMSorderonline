@@ -129,7 +129,9 @@ input,textarea{font-family:inherit}
 .price-tag{position:relative;background:hsl(var(--card));border:1px solid hsl(var(--paper-line));border-radius:6px 6px 14px 14px;padding:22px 12px 12px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column}
 .price-tag:before{content:"";position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:14px;height:14px;border-radius:999px;background:hsl(var(--paper-deep));border:2px solid hsl(var(--paper-line))}
 .price-tag .thumb{font-size:38px;text-align:center;line-height:1;margin-bottom:8px}
-.price-tag img.thumb-img{width:100%;height:64px;object-fit:cover;border-radius:8px;margin-bottom:8px}
+.price-tag .thumb-wrap{position:relative;width:100%;aspect-ratio:1/1;border-radius:8px;margin-bottom:8px;overflow:hidden;background:hsl(var(--paper-mid))}
+.price-tag .thumb-bg{position:absolute;inset:-12%;background-size:cover;background-position:center;filter:blur(16px) saturate(1.15);transform:scale(1.2);opacity:.55}
+.price-tag img.thumb-img{position:relative;display:block;width:100%;height:100%;object-fit:contain}
 .price-tag .name{font-size:13px;font-weight:600;line-height:1.35;min-height:2.5em}
 .price-tag .unit{font-size:11px;color:hsl(var(--ink-soft));margin-top:2px}
 .price-tag .price{font-family:var(--f-sans);font-weight:700;color:hsl(var(--red));margin-top:8px;font-size:15px}
@@ -264,7 +266,8 @@ input,textarea{font-family:inherit}
 /* Kartu produk (dipakai Kejar Diskon & Rekomendasi) */
 .hm-card{display:flex;flex-direction:column;justify-content:space-between;padding:8px;background:#fff;border:1px solid var(--z-line);border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
 .hm-thumb{position:relative;width:100%;aspect-ratio:1/1;margin-bottom:6px;border-radius:6px;overflow:hidden;background:var(--z-bg);display:flex;align-items:center;justify-content:center;font-size:40px;line-height:1}
-.hm-thumb img{width:100%;height:100%;object-fit:cover;padding:4px}
+.hm-thumb-bg{position:absolute;inset:-12%;background-size:cover;background-position:center;filter:blur(16px) saturate(1.15);transform:scale(1.2);opacity:.55}
+.hm-thumb img{position:relative;width:100%;height:100%;object-fit:contain;padding:4px}
 .hm-disc{position:absolute;top:4px;left:4px;z-index:1;padding:2px 6px;border-radius:4px;background:var(--z-red);color:#fff;font-size:9px;font-weight:800}
 .hm-pkg{display:block;font-size:10px;font-weight:500;color:var(--z-muted)}
 .hm-name{margin:2px 0 0;min-height:30px;font-size:12px;font-weight:600;line-height:1.25;color:var(--z-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -483,6 +486,13 @@ input,textarea{font-family:inherit}
 .admin-logo-preview img{width:100%;height:100%;object-fit:cover}
 .admin-logo-actions{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
 .admin-logo-upload{display:inline-block;cursor:pointer}
+.admin-produk-list{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
+.admin-produk-row{display:flex;align-items:center;gap:12px;padding:8px;border:1px solid hsl(var(--paper-line));border-radius:12px}
+.admin-produk-thumb{position:relative;width:52px;height:52px;flex:none;border-radius:8px;overflow:hidden;background:hsl(var(--paper-mid));display:flex;align-items:center;justify-content:center;font-size:22px}
+.admin-produk-thumb img{width:100%;height:100%;object-fit:contain}
+.admin-produk-info{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.admin-produk-nama{font-size:12.5px;font-weight:600;color:hsl(var(--ink));line-height:1.3}
+.admin-produk-upload{display:inline-block;cursor:pointer;padding:6px 12px;font-size:11.5px}
 .toast{position:fixed;left:16px;right:16px;max-width:420px;margin:0 auto;bottom:18px;z-index:80;background:hsl(var(--ink));color:#fff;text-align:center;font-size:12.5px;font-weight:600;padding:12px 16px;border-radius:12px;box-shadow:var(--shadow-md);opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity var(--dur),transform var(--dur)}
 .toast[data-open="true"]{opacity:1;transform:translateY(0)}
 
@@ -1272,6 +1282,82 @@ function msym(name, cls){ return '<span class="msym'+(cls?' '+cls:'')+'" aria-hi
 function rupiah(n){ return 'Rp' + Math.round(n).toLocaleString('id-ID'); }
 function hargaAkhir(p){ return p.diskonPersen ? Math.round((p.harga*(100-p.diskonPersen)/100)/100)*100 : p.harga; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ================================================================
+   AUTO-TRIM FOTO PRODUK
+   Banyak foto produk (mis. dari CDN yoline.co.id) disimpan di kanvas
+   lebar (contoh: 1280x720) dengan padding putih raksasa di kiri-kanan,
+   sementara objek produknya sendiri cuma nempatin sepertiga tengah.
+   Akibatnya di kotak thumbnail kotak persegi tetap keliatan "kosong"
+   walau CSS sudah object-fit:contain - karena bukan CSS yang salah,
+   pixel putihnya memang bagian dari file.
+   Fungsi ini baca pixel via <canvas>, cari bounding-box konten asli
+   (buang tepi yang mendekati putih/transparan), lalu ganti src gambar
+   jadi versi ter-crop. Kalau server gambar gak kirim header CORS,
+   canvas jadi "tainted" dan baca pixel gagal - di-tangkap, otomatis
+   balik pakai gambar asli (gak pernah bikin gambar rusak/blank).
+   ================================================================ */
+const trimCache = new Map(); // "url|maxLen" -> Promise<string> (dataURL hasil crop, atau url asli kalau gagal/gak perlu)
+function getTrimmedImage(url, maxLen){
+  if(!url) return Promise.resolve(url);
+  const cap = maxLen || 250000; // generik buat tampilan (longgar); upload foto produk kirim cap lebih ketat sendiri
+  const cacheKey = url+'|'+cap;
+  if(trimCache.has(cacheKey)) return trimCache.get(cacheKey);
+  const p = new Promise((resolve)=>{
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = function(){
+      try{
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if(!w || !h) { resolve(url); return; }
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        const ctx = cv.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const data = ctx.getImageData(0, 0, w, h).data; // lempar error kalau canvas tainted (CORS)
+        let minX=w, minY=h, maxX=-1, maxY=-1;
+        const step = Math.max(1, Math.floor(Math.max(w,h)/600)); // sampling biar gambar gede tetap cepat
+        for(let y=0;y<h;y+=step){
+          for(let x=0;x<w;x+=step){
+            const i=(y*w+x)*4, r=data[i], g=data[i+1], b=data[i+2], a=data[i+3];
+            const bg = a<10 || (r>244 && g>244 && b>244);
+            if(!bg){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+          }
+        }
+        if(maxX<minX || maxY<minY){ resolve(url); return; } // gagal deteksi konten -> gambar asli
+        const padX = Math.round((maxX-minX)*0.04)+step, padY = Math.round((maxY-minY)*0.04)+step;
+        minX = Math.max(0,minX-padX); minY = Math.max(0,minY-padY);
+        maxX = Math.min(w-1,maxX+padX); maxY = Math.min(h-1,maxY+padY);
+        const cw = maxX-minX+1, ch = maxY-minY+1;
+        if(cw >= w*0.94 && ch >= h*0.94 && !maxLen){ resolve(url); return; } // udah tight & gak ada budget ketat -> gambar asli, hemat kerjaan
+        const out = document.createElement('canvas');
+        out.width = cw; out.height = ch;
+        const octx = out.getContext('2d');
+        octx.fillStyle = '#fff'; octx.fillRect(0,0,cw,ch); // alas putih - JPEG gak dukung transparan, konsisten sama compressImage()
+        octx.drawImage(cv, minX, minY, cw, ch, 0, 0, cw, ch);
+        // JPEG (bukan PNG) + loop turunin kualitas: foto asli bisa kompleks/besar, PNG bakal
+        // lebih gede dari input yang udah dikompres. Dijamin muat di bawah `cap` (dipakai
+        // upload foto produk supaya aman di batas ~50rb karakter 1 cell Google Sheets).
+        let q = .85, res = out.toDataURL('image/jpeg', q);
+        while(res.length > cap && q > .35){ q -= .1; res = out.toDataURL('image/jpeg', q); }
+        resolve(res);
+      }catch(e){ resolve(url); } // CORS taint / error lain -> fallback gambar asli, diam-diam
+    };
+    img.onerror = function(){ resolve(url); };
+    img.src = url;
+  });
+  trimCache.set(cacheKey, p);
+  return p;
+}
+function applyTrimmedThumb(url){
+  if(!url) return;
+  getTrimmedImage(url).then(function(trimmed){
+    if(trimmed===url) return;
+    document.querySelectorAll('[data-thumb-src="'+CSS.escape(url)+'"]').forEach(function(el){
+      if(el.tagName==='IMG') el.src = trimmed; else el.style.backgroundImage = 'url("'+trimmed+'")';
+    });
+  });
+}
 function isStoreOpen(){
   const now = new Date();
   const [oh,om] = STORE.jamBuka.split(':').map(Number);
@@ -1374,10 +1460,14 @@ const state = {
 
   // ---- ADMIN (ubah Nama Toko, Alamat & No. WhatsApp) ----
   adminOpen: false,
-  adminStep: 'pin',        // 'pin' | 'form'
+  adminStep: 'pin',        // 'pin' | 'form' | 'produk'
   adminForm: { pin:'', nama:'', whatsapp:'', alamat:'', logo:'' },
   adminSaving: false,
   adminError: null,
+  // ---- ADMIN > Foto Produk (upload foto tiap produk katalog lewat HP) ----
+  adminProdukQuery: '',
+  adminProdukBusy: {},      // {[produkId]: true} selama upload jalan
+  adminProdukRowError: {},  // {[produkId]: 'pesan error'} per baris produk
   toast: null
 };
 
@@ -1799,8 +1889,9 @@ function productCard(p){
   const habis = p.stok<=0;
   const rendahStok = !habis && p.stok<=5;
   const thumb = p.gambar
-    ? '<img class="thumb-img" src="'+esc(p.gambar)+'" alt="">'
+    ? '<div class="thumb-wrap"><div class="thumb-bg" data-thumb-src="'+esc(p.gambar)+'" style=\'background-image:url("'+esc(p.gambar)+'")\'></div><img class="thumb-img" data-thumb-src="'+esc(p.gambar)+'" src="'+esc(p.gambar)+'" alt=""></div>'
     : '<div class="thumb" aria-hidden="true">'+(p.emoji||'🛍️')+'</div>';
+  if(p.gambar) applyTrimmedThumb(p.gambar);
   return `
     <div class="price-tag"${pAttr(p.id)}>
       ${p.diskonPersen ? '<span class="discount-flag">-'+p.diskonPersen+'%</span>' : ''}
@@ -1944,8 +2035,9 @@ function homeAddControl(p, big){
 
 function homeCard(p, grid){
   const thumb = p.gambar
-    ? '<img alt="'+esc(p.nama)+'" src="'+esc(p.gambar)+'" loading="lazy">'
+    ? '<div class="hm-thumb-bg" data-thumb-src="'+esc(p.gambar)+'" style=\'background-image:url("'+esc(p.gambar)+'")\'></div><img data-thumb-src="'+esc(p.gambar)+'" alt="'+esc(p.nama)+'" src="'+esc(p.gambar)+'" loading="lazy">'
     : '<span aria-hidden="true">'+(p.emoji||'🛒')+'</span>';
+  if(p.gambar) applyTrimmedThumb(p.gambar);
   const pkg = p.satuan ? '<span class="hm-pkg">per '+esc(p.satuan)+'</span>' : '';
   const rendahStok = p.stok>0 && p.stok<=5;
   const chip = grid
@@ -3398,6 +3490,98 @@ function closeAdmin(){
   document.body.style.overflow='';
 }
 
+/* ---------- ADMIN > Foto Produk ----------
+   Upload foto produk langsung dari HP (tab Akun > Pengaturan Toko > Kelola Foto
+   Produk), tanpa perlu buka Sheet/ERP terpisah. Alur: pilih file -> compressImage()
+   (resize+kompres, sama seperti logo/promo) -> getTrimmedImage() (buang tepi
+   putih/transparan bawaan foto - AMAN dari CORS di sini karena sumbernya data URL
+   hasil compressImage, bukan URL remote) -> kirim ke backend action baru
+   'updateFotoProduk'. LIHAT CATATAN PENTING soal action ini di bawah uploadFotoProduk(). */
+function renderAdminProdukForm(body){
+  body.innerHTML = `
+    <h2>Foto Produk</h2>
+    <div class="admin-note">Cari produk, lalu pilih "Ganti Foto". Otomatis dikompres &amp; tepiannya dirapikan sebelum dikirim ke server - begitu tersimpan langsung kepakai di semua perangkat.</div>
+    <div class="field"><input id="admin-produk-q" type="search" placeholder="Cari nama produk…" value="${esc(state.adminProdukQuery||'')}"></div>
+    <div id="admin-produk-list" class="admin-produk-list"></div>
+    <div class="guest-link-row"><button class="link-btn" data-action="admin-back-form">← Kembali ke Pengaturan Toko</button></div>
+  `;
+  const qElm = document.getElementById('admin-produk-q');
+  qElm.addEventListener('input', e=>{ state.adminProdukQuery = e.target.value; renderAdminProdukList(); });
+  qElm.focus();
+  const vlen = qElm.value.length; qElm.setSelectionRange(vlen, vlen); // kursor tetap di akhir, gak keganggu re-render list
+  renderAdminProdukList();
+}
+/* Cuma innerHTML #admin-produk-list yang diganti tiap ketik di kotak cari, BUKAN
+   seluruh body - supaya fokus & posisi kursor di kotak cari gak ke-reset tiap huruf. */
+function renderAdminProdukList(){
+  const listElm = document.getElementById('admin-produk-list');
+  if(!listElm) return;
+  const q = (state.adminProdukQuery||'').trim().toLowerCase();
+  const list = q ? PRODUCTS.filter(p=>String(p.nama||'').toLowerCase().includes(q)) : PRODUCTS;
+  const LIMIT = 40; // batasi render awal biar ringan kalau katalog ratusan item
+  const shown = list.slice(0, LIMIT);
+  listElm.innerHTML = !PRODUCTS.length
+    ? '<div class="admin-note">Katalog belum termuat. Tutup dialog ini, tunggu katalog kebuka, lalu coba lagi.</div>'
+    : (shown.length ? shown.map(adminProdukRow).join('') : '<div class="admin-note">Produk tidak ditemukan.</div>')
+      + (list.length>LIMIT ? '<div class="admin-note">Menampilkan '+LIMIT+' dari '+list.length+' produk. Persempit pencarian buat lihat lainnya.</div>' : '');
+  listElm.querySelectorAll('[data-produk-photo]').forEach(el=>{
+    el.addEventListener('change', e=>{
+      const file = e.target.files && e.target.files[0];
+      const id = el.dataset.produkPhoto;
+      if(file) uploadFotoProduk(id, file);
+    });
+  });
+}
+function adminProdukRow(p){
+  const busy = !!state.adminProdukBusy[p.id];
+  const err = state.adminProdukRowError[p.id];
+  return `
+    <div class="admin-produk-row">
+      <div class="admin-produk-thumb">${p.gambar ? '<img src="'+esc(p.gambar)+'" alt="">' : '<span aria-hidden="true">'+(p.emoji||'🛒')+'</span>'}</div>
+      <div class="admin-produk-info">
+        <div class="admin-produk-nama">${esc(p.nama)}</div>
+        <label class="btn-outline admin-produk-upload" ${busy?'aria-disabled="true"':''}>${busy?'Mengupload…':'Ganti Foto'}<input type="file" accept="image/*" data-produk-photo="${esc(p.id)}" style="display:none" ${busy?'disabled':''}></label>
+        ${err ? '<div class="auth-error" style="margin-top:4px">'+esc(err)+'</div>' : ''}
+      </div>
+    </div>`;
+}
+/**
+ * Upload foto satu produk lewat action 'updateFotoProduk'. Backend-nya sudah ditambahkan
+ * ke project Apps Script ASLI (dicek langsung dari file yang kamu upload, bukan tebakan lagi):
+ *   - src/server/controllers/ProdukController.js -> fungsi apiUpdateFotoProdukPublik()
+ *   - src/server/Code.js -> whitelist doPost, key 'updateFotoProduk'
+ * Foto disimpan APA ADANYA sebagai data URL langsung di kolom Foto Sheet_Produk (BUKAN
+ * upload ke Drive) - pola ini SAMA PERSIS seperti Logo Toko/Icon Jajanan yang sudah ada
+ * (STORE_LOGO_DATA_URL dsb, lihat PengaturanTokoPublikController.js), makanya di sini
+ * dipaksa muat di bawah ~45.000 karakter (getTrimmedImage(compressed, 45000) di bawah) -
+ * batas aman 1 cell Google Sheets (~50.000 karakter).
+ */
+async function uploadFotoProduk(produkId, file){
+  const p = PRODUCTS.find(x=>String(x.id)===String(produkId));
+  if(!p) return;
+  if(!file.type.startsWith('image/')){
+    state.adminProdukRowError[produkId] = 'File harus berupa gambar.';
+    renderAdminProdukList();
+    return;
+  }
+  state.adminProdukBusy[produkId] = true;
+  delete state.adminProdukRowError[produkId];
+  renderAdminProdukList();
+  try{
+    const compressed = await compressImage(file, 720);   // resize + kompres ke JPEG, sama seperti logo/promo
+    const rapi = await getTrimmedImage(compressed, 45000); // buang tepi putih/transparan + pastikan muat 1 cell Sheets (aman dari CORS: sumbernya data URL sendiri)
+    const saved = await api('updateFotoProduk', { pin: state.adminForm.pin, produkId: produkId, foto: rapi });
+    p.gambar = (saved && saved.foto) || rapi; // optimistic: kalau server gak balikin URL, pakai hasil kompres sendiri dulu
+    showToast('Foto "'+p.nama+'" tersimpan.');
+    renderTabContent(); // grid Beranda/Belanja & halaman detail ikut kebarui seketika
+  }catch(e){
+    state.adminProdukRowError[produkId] = e.message || 'Gagal menyimpan foto. Coba lagi.';
+  }finally{
+    state.adminProdukBusy[produkId] = false;
+    renderAdminProdukList();
+  }
+}
+
 function renderAdminBody(){
   const body = document.getElementById('admin-body');
   if(!body) return;
@@ -3419,6 +3603,8 @@ function renderAdminBody(){
     return;
   }
 
+  if(state.adminStep==='produk'){ renderAdminProdukForm(body); return; }
+
   body.innerHTML = `
     <h2>Pengaturan Toko</h2>
     <div class="admin-note">Perubahan disimpan di server dan otomatis berlaku di semua perangkat yang buka link toko ini (header, tombol WhatsApp, dll) — bukan cuma di HP/browser ini.</div>
@@ -3438,6 +3624,11 @@ function renderAdminBody(){
     <div class="field"><label for="admin-wa">Nomor WhatsApp Toko</label><input id="admin-wa" type="tel" placeholder="62xxxxxxxxxx" value="${esc(f.whatsapp)}"></div>
     <div class="admin-note" style="margin-top:-6px">Format: diawali <strong>62</strong>, tanpa spasi/strip/tanda plus. Contoh: 6281234567890.</div>
     <div class="field"><label for="admin-alamat">Alamat Toko</label><textarea id="admin-alamat" rows="2" placeholder="Jalan, nomor, patokan">${esc(f.alamat)}</textarea></div>
+    <div class="field">
+      <label>Foto Produk</label>
+      <div class="admin-note" style="margin:0 0 8px">Upload/ganti foto tiap produk katalog langsung dari HP, tanpa perlu buka Sheet/ERP.</div>
+      <button type="button" class="btn-outline" data-action="open-admin-produk">📷 Kelola Foto Produk</button>
+    </div>
     ${adminJajananHtml(f)}
     ${adminPromoHtml(f)}
     <button class="submit-btn" data-action="submit-admin-save" ${state.adminSaving?'disabled':''}>${state.adminSaving?'Menyimpan…':'Simpan Perubahan'}</button>
@@ -4327,6 +4518,8 @@ document.addEventListener('click', function(e){
   else if(a==='logout') logout();
   else if(a==='retry-riwayat') loadRiwayatPelanggan();
   else if(a==='open-admin') openAdmin();
+  else if(a==='open-admin-produk'){ state.adminStep='produk'; renderAdminBody(); }
+  else if(a==='admin-back-form'){ state.adminStep='form'; renderAdminBody(); }
   else if(a==='close-admin') closeAdmin();
   else if(a==='submit-admin-pin') submitAdminPin();
   else if(a==='submit-admin-save') submitAdminSave();
