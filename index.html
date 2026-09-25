@@ -385,6 +385,14 @@ input,textarea{font-family:inherit}
 
 /* ---------- Overlays: cart sheet / dialogs ---------- */
 .overlay{position:fixed;inset:0;z-index:50;display:none}
+
+/* ---------- Boot-sync overlay: nutup layar pas app deteksi pengaturan toko baru dari admin ---------- */
+.boot-sync-overlay{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:hsl(var(--paper));text-align:center;padding:24px}
+.boot-sync-overlay[hidden]{display:none}
+.boot-sync-spin{width:38px;height:38px;border-radius:999px;border:3px solid hsl(var(--paper-line));border-top-color:hsl(var(--red));animation:bootSyncSpin .8s linear infinite}
+@keyframes bootSyncSpin{to{transform:rotate(360deg)}}
+.boot-sync-overlay b{font-size:14px;color:hsl(var(--ink))}
+.boot-sync-overlay span{font-size:12px;color:hsl(var(--ink-soft));max-width:280px}
 .overlay[data-open="true"]{display:block}
 .overlay-backdrop{position:absolute;inset:0;background:rgba(20,12,6,.45);opacity:0;transition:opacity var(--dur)}
 .overlay[data-open="true"] .overlay-backdrop{opacity:1}
@@ -921,6 +929,11 @@ body{background:hsl(var(--paper-deep))}
 </head>
 <body>
 <div id="app" class="app"></div>
+<div id="boot-sync-overlay" class="boot-sync-overlay" hidden>
+  <div class="boot-sync-spin"></div>
+  <b>Memperbarui data toko...</b>
+  <span>Admin baru saja mengubah pengaturan toko. Mohon tunggu sebentar.</span>
+</div>
 
 <script>
 /* ================================================================
@@ -1204,6 +1217,35 @@ function applyStoreBranding(){
   renderTabContent(); // tab Akun/Beranda nampilin alamat & FAQ metode bayar yang baca STORE juga
 }
 
+/* ---------- Boot-sync overlay: dipicu kalau pengaturan toko server BEDA dari
+   snapshot terakhir yang device ini simpan (artinya admin ubah sesuatu sejak
+   kunjungan terakhir). Bukan dicek tiap detik/polling - cukup 1x tiap app
+   dibuka, sebelum PENGGUNA sempat pencet apa-apa, jadi gak ada celah pengguna
+   checkout pakai data toko yang sudah usang (nomor WA lama, promo lama, dst). */
+const STORE_SNAPSHOT_KEY = 'ainiMartStoreSnapshotV1';
+function buatSnapshotToko_(s){
+  return JSON.stringify({
+    nama: s.nama||'', whatsapp: s.whatsapp||'', alamat: s.alamat||'', logo: s.logo||'',
+    promo: typeof s.promo==='string' ? s.promo : JSON.stringify(s.promo||[]),
+    jajananIcons: typeof s.jajananIcons==='string' ? s.jajananIcons : JSON.stringify(s.jajananIcons||{})
+  });
+}
+function showBootSyncOverlay(title, subtitle){
+  const el = document.getElementById('boot-sync-overlay');
+  if(!el) return;
+  const t = el.querySelector('b'); if(t) t.textContent = title || 'Memperbarui data toko...';
+  const s = el.querySelector('span'); if(s) s.textContent = subtitle || 'Mohon tunggu sebentar.';
+  el.hidden = false;
+  // failsafe: request macet/lambat gak boleh nutup toko selamanya - paksa ke-hide maks 6 detik
+  clearTimeout(showBootSyncOverlay._failsafe);
+  showBootSyncOverlay._failsafe = setTimeout(hideBootSyncOverlay, 6000);
+}
+function hideBootSyncOverlay(){
+  clearTimeout(showBootSyncOverlay._failsafe);
+  const el = document.getElementById('boot-sync-overlay');
+  if(el) el.hidden = true;
+}
+
 /**
  * Ambil pengaturan toko TERBARU dari server (Sheet/Properties di Apps
  * Script - lihat action 'pengaturanTokoPublik'). Dipanggil sekali tiap app
@@ -1211,11 +1253,20 @@ function applyStoreBranding(){
  * default/cache) duluan sebelum data server sampai - baru begitu server
  * jawab, header ditimpa ke nilai terkini. Kalau server gak bisa dihubungi
  * (offline dsb), app tetap jalan pakai nilai default di STORE, gak nge-block.
+ *
+ * BARU: kalau hasil server BEDA dari snapshot device ini (bukan kunjungan
+ * pertama) -> tampilkan boot-sync-overlay dulu, baru diterapkan, baru
+ * overlay ditutup. Kunjungan normal (gak ada perubahan admin) tetap silent
+ * kayak sebelumnya, gak ada overlay sama sekali.
  */
 async function loadPengaturanToko(){
   try{
     const s = await api('pengaturanTokoPublik', {}, API_READ);
     if(!s) return;
+    const snapshotBaru = buatSnapshotToko_(s);
+    const snapshotLama = localStorage.getItem(STORE_SNAPSHOT_KEY);
+    const adaPerubahan = snapshotLama !== null && snapshotLama !== snapshotBaru;
+    if(adaPerubahan) showBootSyncOverlay('Memperbarui data toko...', 'Admin baru saja mengubah pengaturan toko. Mohon tunggu sebentar.');
     if(s.nama) STORE.nama = s.nama;
     if(s.whatsapp) STORE.whatsapp = s.whatsapp;
     if(s.alamat) STORE.alamat = s.alamat;
@@ -1227,10 +1278,15 @@ async function loadPengaturanToko(){
         if(obj && typeof obj==='object'){ JAJANAN_ICONS = obj; saveJajananIconsLocal(obj); }
       }catch(e){}
     }
+    try{ localStorage.setItem(STORE_SNAPSHOT_KEY, snapshotBaru); }catch(e){}
     applyStoreBranding();
     if(state.tab==='beranda') renderTabContent(); // icon jajanan bisa berubah dari server, refresh kalau lagi kelihatan
+    if(adaPerubahan){
+      setTimeout(function(){ hideBootSyncOverlay(); showToast('Tampilan toko sudah diperbarui.'); }, 700);
+    }
   }catch(e){
     console.warn('Gagal muat pengaturan toko dari server, pakai nilai default:', e.message);
+    hideBootSyncOverlay(); // jaga-jaga: kalau overlay sempat kebuka lalu fetch gagal, jangan nyangkut
   }
 }
 
@@ -3699,6 +3755,7 @@ async function submitAdminSave(){
   state.adminSaving = true;
   state.adminError = null;
   renderAdminBody();
+  showBootSyncOverlay('Menyimpan perubahan...', 'Mohon tunggu, perubahan sedang dikirim & disimpan ke server.');
   try{
     // BARU: simpan ke server (bukan localStorage) - PIN dikirim ulang di sini
     // biar server yang jadi penentu akhir boleh/gaknya perubahan tersimpan
@@ -3724,10 +3781,12 @@ async function submitAdminSave(){
     // fallback ke objek lokal cuma buat server lama yang belum kirim field ini balik.
     const savedJajananIcons = (saved && saved.jajananIcons && typeof saved.jajananIcons==='object') ? saved.jajananIcons : jajananIcons;
     JAJANAN_ICONS = savedJajananIcons; saveJajananIconsLocal(savedJajananIcons);
+    try{ localStorage.setItem(STORE_SNAPSHOT_KEY, buatSnapshotToko_({ nama:STORE.nama, whatsapp:STORE.whatsapp, alamat:STORE.alamat, logo:STORE.logo, promo:promos, jajananIcons:savedJajananIcons })); }catch(e){}
     state.adminSaving = false;
     closeAdmin();
     applyStoreBranding(); // update header dsb di device INI juga, tanpa nunggu reload
     if(state.tab==='beranda') renderTabContent(); // icon jajanan baru langsung kelihatan tanpa reload
+    hideBootSyncOverlay();
     showToast((!serverPromo && (promos.length || promoChanged))
       ? 'Tersimpan. Promo banner baru berlaku di perangkat ini saja (server belum mendukung).'
       : 'Pengaturan toko disimpan & langsung berlaku di semua perangkat.');
@@ -3735,6 +3794,7 @@ async function submitAdminSave(){
     state.adminSaving = false;
     state.adminError = e.message || 'Gagal menyimpan ke server. Coba lagi.';
     renderAdminBody();
+    hideBootSyncOverlay();
   }
 }
 
