@@ -2,7 +2,7 @@
   "name": "A'ini Mart - Pesan Online",
   "short_name": "A'ini Mart",
   "description": "Pesan belanjaan A'ini Mart online, ambil sendiri atau diantar ke rumah.",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
