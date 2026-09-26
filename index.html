@@ -149,7 +149,10 @@ input,textarea{font-family:inherit}
 .qty-stepper{margin-top:10px;display:flex;align-items:center;justify-content:space-between;background:hsl(var(--paper-mid));border:1px solid hsl(var(--paper-line));border-radius:8px}
 .qty-stepper button{border:none;background:none;padding:7px 10px;display:flex;color:hsl(var(--ink))}
 .qty-stepper button:disabled{opacity:.3}
-.qty-stepper span{font-family:var(--f-sans);font-weight:700;font-size:13px}
+.qty-stepper span,.qty-stepper .qty-input{font-family:var(--f-sans);font-weight:700;font-size:13px}
+.qty-input{width:32px;padding:0;border:none;background:transparent;text-align:center;color:inherit;font:inherit;-moz-appearance:textfield}
+.qty-input::-webkit-outer-spin-button,.qty-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.qty-input:focus{outline:none;background:rgba(0,0,0,.06);border-radius:4px}
 
 /* ---------- Empty states ---------- */
 .empty-state{padding:56px 28px;text-align:center;color:hsl(var(--ink-soft));display:flex;flex-direction:column;align-items:center;gap:10px}
@@ -283,7 +286,7 @@ input,textarea{font-family:inherit}
 .hm-step button{display:flex;padding:4px 10px;border:none;background:none;color:var(--z-red)}
 .hm-step button:disabled{opacity:.3}
 .hm-step .msym{font-size:18px}
-.hm-step b{font-size:12px;font-weight:800}
+.hm-step b,.hm-step .qty-input{font-size:12px;font-weight:800}
 .hm-out{margin-top:8px;padding:5px 0;border-radius:4px;background:var(--z-bg);color:var(--z-muted);font-size:11px;font-weight:600;text-align:center}
 
 /* 6. Kategori Pilihan */
@@ -517,6 +520,12 @@ input,textarea{font-family:inherit}
 .poin-hero{background:linear-gradient(135deg, hsl(var(--red)), hsl(0 65% 34%));color:#fff;padding:18px 18px 22px}
 .poin-hi{font-size:15px}
 .poin-hi strong{font-family:var(--f-sans);font-size:22px;font-weight:700;margin-left:2px}
+.poin-hi-name-row{display:flex;align-items:center;gap:6px}
+.poin-edit-btn{border:none;background:rgba(255,255,255,.2);color:#fff;width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;flex:none;transition:background var(--dur)}
+.poin-edit-btn .icon{width:12px;height:12px}
+.poin-edit-btn:hover{background:rgba(255,255,255,.32)}
+.poin-edit-btn:active{transform:scale(.92)}
+.poin-edit-btn.plain{background:hsl(var(--paper-mid));color:hsl(var(--ink-soft))}
 .poin-tier-badge{display:inline-flex;align-items:center;gap:5px;margin-top:8px;background:rgba(255,255,255,.16);border-radius:999px;padding:4px 12px 4px 8px;font-size:11.5px;font-weight:700;letter-spacing:.02em}
 .poin-tier-badge .icon{width:14px;height:14px;color:hsl(var(--gold))}
 .poin-stats{display:flex;align-items:center;background:hsl(var(--card));margin:-14px 12px 0;border-radius:16px;box-shadow:var(--shadow-md);padding:14px 8px;position:relative}
@@ -537,7 +546,7 @@ input,textarea{font-family:inherit}
 .store-mark,.admin-logo-preview{font-weight:800}
 .store-mark{font-size:14px}
 .poin-hi strong{font-size:16px;font-weight:800}
-.chip,.btn-add,.btn-primary,.wa-btn,.order-cancel-btn,.btn-outline,.auth-tab,.method-btn,.submit-btn,.qty-stepper span,.cart-line-name,.field label,.field-label-plain,.toast{font-size:12px;font-weight:700}
+.chip,.btn-add,.btn-primary,.wa-btn,.order-cancel-btn,.btn-outline,.auth-tab,.method-btn,.submit-btn,.qty-stepper span,.qty-stepper .qty-input,.cart-line-name,.field label,.field-label-plain,.toast{font-size:12px;font-weight:700}
 .price-tag .name{font-size:14px;font-weight:600;line-height:1.3}
 .price-tag .price-old{font-size:12px}
 .cart-line-sub{font-size:10px}
@@ -570,7 +579,7 @@ input,textarea{font-family:inherit}
 .ct-step button{width:24px;height:24px;border:none;border-radius:4px;background:#fff;color:var(--z-ink);display:flex;align-items:center;justify-content:center;box-shadow:0 1px 2px rgba(0,0,0,.05)}
 .ct-step button:disabled{opacity:.3}
 .ct-step button .msym{font-size:14px}
-.ct-step span{padding:0 10px;font-size:12px;font-weight:700;color:var(--z-ink)}
+.ct-step span,.ct-step .qty-input{padding:0 10px;font-size:12px;font-weight:700;color:var(--z-ink)}
 .ct-card{padding:14px;display:flex;flex-direction:column;gap:8px}
 .ct-card h4{margin:0;padding-bottom:4px;border-bottom:1px solid rgba(222,232,255,.5);font-size:12px;font-weight:700;color:var(--z-ink)}
 .ct-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--z-muted)}
@@ -754,8 +763,15 @@ input,textarea{font-family:inherit}
 .dt-btn{pointer-events:auto;position:relative;width:38px;height:38px;border:none;border-radius:999px;background:rgba(120,120,120,.75);color:#fff;display:flex;align-items:center;justify-content:center}
 .dt-btn .msym{font-size:22px}
 .dt-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:96px}
-.dt-hero{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#fff}
-.dt-hero img{width:100%;height:100%;object-fit:contain;padding:56px 24px 16px}
+.dt-hero{position:relative;aspect-ratio:1/1;background:#fff}
+.dt-hero:not(.has-photo){display:flex;align-items:center;justify-content:center}
+.dt-hero-track{display:flex;width:100%;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.dt-hero-track::-webkit-scrollbar{display:none}
+.dt-hero-slide{flex:0 0 100%;scroll-snap-align:start;display:flex;align-items:center;justify-content:center}
+.dt-hero-slide img{width:100%;height:100%;object-fit:contain;padding:56px 24px 16px}
+.dt-hero-dots{position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none}
+.dt-hero-dot{width:6px;height:6px;border-radius:3px;background:rgba(0,0,0,.22);transition:width var(--dur),background var(--dur)}
+.dt-hero-dot.on{width:16px;background:rgba(0,0,0,.55)}
 .dt-hero img~.dt-emo{display:none}
 .dt-emo{font-size:96px;line-height:1}
 .dt-gap{height:8px;background:#f0f0f0}
@@ -818,7 +834,7 @@ input,textarea{font-family:inherit}
 .dt-step button{width:34px;height:34px;border:none;background:none;color:var(--z-blue);display:flex;align-items:center;justify-content:center}
 .dt-step button:disabled{opacity:.3}
 .dt-step .msym{font-size:22px}
-.dt-step b{min-width:24px;text-align:center;font-size:16px}
+.dt-step b,.dt-step .qty-input{min-width:24px;text-align:center;font-size:16px}
 .hm-hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .hm-hero-shade{position:absolute;inset:0;background:linear-gradient(to right,rgba(120,0,15,.88),rgba(0,0,0,.2))}
 .hm-hero-body.img-only{min-height:132px;cursor:pointer}
@@ -955,8 +971,15 @@ const STORE = {
   tagline: "Belanja kebutuhan harian, tinggal pesan online.",
   whatsapp: "6281234567890",      // ganti nomor WA toko (format 62xxxxxxxxxx, tanpa spasi/strip)
   alamat: "Isi alamat toko di sini",
-  jamBuka: "07:00",
-  jamTutup: "21:00",
+  // Titik lokasi presisi buat tombol "Rute" (Plus Code Google Maps, BUKAN teks alamat).
+  // Beda dari `alamat` di atas (itu cuma teks tampilan) - ini yang beneran nentuin pin
+  // di Maps. Kosongkan buat balik pakai `nama+alamat` sebagai query (kurang presisi).
+  // BARU: field ini sekarang bisa diedit lewat menu "Pengaturan Toko (Admin)" di app
+  // (sama kayak Nama/WA/Alamat) - nilai di bawah cuma fallback awal sebelum sempat
+  // kontak server, BUKAN satu-satunya tempat ubahnya lagi.
+  titikMaps: "PH6R+J6J, Pinangsari, Kec. Ciasem, Kabupaten Subang, Jawa Barat 41256",
+  jamBuka: "06:00",
+  jamTutup: "23:00",
   metodePembayaran: [],            // contoh: ["Tunai di tempat","Transfer Bank","QRIS"]
   // BARU: link gambar kode QRIS statis toko (upload ke Drive lalu "Get link" -> ubah
   // jadi format https://drive.google.com/uc?export=view&id=FILE_ID, atau host di mana
@@ -1078,8 +1101,18 @@ function emojiProduk(nama, kategori) {
  * Ubah bentuk produk dari backend (apiKatalogProdukPublik: Id/Nama/HargaJual/
  * Stok/KategoriNama/Satuan/Foto) ke bentuk yang dipakai render di file ini.
  * @param {Object} p
+ *
+ * MULTI-FOTO TANPA UBAH BACKEND: kolom Foto di Sheet_Produk masih 1 kolom, tapi kalau
+ * isinya beberapa LINK ASLI (https://... hasil hosting di Drive/Imgur/dll, BUKAN hasil
+ * upload file dari tombol "Ganti Foto" - itu base64 gede, >1 foto pasti kepentok limit
+ * cell ~50rb karakter) dipisah karakter "|", di sini otomatis dipecah jadi galeri swipe.
+ * Contoh isi cell: https://drive.google.com/.../a.jpg|https://drive.google.com/.../b.jpg
+ * Awas: kalau abis itu admin pencet "Ganti Foto" di app buat produk yang sama, seluruh
+ * cell (termasuk galerinya) KETIMPA jadi 1 foto lagi - dua cara ini gak bisa dicampur.
  */
 function mapProdukPublik(p) {
+  const foto = String(p.Foto || '').trim();
+  const galeri = foto.includes('|') ? foto.split('|').map(s=>s.trim()).filter(Boolean) : [];
   return {
     id: p.Id,
     nama: p.Nama,
@@ -1088,7 +1121,8 @@ function mapProdukPublik(p) {
     satuan: p.Satuan || '',
     stok: Number(p.Stok) || 0,
     emoji: emojiProduk(p.Nama, p.KategoriNama),
-    gambar: p.Foto || null,
+    gambar: galeri[0] || foto || null, // dipakai thumbnail (home/cart/admin) - selalu 1 foto pertama
+    galeri: galeri, // dipakai productPhotos() buat galeri swipe di detail - kosong kalau cuma 1 foto
     diskonPersen: 0,
     unggulan: false
   };
@@ -1231,7 +1265,7 @@ function applyStoreBranding(){
 const STORE_SNAPSHOT_KEY = 'ainiMartStoreSnapshotV1';
 function buatSnapshotToko_(s){
   return JSON.stringify({
-    nama: s.nama||'', whatsapp: s.whatsapp||'', alamat: s.alamat||'', logo: s.logo||'',
+    nama: s.nama||'', whatsapp: s.whatsapp||'', alamat: s.alamat||'', logo: s.logo||'', titikMaps: s.titikMaps||'',
     promo: typeof s.promo==='string' ? s.promo : JSON.stringify(s.promo||[]),
     jajananIcons: typeof s.jajananIcons==='string' ? s.jajananIcons : JSON.stringify(s.jajananIcons||{})
   });
@@ -1276,6 +1310,7 @@ async function loadPengaturanToko(){
     if(s.nama) STORE.nama = s.nama;
     if(s.whatsapp) STORE.whatsapp = s.whatsapp;
     if(s.alamat) STORE.alamat = s.alamat;
+    if(s.titikMaps !== undefined) STORE.titikMaps = s.titikMaps || ''; // butuh backend Apps Script simpan+balikin field ini (lihat updatePengaturanToko)
     STORE.logo = s.logo || ''; // logo boleh kosong (admin hapus logo) beda dari "belum ada data"
     if(s.promo != null){ const pr = normPromos(s.promo); setPromos(pr); savePromosLocal(pr); }
     if(s.jajananIcons != null){
@@ -1328,7 +1363,9 @@ const ICONS = {
   coin:'<circle cx="12" cy="12" r="8"/><path d="M9.5 9a2.5 2 0 0 1 5 0c0 1.5-2.5 1.5-2.5 3"/><path d="M12 15h.01"/>',
   crown:'<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7Z"/><path d="M5 20h14"/>',
   fileText:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
-  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>'
+  settings:'<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/><circle cx="12" cy="12" r="3"/>',
+  camera:'<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/>',
+  edit:'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>'
 };
 function icon(name, cls){
   return '<svg class="icon '+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'+(ICONS[name]||'')+'</svg>';
@@ -1523,7 +1560,7 @@ const state = {
   // ---- ADMIN (ubah Nama Toko, Alamat & No. WhatsApp) ----
   adminOpen: false,
   adminStep: 'pin',        // 'pin' | 'form' | 'produk'
-  adminForm: { pin:'', nama:'', whatsapp:'', alamat:'', logo:'' },
+  adminForm: { pin:'', nama:'', whatsapp:'', alamat:'', titikMaps:'', logo:'' },
   adminSaving: false,
   adminError: null,
   // ---- ADMIN > Foto Produk (upload foto tiap produk katalog lewat HP) ----
@@ -1677,6 +1714,17 @@ function changeQty(id, delta){
   pruneTebus();
   refresh();
 }
+/** Set qty langsung dari input angka (ketik manual, bukan tap +/-). Clamp 0..stok. */
+function setQty(id, val){
+  const p = PRODUCTS.find(p=>p.id===id);
+  if(!p) return;
+  let n = parseInt(val, 10);
+  if(isNaN(n) || n<0) n = 0;
+  n = Math.min(p.stok, n);
+  state.cart[id] = n;
+  pruneTebus();
+  refresh();
+}
 /** Tambah 1 porsi Seblak + topping yang dicentang. Topping masuk keranjang sebagai produk
  *  biasa (harga & stok dicek server), pilihan per porsi dicatat di state.porsi. */
 function addPorsi(id){
@@ -1825,6 +1873,11 @@ function renderShell(){
       <div class="dialog" id="legal-body"></div>
     </div>
 
+    <div class="overlay" id="profil-overlay">
+      <div class="overlay-backdrop" data-action="close-profil"></div>
+      <div class="dialog" id="profil-body"></div>
+    </div>
+
     <div class="dt" id="detail-overlay" data-open="false" role="dialog" aria-modal="true" aria-label="Detail produk">
       <div class="dt-backdrop" data-action="close-product"></div>
       <div class="dt-page">
@@ -1971,7 +2024,7 @@ function productCard(p){
           ? '<button class="btn-add" data-action="open-topping" data-id="'+esc(p.id)+'">Pilih Topping'+(qty>0?' ('+qty+')':'')+'</button>'
           : qty===0
           ? '<button class="btn-add" data-action="qty" data-id="'+p.id+'" data-delta="1">'+icon('plus')+' Tambah</button>'
-          : '<div class="qty-stepper"><button data-action="qty" data-id="'+p.id+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><span>'+qty+'</span><button data-action="qty" data-id="'+p.id+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>')
+          : '<div class="qty-stepper"><button data-action="qty" data-id="'+p.id+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><input type="number" class="qty-input" inputmode="numeric" data-id="'+p.id+'" value="'+qty+'" min="0" max="'+p.stok+'"><button data-action="qty" data-id="'+p.id+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>')
       }
     </div>`;
 }
@@ -2091,7 +2144,7 @@ function homeAddControl(p, big){
   }
   return '<div class="hm-step">'
     + '<button data-action="qty" data-id="'+id+'" data-delta="-1" aria-label="Kurangi">'+msym('remove')+'</button>'
-    + '<b>'+qty+'</b>'
+    + '<input type="number" class="qty-input" inputmode="numeric" data-id="'+id+'" value="'+qty+'" min="0" max="'+p.stok+'">'
     + '<button data-action="qty" data-id="'+id+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+msym('add')+'</button>'
     + '</div>';
 }
@@ -2212,7 +2265,7 @@ function tabBeranda(){
         </div>
         ${isMember
           ? '<button class="hm-link" data-action="set-tab" data-tab="akun">Kartu Member'+msym('chevron_right')+'</button>'
-          : '<button class="hm-link" data-action="open-auth">Masuk / Daftar'+msym('chevron_right')+'</button>'}
+          : '<button class="hm-link" data-action="open-auth">Login / Daftar'+msym('chevron_right')+'</button>'}
       </div>
       <div class="hm-mosaic">
         <button class="hm-tile gold" data-action="home-member">
@@ -2456,7 +2509,7 @@ function promoCatalogHtml(diskon){
     const act = habis ? '<div class="stock-out" style="margin-top:10px">Stok habis</div>'
       : (qty===0
         ? '<button class="pm-card-add" data-action="qty" data-id="'+esc(p.id)+'" data-delta="1">'+msym('add_shopping_cart')+'<span>+ Keranjang</span></button>'
-        : '<div class="qty-stepper"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><span>'+qty+'</span><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>');
+        : '<div class="qty-stepper"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><input type="number" class="qty-input" inputmode="numeric" data-id="'+esc(p.id)+'" value="'+qty+'" min="0" max="'+p.stok+'"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>');
     return `<article class="pm-card"><div${pAttr(p.id)}>
         <div class="pm-card-im">${im}<i>Hemat ${p.diskonPersen}%</i></div>
         <h3>${esc(p.nama)}</h3>
@@ -2577,11 +2630,11 @@ function tabPesanan(){
   // Tamu: riwayat cuma lokal (hilang kalau reload) - behavior lama, tanpa akun memang gak ada tempat nyimpennya.
   if(state.orders.length===0){
     return emptyState('packageCheck','Belum ada pesanan. Yuk mulai belanja kebutuhanmu!','Mulai Belanja','belanja') +
-      `<div class="account-guest-note" style="text-align:center;padding:0 28px">Belanja sebagai <strong>Tamu</strong> - riwayat ini cuma tersimpan di perangkat ini. <button class="link-btn" data-action="open-auth">Masuk / daftar member</button> biar riwayat pesanan tersimpan otomatis.</div>`;
+      `<div class="account-guest-note" style="text-align:center;padding:0 28px">Belanja sebagai <strong>Tamu</strong> - riwayat ini cuma tersimpan di perangkat ini. <button class="link-btn" data-action="open-auth">Login / daftar member</button> biar riwayat pesanan tersimpan otomatis.</div>`;
   }
   return `<div class="section" style="padding-top:16px">
     <h2 class="font-chalk" style="font-size:24px;margin:0 0 4px">Riwayat Pesanan (Tamu)</h2>
-    <div class="account-guest-note" style="margin-bottom:12px">Cuma tersimpan di perangkat ini. <button class="link-btn" data-action="open-auth">Masuk / daftar member</button> biar tersimpan otomatis lintas perangkat.</div>
+    <div class="account-guest-note" style="margin-bottom:12px">Cuma tersimpan di perangkat ini. <button class="link-btn" data-action="open-auth">Login / daftar member</button> biar tersimpan otomatis lintas perangkat.</div>
     <div class="retention-notice">Struk pesanan tersedia selama 60 hari sejak pesanan selesai.</div>
     ${state.orders.slice().reverse().map((o)=>{
       const idx = state.orders.indexOf(o);
@@ -2621,9 +2674,9 @@ function accountCard(){
           <div class="account-sub">Belum masuk / belum member</div>
         </div>
       </div>
-      <div class="account-guest-note" style="margin-top:10px">Masuk pakai nomor WhatsApp biar data pemesan & riwayat pesanan tersimpan otomatis tiap belanja. Belanja tanpa akun tetap bisa, kok.</div>
+      <div class="account-guest-note" style="margin-top:10px">Login pakai nomor WhatsApp biar data pemesan & riwayat pesanan tersimpan otomatis tiap belanja. Belanja tanpa akun tetap bisa, kok.</div>
       <div class="account-actions">
-        <button class="btn-primary" style="border-radius:10px" data-action="open-auth">Masuk / Daftar Member</button>
+        <button class="btn-primary" style="border-radius:10px" data-action="open-auth">Login / Daftar Member</button>
       </div>
     </div>`;
 }
@@ -2647,17 +2700,15 @@ function poinMemberCard(){
   }
   if(state.poinError){
     return `<div class="poin-card poin-card-plain">
-      <div class="poin-hi-row">${profileAvatarBadge_(false)}<div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div></div>
+      <div class="poin-hi-row">${profileAvatarBadge_(false)}<div class="poin-hi-name-row"><div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div><button class="poin-edit-btn plain" data-action="open-profil" title="Edit Profil" aria-label="Edit Profil">${icon('edit')}</button></div></div>
       <div class="poin-error" style="margin-top:8px">Gagal memuat poin: ${esc(state.poinError)} <button class="link-btn" data-action="retry-poin">Coba lagi</button></div>
-      <div class="account-actions"><button class="btn-outline danger" data-action="logout">Keluar</button></div>
     </div>`;
   }
   const m = state.poinMember;
   if(!m || !m.terdaftar){
     return `<div class="poin-card poin-card-plain">
-      <div class="poin-hi-row">${profileAvatarBadge_(false)}<div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div></div>
+      <div class="poin-hi-row">${profileAvatarBadge_(false)}<div class="poin-hi-name-row"><div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div><button class="poin-edit-btn plain" data-action="open-profil" title="Edit Profil" aria-label="Edit Profil">${icon('edit')}</button></div></div>
       <div class="account-guest-note" style="margin-top:8px">Nomor WhatsApp kamu belum terdaftar sebagai member poin toko. Datang & belanja ke toko, minta kasir daftarkan pakai nomor ini biar mulai kumpul poin.</div>
-      <div class="account-actions"><button class="btn-outline danger" data-action="logout">Keluar</button></div>
     </div>`;
   }
   return `
@@ -2666,7 +2717,10 @@ function poinMemberCard(){
         <div class="poin-hi-row">
           ${profileAvatarBadge_(true)}
           <div>
-            <div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div>
+            <div class="poin-hi-name-row">
+              <div class="poin-hi">Hai, <strong>${esc(p.nama)}</strong></div>
+              <button class="poin-edit-btn" data-action="open-profil" title="Edit Profil" aria-label="Edit Profil">${icon('edit')}</button>
+            </div>
             <div class="poin-tier-badge">${icon('crown')}${esc(MEMBER_TIER_LABEL[m.tier] || m.tier)} Member</div>
           </div>
         </div>
@@ -2684,7 +2738,6 @@ function poinMemberCard(){
       </div>
       <button class="poin-barcode-btn" data-action="open-member-barcode">${icon('qrcode')} Tunjukkan ke Kasir</button>
     </div>
-    <div class="account-actions" style="margin:10px 16px 0"><button class="btn-outline danger" style="flex:none;padding:9px 18px" data-action="logout">Keluar</button></div>
   `;
 }
 
@@ -2969,7 +3022,7 @@ function renderCartBody(){
           </div>
           <div class="ct-act">
             <button class="ct-del" data-action="qty" data-id="${p.id}" data-delta="-9999" aria-label="Hapus produk">${msym('delete')}</button>
-            <div class="ct-step">${qb(p.id,-1,'remove')}<span>${l.qty}</span>${qb(p.id,1,'add',l.qty>=p.stok)}</div>
+            <div class="ct-step">${qb(p.id,-1,'remove')}<input type="number" class="qty-input" inputmode="numeric" data-id="${p.id}" value="${l.qty}" min="0" max="${p.stok}">${qb(p.id,1,'add',l.qty>=p.stok)}</div>
           </div>
         </div>
       </div>`;}).join('')}
@@ -3105,7 +3158,7 @@ function homeAlamatHtml_(){
       + (a ? '<b>'+esc(a)+'</b>' : '<span>Belum ada alamat pengantaran</span>')
       + '</div><button class="hm-addr-btn" data-action="edit-alamat">'+(a?'Ubah':'Isi Alamat')+'</button></div>';
   }
-  const maps = 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(STORE.nama+' '+STORE.alamat);
+  const maps = 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(STORE.titikMaps || (STORE.nama+' '+STORE.alamat));
   return '<div class="hm-addr"><span class="hm-addr-ic">'+msym('storefront','fill')+'</span><div class="hm-addr-txt"><small>Ambil di toko</small><b>'+esc(STORE.nama)+'</b>'
     + '<span>'+esc(STORE.alamat)+'</span><span>Buka '+esc(STORE.jamBuka)+'–'+esc(STORE.jamTutup)+'</span></div>'
     + '<a class="hm-addr-btn" href="'+maps+'" target="_blank" rel="noopener">Rute</a></div>';
@@ -3115,7 +3168,7 @@ function openAlamat_(){
   document.getElementById('alamat-body').innerHTML = `
     <h2>Alamat Pengantaran</h2>
     <div class="field"><label for="inp-alamat-edit">Alamat lengkap</label><textarea id="inp-alamat-edit" rows="3" placeholder="Jalan, nomor rumah, RT/RW, patokan">${esc(state.form.alamat||'')}</textarea></div>
-    <div class="auth-hint">${member ? 'Tersimpan di perangkat ini dan otomatis terisi di pesananmu berikutnya.' : 'Berlaku untuk sesi ini saja. Masuk sebagai member supaya alamat tersimpan.'}</div>
+    <div class="auth-hint">${member ? 'Tersimpan di perangkat ini dan otomatis terisi di pesananmu berikutnya.' : 'Berlaku untuk sesi ini saja. Login sebagai member supaya alamat tersimpan.'}</div>
     <button class="submit-btn" data-action="save-alamat">Simpan Alamat</button>
     <div class="guest-link-row"><button class="link-btn" data-action="close-alamat">Batal</button></div>`;
   document.getElementById('alamat-overlay').setAttribute('data-open','true');
@@ -3133,6 +3186,87 @@ function saveAlamat_(){
   closeAlamat_();
   renderTabContent();
   showToast(state.form.alamat ? 'Alamat disimpan' : 'Alamat dihapus');
+}
+
+/* ================================================================
+   EDIT PROFIL — layar milik member (tab Akun): ganti foto profil,
+   ubah Alamat Pengantaran (otomatis kepakai pas pilih "Diantar ke
+   Rumah" saat checkout, lewat state.form.alamat + simpanAlamatMember_
+   sama seperti alamat-overlay), & tombol Keluar. Foto disimpan
+   LANGSUNG begitu dipilih (sama pola kayak avatar di kartu poin);
+   Alamat baru disimpan pas tombol "Simpan Perubahan" dipencet.
+   ================================================================ */
+function openProfilSettings_(){
+  const a = muatAlamatMember_();
+  const foto = muatFotoProfilMember_();
+  document.getElementById('profil-body').innerHTML = `
+    <h2>Edit Profil</h2>
+    <div class="field">
+      <label>Foto Profil</label>
+      <div class="admin-logo-row">
+        <div class="admin-logo-preview">${foto ? '<img src="'+esc(foto)+'" alt="Foto profil">' : icon('user')}</div>
+        <div class="admin-logo-actions">
+          <label class="btn-outline admin-logo-upload">Pilih Foto<input id="profil-foto-file" type="file" accept="image/*" style="display:none"></label>
+          ${foto ? '<button type="button" class="link-btn" data-action="remove-profil-foto">Hapus Foto</button>' : ''}
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label for="profil-nama">Nama</label>
+      <input id="profil-nama" type="text" value="${esc(state.auth.pelanggan.nama)}" placeholder="Nama kamu">
+    </div>
+    <div class="field">
+      <label for="profil-alamat">Alamat Pengantaran</label>
+      <textarea id="profil-alamat" rows="2" placeholder="Jalan, nomor rumah, RT/RW, patokan">${esc(a)}</textarea>
+      <div class="admin-note" style="margin:6px 0 0">Otomatis terisi tiap pilih "Diantar ke Rumah" saat checkout.</div>
+    </div>
+    <button class="submit-btn" data-action="save-profil">Simpan Perubahan</button>
+    <div class="account-actions" style="margin-top:14px"><button class="btn-outline danger" data-action="logout">Logout</button></div>
+    <div class="guest-link-row"><button class="link-btn" data-action="close-profil">Tutup</button></div>
+  `;
+  document.getElementById('profil-overlay').setAttribute('data-open','true');
+  document.body.style.overflow = 'hidden';
+  const fileElm = document.getElementById('profil-foto-file');
+  if(fileElm){
+    fileElm.addEventListener('change', async e=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(!file.type.startsWith('image/')){ showToast('File harus berupa gambar.'); return; }
+      try{
+        const dataUrl = await compressImage(file, 400);
+        simpanFotoProfilMember_(dataUrl);
+        openProfilSettings_(); // refresh preview foto di layar ini
+        renderTabContent();    // avatar di kartu poin ikut kebaru
+        showToast('Foto profil diperbarui.');
+      }catch(err){
+        showToast(err.message || 'Gagal memuat foto. Coba lagi.');
+      }
+    });
+  }
+}
+function removeProfilFoto_(){
+  simpanFotoProfilMember_('');
+  openProfilSettings_();
+  renderTabContent();
+  showToast('Foto profil dihapus.');
+}
+function closeProfil_(){
+  document.getElementById('profil-overlay').setAttribute('data-open','false');
+  document.body.style.overflow = '';
+}
+function saveProfil_(){
+  const n = document.getElementById('profil-nama');
+  const namaBaru = n ? n.value.trim() : '';
+  if(!namaBaru){ showToast('Nama tidak boleh kosong.'); return; }
+  state.auth.pelanggan.nama = namaBaru;
+  state.form.nama = namaBaru;
+  saveAuthSession(state.auth.pelanggan);
+  const t = document.getElementById('profil-alamat');
+  state.form.alamat = t ? t.value.trim() : '';
+  simpanAlamatMember_(state.form.alamat);
+  closeProfil_();
+  renderTabContent();
+  showToast('Profil disimpan.');
 }
 
 /** Nama & Nomor WhatsApp di form checkout: member login = terisi otomatis dari akun; Tamu / belum login = kosong. */
@@ -3224,8 +3358,8 @@ function renderCheckoutBody(){
   body.innerHTML = `
     <h2>Selesaikan Pesanan</h2>
     ${isMember
-      ? '<div class="auth-hint" style="margin-top:-6px">Masuk sebagai member <strong>'+esc(state.auth.pelanggan.nama)+'</strong>. Nama &amp; No WhatsApp terisi otomatis dari akunmu (boleh diubah).</div>'
-      : '<div class="auth-hint" style="margin-top:-6px">Belanja sebagai Tamu. Sudah member? <button class="link-btn" data-action="open-auth">Masuk</button></div>'}
+      ? '<div class="auth-hint" style="margin-top:-6px">Login sebagai member <strong>'+esc(state.auth.pelanggan.nama)+'</strong>. Nama &amp; No WhatsApp terisi otomatis dari akunmu (boleh diubah).</div>'
+      : '<div class="auth-hint" style="margin-top:-6px">Belanja sebagai Tamu. Sudah member? <button class="link-btn" data-action="open-auth">Login</button></div>'}
     <div class="method-toggle">
       <button class="method-btn" data-action="set-method" data-method="ambil" data-active="${state.method==='ambil'}">${icon('store')} Ambil di Toko</button>
       <button class="method-btn" data-action="set-method" data-method="antar" data-active="${state.method==='antar'}">${icon('truck')} Diantar</button>
@@ -3447,18 +3581,18 @@ function renderAuthBody(){
   const f = state.authForm;
   const isDaftar = state.authMode==='daftar';
   body.innerHTML = `
-    <h2>${isDaftar ? 'Daftar Member Baru' : 'Masuk Member'}</h2>
+    <h2>${isDaftar ? 'Daftar Member Baru' : 'Login Member'}</h2>
     <div class="auth-tabs">
-      <button class="auth-tab" data-action="set-auth-mode" data-mode="login" data-active="${!isDaftar}">Masuk</button>
+      <button class="auth-tab" data-action="set-auth-mode" data-mode="login" data-active="${!isDaftar}">Login</button>
       <button class="auth-tab" data-action="set-auth-mode" data-mode="daftar" data-active="${isDaftar}">Daftar Baru</button>
     </div>
-    <div class="auth-hint">${isDaftar ? 'Nomor kamu belum terdaftar sebagai member. Lengkapi nama buat daftar sekaligus masuk.' : 'Masuk pakai nomor WhatsApp & PIN member kamu. Belum punya akun? Pindah ke tab "Daftar Baru", nanti otomatis kedeteksi juga kalau nomornya belum member.'}</div>
+    <div class="auth-hint">${isDaftar ? 'Nomor kamu belum terdaftar sebagai member. Lengkapi nama buat daftar sekaligus masuk.' : 'Login pakai nomor WhatsApp & PIN member kamu. Belum punya akun? Pindah ke tab "Daftar Baru", nanti otomatis kedeteksi juga kalau nomornya belum member.'}</div>
     ${state.authError ? '<div class="auth-error">'+esc(state.authError)+'</div>' : ''}
     ${isDaftar ? '<div class="field"><label for="auth-nama">Nama</label><input id="auth-nama" type="text" placeholder="Nama kamu" value="'+esc(f.nama)+'"></div>' : ''}
     <div class="field"><label for="auth-wa">Nomor WhatsApp</label><input id="auth-wa" type="tel" placeholder="08xx-xxxx-xxxx" value="${esc(f.wa)}"></div>
     ${isDaftar ? '<div class="field"><label for="auth-alamat">Alamat Pengantaran (opsional)</label><textarea id="auth-alamat" rows="2" placeholder="Jalan, nomor rumah, RT/RW, patokan">'+esc(f.alamat)+'</textarea></div>' : ''}
     <div class="field"><label for="auth-pin">PIN (4-6 digit)</label><input id="auth-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" value="${esc(f.pin)}"></div>
-    <button class="submit-btn" id="auth-submit-btn" data-action="submit-auth" ${state.authSubmitting?'disabled':''}>${state.authSubmitting ? 'Memproses...' : (isDaftar ? 'Daftar & Masuk' : 'Masuk')}</button>
+    <button class="submit-btn" id="auth-submit-btn" data-action="submit-auth" ${state.authSubmitting?'disabled':''}>${state.authSubmitting ? 'Memproses...' : (isDaftar ? 'Daftar & Login' : 'Login')}</button>
     <div class="guest-link-row">atau <button class="link-btn" data-action="close-auth">Masuk sebagai Tamu</button></div>
   `;
   ['nama','wa','alamat','pin'].forEach(key=>{
@@ -3533,6 +3667,7 @@ function logout(){
   state.riwayatError = null;
   state.poinMember = null;
   state.poinError = null;
+  closeProfil_(); // jaga-jaga: logout dipencet dari dalam overlay Pengaturan Profil
   refresh();
 }
 
@@ -3542,7 +3677,7 @@ function logout(){
 function openAdmin(){
   state.adminOpen = true;
   state.adminStep = 'pin';
-  state.adminForm = { pin:'', nama: STORE.nama, whatsapp: STORE.whatsapp, alamat: STORE.alamat, logo: STORE.logo, promos: PROMOS.map(x=>Object.assign({}, x)), jajananIcons: Object.assign({}, JAJANAN_ICONS) };
+  state.adminForm = { pin:'', nama: STORE.nama, whatsapp: STORE.whatsapp, alamat: STORE.alamat, titikMaps: STORE.titikMaps||'', logo: STORE.logo, promos: PROMOS.map(x=>Object.assign({}, x)), jajananIcons: Object.assign({}, JAJANAN_ICONS) };
   state.adminError = null;
   document.getElementById('admin-overlay').setAttribute('data-open','true');
   renderAdminBody();
@@ -3688,6 +3823,8 @@ function renderAdminBody(){
     <div class="field"><label for="admin-wa">Nomor WhatsApp Toko</label><input id="admin-wa" type="tel" placeholder="62xxxxxxxxxx" value="${esc(f.whatsapp)}"></div>
     <div class="admin-note" style="margin-top:-6px">Format: diawali <strong>62</strong>, tanpa spasi/strip/tanda plus. Contoh: 6281234567890.</div>
     <div class="field"><label for="admin-alamat">Alamat Toko</label><textarea id="admin-alamat" rows="2" placeholder="Jalan, nomor, patokan">${esc(f.alamat)}</textarea></div>
+    <div class="field"><label for="admin-titik-maps">Titik Lokasi Peta (buat tombol "Rute")</label><input id="admin-titik-maps" type="text" placeholder="Plus Code, mis. PH6R+J6J, Nama Kota" value="${esc(f.titikMaps)}"></div>
+    <div class="admin-note" style="margin-top:-6px">Beda dari Alamat di atas — ini yang nentuin titik pin pas customer pencet "Rute". Buka lokasi toko di Google Maps, salin Plus Code-nya (kayak PH6R+J6J...) ke sini. Kosongkan buat pakai Nama+Alamat sebagai pencarian (kurang presisi).</div>
     <div class="field">
       <label>Foto Produk</label>
       <div class="admin-note" style="margin:0 0 8px">Upload/ganti foto tiap produk katalog langsung dari HP, tanpa perlu buka Sheet/ERP.</div>
@@ -3698,8 +3835,9 @@ function renderAdminBody(){
     <button class="submit-btn" data-action="submit-admin-save" ${state.adminSaving?'disabled':''}>${state.adminSaving?'Menyimpan…':'Simpan Perubahan'}</button>
     <div class="guest-link-row">atau <button class="link-btn" data-action="close-admin">Batal</button></div>
   `;
-  ['nama','whatsapp','alamat'].forEach(key=>{
-    const elm = document.getElementById(key==='nama' ? 'admin-nama' : (key==='whatsapp' ? 'admin-wa' : 'admin-alamat'));
+  const ADMIN_FIELD_IDS = { nama:'admin-nama', whatsapp:'admin-wa', alamat:'admin-alamat', titikMaps:'admin-titik-maps' };
+  Object.keys(ADMIN_FIELD_IDS).forEach(key=>{
+    const elm = document.getElementById(ADMIN_FIELD_IDS[key]);
     if(!elm) return;
     elm.addEventListener('input', e=>{ state.adminForm[key]=e.target.value; });
   });
@@ -3722,15 +3860,18 @@ function renderAdminBody(){
   }));
   const fileElm = document.getElementById('admin-logo-file');
   if(fileElm){
-    fileElm.addEventListener('change', e=>{
+    fileElm.addEventListener('change', async e=>{
       const file = e.target.files && e.target.files[0];
       if(!file) return;
       if(!file.type.startsWith('image/')){ state.adminError='File harus berupa gambar.'; renderAdminBody(); return; }
-      if(file.size > 400*1024){ state.adminError='Ukuran gambar kegedean. Pakai yang di bawah ±300KB.'; renderAdminBody(); return; }
-      const reader = new FileReader();
-      reader.onload = ()=>{ state.adminForm.logo = reader.result; state.adminError=null; renderAdminBody(); };
-      reader.onerror = ()=>{ state.adminError='Gagal membaca file gambar. Coba lagi.'; renderAdminBody(); };
-      reader.readAsDataURL(file);
+      try{
+        // resize + kompres otomatis (sama pola kayak promo/produk) - foto gede gak ditolak lagi, langsung dikecilkan ke bawah cap aman Sheet cell
+        state.adminForm.logo = await compressImage(file, 480, 45000);
+        state.adminError = null;
+      }catch(err){
+        state.adminError = err.message || 'Gagal memuat foto. Coba lagi.';
+      }
+      renderAdminBody();
     });
   }
 }
@@ -3752,6 +3893,7 @@ async function submitAdminSave(){
   const nama = state.adminForm.nama.trim();
   const whatsapp = state.adminForm.whatsapp.trim().replace(/[\s\-+]/g,'');
   const alamat = state.adminForm.alamat.trim();
+  const titikMaps = (state.adminForm.titikMaps||'').trim(); // opsional - kosong = fallback nama+alamat di tombol Rute
   if(!nama){ state.adminError='Nama toko wajib diisi.'; renderAdminBody(); return; }
   if(!/^62[0-9]{8,13}$/.test(whatsapp)){ state.adminError='Nomor WhatsApp harus diawali 62 dan hanya angka (contoh: 6281234567890).'; renderAdminBody(); return; }
   if(!alamat){ state.adminError='Alamat toko wajib diisi.'; renderAdminBody(); return; }
@@ -3773,7 +3915,7 @@ async function submitAdminSave(){
     // Nama/Logo/dll di atas, langsung berlaku di semua device begitu tersimpan.
     const saved = await api('updatePengaturanToko', {
       pin: state.adminForm.pin,
-      nama, whatsapp, alamat,
+      nama, whatsapp, alamat, titikMaps,
       logo: state.adminForm.logo || '',
       promo: JSON.stringify(promos),
       jajananIcons: JSON.stringify(jajananIcons)
@@ -3782,6 +3924,9 @@ async function submitAdminSave(){
     STORE.whatsapp = saved.whatsapp || whatsapp;
     STORE.alamat = saved.alamat || alamat;
     STORE.logo = saved.logo || '';
+    const serverTitikMaps = !!saved && saved.titikMaps !== undefined; // server lama (belum update Apps Script) tidak mengembalikan field ini
+    const titikMapsChanged = titikMaps !== (STORE.titikMaps||'');
+    STORE.titikMaps = serverTitikMaps ? (saved.titikMaps||'') : titikMaps; // fallback: tetap kepakai di device INI walau server lama belum simpan
     const serverPromo = !!saved && saved.promo !== undefined; // server lama (belum update Apps Script) tidak mengembalikan field promo
     const promoChanged = JSON.stringify(promos) !== JSON.stringify(PROMOS);
     setPromos(promos); savePromosLocal(promos);
@@ -3789,14 +3934,17 @@ async function submitAdminSave(){
     // fallback ke objek lokal cuma buat server lama yang belum kirim field ini balik.
     const savedJajananIcons = (saved && saved.jajananIcons && typeof saved.jajananIcons==='object') ? saved.jajananIcons : jajananIcons;
     JAJANAN_ICONS = savedJajananIcons; saveJajananIconsLocal(savedJajananIcons);
-    try{ localStorage.setItem(STORE_SNAPSHOT_KEY, buatSnapshotToko_({ nama:STORE.nama, whatsapp:STORE.whatsapp, alamat:STORE.alamat, logo:STORE.logo, promo:promos, jajananIcons:savedJajananIcons })); }catch(e){}
+    try{ localStorage.setItem(STORE_SNAPSHOT_KEY, buatSnapshotToko_({ nama:STORE.nama, whatsapp:STORE.whatsapp, alamat:STORE.alamat, logo:STORE.logo, titikMaps:STORE.titikMaps, promo:promos, jajananIcons:savedJajananIcons })); }catch(e){}
     state.adminSaving = false;
     closeAdmin();
     applyStoreBranding(); // update header dsb di device INI juga, tanpa nunggu reload
     if(state.tab==='beranda') renderTabContent(); // icon jajanan baru langsung kelihatan tanpa reload
     hideBootSyncOverlay();
-    showToast((!serverPromo && (promos.length || promoChanged))
-      ? 'Tersimpan. Promo banner baru berlaku di perangkat ini saja (server belum mendukung).'
+    const belumDidukungServer = [];
+    if(!serverPromo && (promos.length || promoChanged)) belumDidukungServer.push('promo banner');
+    if(!serverTitikMaps && titikMapsChanged) belumDidukungServer.push('titik lokasi (Rute)');
+    showToast(belumDidukungServer.length
+      ? 'Tersimpan. '+belumDidukungServer.join(' & ')+' baru berlaku di perangkat ini saja (server belum mendukung).'
       : 'Pengaturan toko disimpan & langsung berlaku di semua perangkat.');
   }catch(e){
     state.adminSaving = false;
@@ -4475,15 +4623,41 @@ function detailBarHtml(p){
       + '<button class="dt-cta" data-action="add-porsi" data-id="'+id+'"'+(qty>=p.stok?' disabled':'')+'>+ Keranjang<small>'+rupiah(total)+'</small></button>';
   }
   if(qty===0) return '<button class="dt-cta" data-action="qty" data-id="'+id+'" data-delta="1">+ Keranjang</button>';
-  return '<div class="dt-step"><button data-action="qty" data-id="'+id+'" data-delta="-1" aria-label="Kurangi">'+msym('remove')+'</button><b>'+qty+'</b>'
+  return '<div class="dt-step"><button data-action="qty" data-id="'+id+'" data-delta="-1" aria-label="Kurangi">'+msym('remove')+'</button><input type="number" class="qty-input" inputmode="numeric" data-id="'+id+'" value="'+qty+'" min="0" max="'+p.stok+'">'
     + '<button data-action="qty" data-id="'+id+'" data-delta="1" '+(qty>=p.stok?'disabled ':'')+'aria-label="Tambah">'+msym('add')+'</button></div>'
     + '<button class="dt-cta" data-action="open-cart">Lihat Keranjang<small>'+rupiah(netTotal())+'</small></button>';
 }
 
+/** Daftar foto produk untuk galeri swipe di detail. Sekarang backend cuma simpan 1 foto
+ *  (kolom Foto tunggal di Sheet_Produk), jadi hasilnya hampir selalu 1 item - tapi kalau
+ *  suatu saat p.galeri (array) diisi dari sumber lain, otomatis jadi multi-slide tanpa
+ *  ubah kode render. */
+function productPhotos(p){
+  if(Array.isArray(p.galeri) && p.galeri.length) return p.galeri.filter(Boolean);
+  return p.gambar ? [p.gambar] : [];
+}
+function detailHeroHtml(p){
+  const photos = productPhotos(p);
+  if(!photos.length) return '<div class="dt-hero"><span class="dt-emo">'+(p.emoji||'🛒')+'</span></div>';
+  const slides = photos.map((src,i)=>'<div class="dt-hero-slide"><img alt="'+esc(p.nama)+' foto '+(i+1)+'" src="'+esc(src)+'" onerror="this.closest(\'.dt-hero-slide\').remove()"></div>').join('');
+  const dots = photos.length>1 ? '<div class="dt-hero-dots" id="dt-hero-dots">'+photos.map((_,i)=>'<span class="dt-hero-dot'+(i===0?' on':'')+'"></span>').join('')+'</div>' : '';
+  return '<div class="dt-hero has-photo"><div class="dt-hero-track" id="dt-hero-track">'+slides+'</div>'+dots+'</div>';
+}
+/** Titik indikator galeri ikut posisi swipe. Dipasang sekali tiap detail dibuka (renderDetailBody),
+ *  bukan lewat delegasi document - event "scroll" elemen gak bubble ke atas. */
+function attachHeroSwipeListener(){
+  const track = document.getElementById('dt-hero-track'), dots = document.getElementById('dt-hero-dots');
+  if(!track || !dots) return;
+  const dotEls = dots.querySelectorAll('.dt-hero-dot');
+  track.addEventListener('scroll', function(){
+    const i = Math.max(0, Math.min(dotEls.length-1, Math.round(track.scrollLeft/track.clientWidth)));
+    dotEls.forEach((d,idx)=>d.classList.toggle('on', idx===i));
+  }, { passive:true });
+}
 function renderDetailBody(p){
   const [st, cls] = stokLabel(p), antar = state.method==='antar';
   document.getElementById('detail-scroll').innerHTML = `
-    <div class="dt-hero">${p.gambar ? '<img alt="'+esc(p.nama)+'" src="'+esc(p.gambar)+'" onerror="this.remove()">' : ''}<span class="dt-emo">${p.emoji||'🛒'}</span></div>
+    ${detailHeroHtml(p)}
     <div class="dt-gap"></div>
     <section class="dt-info">
       <div class="dt-tags"><span class="dt-ship">${msym(antar?'local_shipping':'storefront','fill')}${antar?'Antar ke Rumah':'Ambil di Toko'}</span><span class="dt-stok ${cls}">${st}</span></div>
@@ -4514,6 +4688,7 @@ function openProduct(id){
   state.detailId = p.id;
   renderDetailBody(p);
   renderDetailDynamic();
+  attachHeroSwipeListener();
   document.getElementById('detail-overlay').setAttribute('data-open','true');
   document.getElementById('detail-scroll').scrollTop = 0;
   document.body.style.overflow = 'hidden';
@@ -4621,12 +4796,26 @@ document.addEventListener('click', function(e){
   else if(a==='edit-alamat') openAlamat_();
   else if(a==='close-alamat') closeAlamat_();
   else if(a==='save-alamat') saveAlamat_();
+  else if(a==='open-profil') openProfilSettings_();
+  else if(a==='close-profil') closeProfil_();
+  else if(a==='save-profil') saveProfil_();
+  else if(a==='remove-profil-foto') removeProfilFoto_();
   else if(a==='home-method'){ state.method = t.dataset.method; renderTabContent(); }
   else if(a==='home-member'){ if(state.auth.status==='member') setTab('akun'); else openAuth(); }
 });
 document.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){ closeCart(); closeCheckout(); closeReceipt(); closeAuth(); closeAdmin(); closeMemberBarcode(); closeLegal(); closeProduct(); }
+  if(e.key==='Escape'){ closeCart(); closeCheckout(); closeReceipt(); closeAuth(); closeAdmin(); closeMemberBarcode(); closeLegal(); closeProfil_(); closeProduct(); }
+  else if(e.key==='Enter' && e.target.classList && e.target.classList.contains('qty-input')) e.target.blur();
 });
+/* Input qty diketik langsung: commit saat blur/Enter (event "change"), bukan tiap ketik,
+   biar re-render (refresh) tidak motong fokus user pas lagi ngetik. */
+document.addEventListener('change', function(e){
+  const inp = e.target.closest('.qty-input');
+  if(inp) setQty(inp.dataset.id, inp.value);
+});
+document.addEventListener('focus', function(e){
+  if(e.target.classList && e.target.classList.contains('qty-input')) e.target.select();
+}, true);
 
 /* ================================================================
    INIT
