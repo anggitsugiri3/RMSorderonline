@@ -491,6 +491,7 @@ input,textarea{font-family:inherit}
 .auth-error{color:hsl(var(--red));font-size:12.5px;margin:-2px 0 10px;text-align:center}
 .link-btn{border:none;background:none;color:hsl(var(--green));font-weight:600;font-size:12.5px;padding:0}
 .guest-link-row{text-align:center;margin-top:14px;font-size:12.5px;color:hsl(var(--ink-soft))}
+.auth-forgot-row{text-align:right;margin:-6px 0 4px;font-size:12px}
 
 /* ---------- Admin (Nama Toko & No. WA) ---------- */
 .admin-entry-row{text-align:center;padding:20px 16px 30px}
@@ -1551,6 +1552,9 @@ const state = {
   riwayatPelanggan: [],
   riwayatLoading: false,
   riwayatError: null,
+
+  // ---- LUPA PIN (reset via OTP email, lihat submitKirimOtpLupaPin/submitResetPin) ----
+  lupaPin: { step:'input', wa:'', email:'', otp:'', pinBaru:'', pinUlang:'', submitting:false, error:null },
 
   // ---- POIN MEMBER (loyalty, Sheet_Member RMS - lihat loadPoinMember()) ----
   poinMember: null,     // null = belum dimuat | {terdaftar:false} | {terdaftar:true, nomorMember, tier, poin}
@@ -3558,6 +3562,15 @@ function hideCheckoutError(){
        -> data: [ {Kode,Pelanggan,Tipe,Total,Status,CreatedAt,Items:[{nama,qty,harga}]}, ... ]
      apiBuatPesananOnlinePublik(...) ditambah param opsional `pelangganId`
        supaya pesanan kepasang ke akun member (dilewatin null kalau Tamu).
+
+     -- Lupa PIN (reset via OTP email, lihat LupaPinBackend.gs) --
+     apiKirimOtpLupaPinPublik({wa, email})
+       -> wa & email harus cocok satu baris Sheet_Member (kolom Email baru).
+       -> generate OTP 6 digit, simpan+expiry 5 menit, kirim via MailApp.
+       -> data: { terkirim:true } | throw Error kalau wa/email gak cocok.
+     apiVerifikasiOtpLupaPinPublik({wa, otp, pinBaru})
+       -> cocokkan OTP & belum kadaluarsa, update PIN, hapus OTP terpakai.
+       -> data: { pelanggan:{id,nama,wa} } | throw Error kalau OTP salah/expired.
    ================================================================ */
 function openAuth(){
   state.authOpen = true;
@@ -3573,12 +3586,21 @@ function closeAuth(){
   document.getElementById('auth-overlay').setAttribute('data-open','false');
   document.body.style.overflow='';
 }
-function setAuthMode(mode){ state.authMode = mode; state.authError = null; renderAuthBody(); }
+function setAuthMode(mode){
+  state.authMode = mode;
+  state.authError = null;
+  if(mode==='lupapin'){
+    // reset tiap masuk mode ini (juga dipakai tombol "Ganti nomor/email" buat mulai ulang)
+    state.lupaPin = { step:'input', wa:state.authForm.wa||'', email:'', otp:'', pinBaru:'', pinUlang:'', submitting:false, error:null };
+  }
+  renderAuthBody();
+}
 
 function renderAuthBody(){
   const body = document.getElementById('auth-body');
   if(!body) return;
   const f = state.authForm;
+  if(state.authMode==='lupapin'){ renderLupaPinBody_(body); return; }
   const isDaftar = state.authMode==='daftar';
   body.innerHTML = `
     <h2>${isDaftar ? 'Daftar Member Baru' : 'Login Member'}</h2>
@@ -3592,6 +3614,7 @@ function renderAuthBody(){
     <div class="field"><label for="auth-wa">Nomor WhatsApp</label><input id="auth-wa" type="tel" placeholder="08xx-xxxx-xxxx" value="${esc(f.wa)}"></div>
     ${isDaftar ? '<div class="field"><label for="auth-alamat">Alamat Pengantaran (opsional)</label><textarea id="auth-alamat" rows="2" placeholder="Jalan, nomor rumah, RT/RW, patokan">'+esc(f.alamat)+'</textarea></div>' : ''}
     <div class="field"><label for="auth-pin">PIN (4-6 digit)</label><input id="auth-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" value="${esc(f.pin)}"></div>
+    ${!isDaftar ? '<div class="auth-forgot-row"><button class="link-btn" data-action="set-auth-mode" data-mode="lupapin">Lupa PIN?</button></div>' : ''}
     <button class="submit-btn" id="auth-submit-btn" data-action="submit-auth" ${state.authSubmitting?'disabled':''}>${state.authSubmitting ? 'Memproses...' : (isDaftar ? 'Daftar & Login' : 'Login')}</button>
     <div class="guest-link-row">atau <button class="link-btn" data-action="close-auth">Masuk sebagai Tamu</button></div>
   `;
@@ -3600,6 +3623,100 @@ function renderAuthBody(){
     if(!elm) return;
     elm.addEventListener('input', e=>{ state.authForm[key]=e.target.value; });
   });
+}
+
+/* Lupa PIN, 2 langkah - reset via OTP email (backend GAS, lihat LupaPinBackend.gs):
+   step 'input' -> isi WA + email terdaftar -> kirim OTP
+   step 'otp'   -> isi kode OTP + PIN baru -> verifikasi -> auto login */
+function renderLupaPinBody_(body){
+  const lp = state.lupaPin;
+  if(lp.step==='otp'){ renderLupaPinOtpBody_(body, lp); return; }
+  body.innerHTML = `
+    <h2>Lupa PIN</h2>
+    <div class="auth-hint">Masukkan nomor WhatsApp &amp; email yang terdaftar sebagai member. Kode OTP 6 digit dikirim ke email tersebut, berlaku 5 menit.</div>
+    ${lp.error ? '<div class="auth-error">'+esc(lp.error)+'</div>' : ''}
+    <div class="field"><label for="lp-wa">Nomor WhatsApp Member</label><input id="lp-wa" type="tel" placeholder="08xx-xxxx-xxxx" value="${esc(lp.wa)}"></div>
+    <div class="field"><label for="lp-email">Email Terdaftar</label><input id="lp-email" type="email" placeholder="nama@email.com" value="${esc(lp.email)}"></div>
+    <button class="submit-btn" data-action="kirim-otp-lupa-pin" ${lp.submitting?'disabled':''}>${lp.submitting ? 'Mengirim...' : 'Kirim Kode OTP'}</button>
+    <div class="guest-link-row">Belum simpan email di akun? Hubungi admin toko lewat <a class="link-btn" href="https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Halo admin '+STORE.nama+', saya lupa PIN akun member saya. Nomor WhatsApp akun: '+(lp.wa||'').trim()+'. Mohon bantu reset PIN-nya. Terima kasih.')}" target="_blank" rel="noopener">WhatsApp</a></div>
+    <div class="guest-link-row"><button class="link-btn" data-action="set-auth-mode" data-mode="login">Kembali ke Login</button></div>
+  `;
+  const waElm = document.getElementById('lp-wa');
+  if(waElm) waElm.addEventListener('input', e=>{ state.lupaPin.wa = e.target.value; });
+  const emailElm = document.getElementById('lp-email');
+  if(emailElm) emailElm.addEventListener('input', e=>{ state.lupaPin.email = e.target.value; });
+}
+
+function renderLupaPinOtpBody_(body, lp){
+  body.innerHTML = `
+    <h2>Verifikasi Kode</h2>
+    <div class="auth-hint">Kode OTP sudah dikirim ke <strong>${esc(maskEmail_(lp.email))}</strong>. Berlaku 5 menit.</div>
+    ${lp.error ? '<div class="auth-error">'+esc(lp.error)+'</div>' : ''}
+    <div class="field"><label for="lp-otp">Kode OTP (6 digit)</label><input id="lp-otp" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="123456" value="${esc(lp.otp)}"></div>
+    <div class="field"><label for="lp-pinbaru">PIN Baru (4-6 digit)</label><input id="lp-pinbaru" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" value="${esc(lp.pinBaru)}"></div>
+    <div class="field"><label for="lp-pinulang">Ulangi PIN Baru</label><input id="lp-pinulang" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" value="${esc(lp.pinUlang)}"></div>
+    <button class="submit-btn" data-action="submit-reset-pin" ${lp.submitting?'disabled':''}>${lp.submitting ? 'Memproses...' : 'Reset PIN'}</button>
+    <div class="guest-link-row">Gak dapat kode? <button class="link-btn" data-action="kirim-otp-lupa-pin" ${lp.submitting?'disabled':''}>Kirim ulang</button></div>
+    <div class="guest-link-row"><button class="link-btn" data-action="set-auth-mode" data-mode="lupapin">Ganti nomor/email</button></div>
+  `;
+  const otpElm = document.getElementById('lp-otp');
+  if(otpElm) otpElm.addEventListener('input', e=>{ state.lupaPin.otp = e.target.value; });
+  const pinBaruElm = document.getElementById('lp-pinbaru');
+  if(pinBaruElm) pinBaruElm.addEventListener('input', e=>{ state.lupaPin.pinBaru = e.target.value; });
+  const pinUlangElm = document.getElementById('lp-pinulang');
+  if(pinUlangElm) pinUlangElm.addEventListener('input', e=>{ state.lupaPin.pinUlang = e.target.value; });
+}
+
+function maskEmail_(email){
+  const s = String(email||'').trim();
+  const at = s.indexOf('@');
+  if(at<=1) return s; // terlalu pendek buat disamarkan, tampilin apa adanya
+  return s.slice(0,2)+'***'+s.slice(at);
+}
+
+async function submitKirimOtpLupaPin(){
+  const lp = state.lupaPin;
+  if(lp.submitting) return;
+  const wa = (lp.wa||'').trim();
+  const email = (lp.email||'').trim();
+  if(!wa || !email){ lp.error = 'Nomor WhatsApp & email wajib diisi.'; renderAuthBody(); return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ lp.error = 'Format email tidak valid.'; renderAuthBody(); return; }
+
+  lp.submitting = true; lp.error = null; renderAuthBody();
+  try{
+    await api('apiKirimOtpLupaPinPublik', { wa, email });
+    lp.submitting = false;
+    lp.step = 'otp';
+    lp.otp = ''; // kosongin tiap kirim baru, biar gak ketuker sama kode lama
+    renderAuthBody();
+  }catch(e){
+    lp.submitting = false;
+    lp.error = e.message || 'Gagal mengirim kode. Coba lagi.';
+    renderAuthBody();
+  }
+}
+
+async function submitResetPin(){
+  const lp = state.lupaPin;
+  if(lp.submitting) return;
+  const otp = (lp.otp||'').trim();
+  const pinBaru = (lp.pinBaru||'').trim();
+  const pinUlang = (lp.pinUlang||'').trim();
+  if(!/^[0-9]{6}$/.test(otp)){ lp.error = 'Kode OTP harus 6 digit angka.'; renderAuthBody(); return; }
+  if(!/^[0-9]{4,6}$/.test(pinBaru)){ lp.error = 'PIN baru harus 4-6 digit angka.'; renderAuthBody(); return; }
+  if(pinBaru !== pinUlang){ lp.error = 'Konfirmasi PIN baru tidak cocok.'; renderAuthBody(); return; }
+
+  lp.submitting = true; lp.error = null; renderAuthBody();
+  try{
+    const data = await api('apiVerifikasiOtpLupaPinPublik', { wa: lp.wa.trim(), otp, pinBaru });
+    lp.submitting = false;
+    showToast('PIN berhasil diganti. Kamu otomatis masuk.');
+    loginSuccess(data.pelanggan); // pola sama submitAuth(): langsung login, gak perlu ngetik ulang PIN baru
+  }catch(e){
+    lp.submitting = false;
+    lp.error = e.message || 'Kode OTP salah atau sudah kadaluarsa.';
+    renderAuthBody();
+  }
 }
 
 async function submitAuth(){
@@ -4209,7 +4326,12 @@ function openReceiptMember(idx){ openReceiptOrder(state.riwayatPelanggan[Number(
    LACAK & STRUK BELANJA - halaman penuh yang langsung terbuka setelah "Kirim Pesanan".
    Status live: polling apiCekStatusPembayaranPesanan (BARU>DIPROSES>DIANTAR>SELESAI/DIBATALKAN).
    ================================================================ */
-const RP_PER_POIN_EARN = 500; // = POIN_CONFIG.RP_PER_POIN server (default) - angka poin di struk = estimasi
+// FIX (estimasi Poin di struk) - dulu hardcode 500 & basi kalau Admin ganti rasio lewat
+// Pengaturan -> Poin. Sekarang rasio ASLI diambil dari state.poinMember.rpPerPoin (field
+// baru dari apiPoinMemberPelangganPublik, lihat komentar server-nya) - konstanta di bawah
+// cuma fallback kalau poinMember belum sempat kemuat (jarang, loadPoinMember() sudah
+// dipanggil sejak buka Checkout/setelah checkout/saat login, lihat pemanggilnya).
+const RP_PER_POIN_EARN_DEFAULT = 500;
 const TRK_STEPS = {
   antar: [['Diterima Toko','storefront'],['Dikemas','inventory_2'],['Diantar Kurir','local_shipping'],['Sampai Tujuan','home']],
   ambil: [['Diterima Toko','storefront'],['Dikemas','inventory_2'],['Siap Diambil','shopping_bag'],['Selesai','check_circle']]
@@ -4335,7 +4457,8 @@ function openReceiptOrder(order){
   state.receiptOrder = order;
   const o = order, antar = trkTipe_(o)==='antar';
   const sub = o.items.reduce((s,it)=>s+it.harga*it.qty, 0);
-  const poin = state.auth.status==='member' ? Math.floor(o.total/RP_PER_POIN_EARN) : 0;
+  const rpPerPoinEarn = (state.poinMember && state.poinMember.rpPerPoin) || RP_PER_POIN_EARN_DEFAULT;
+  const poin = state.auth.status==='member' ? Math.floor(o.total/rpPerPoinEarn) : 0;
   const jam = o.waktu ? ' • '+esc(o.waktu) : '';
   document.getElementById('receipt-body').innerHTML = `
     <div class="trk-head">
@@ -4758,6 +4881,8 @@ document.addEventListener('click', function(e){
   else if(a==='close-auth') closeAuth();
   else if(a==='set-auth-mode') setAuthMode(t.dataset.mode);
   else if(a==='submit-auth') submitAuth();
+  else if(a==='kirim-otp-lupa-pin') submitKirimOtpLupaPin();
+  else if(a==='submit-reset-pin') submitResetPin();
   else if(a==='logout') logout();
   else if(a==='retry-riwayat') loadRiwayatPelanggan();
   else if(a==='open-admin') openAdmin();
