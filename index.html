@@ -3870,11 +3870,10 @@ function adminProdukRow(p){
  * ke project Apps Script ASLI (dicek langsung dari file yang kamu upload, bukan tebakan lagi):
  *   - src/server/controllers/ProdukController.js -> fungsi apiUpdateFotoProdukPublik()
  *   - src/server/Code.js -> whitelist doPost, key 'updateFotoProduk'
- * Foto disimpan APA ADANYA sebagai data URL langsung di kolom Foto Sheet_Produk (BUKAN
- * upload ke Drive) - pola ini SAMA PERSIS seperti Logo Toko/Icon Jajanan yang sudah ada
- * (STORE_LOGO_DATA_URL dsb, lihat PengaturanTokoPublikController.js), makanya di sini
- * dipaksa muat di bawah ~45.000 karakter (getTrimmedImage(compressed, 45000) di bawah) -
- * batas aman 1 cell Google Sheets (~50.000 karakter).
+ * Foto dikirim sebagai data URL, lalu SERVER yang upload ke folder Drive "Foto Produk" dan
+ * simpan LINK Drive-nya ke kolom Foto Sheet_Produk (bukan base64 lagi) - jadi batas ~50rb
+ * karakter/cell Sheets tidak berlaku dan kualitas foto bisa lebih bagus (cap 250rb karakter
+ * di bawah cuma buat jaga ukuran kiriman tetap ringan di jaringan HP).
  */
 async function uploadFotoProduk(produkId, file){
   const p = PRODUCTS.find(x=>String(x.id)===String(produkId));
@@ -3888,10 +3887,10 @@ async function uploadFotoProduk(produkId, file){
   delete state.adminProdukRowError[produkId];
   renderAdminProdukList();
   try{
-    const compressed = await compressImage(file, 720);   // resize + kompres ke JPEG, sama seperti logo/promo
-    const rapi = await getTrimmedImage(compressed, 45000); // buang tepi putih/transparan + pastikan muat 1 cell Sheets (aman dari CORS: sumbernya data URL sendiri)
-    const saved = await api('updateFotoProduk', { pin: state.adminForm.pin, produkId: produkId, foto: rapi });
-    p.gambar = (saved && saved.foto) || rapi; // optimistic: kalau server gak balikin URL, pakai hasil kompres sendiri dulu
+    const compressed = await compressImage(file, 720, 250000);   // resize + kompres ke JPEG (cap 250rb karakter - bukan lagi batas cell Sheets)
+    const rapi = await getTrimmedImage(compressed, 250000);      // buang tepi putih/transparan (aman dari CORS: sumbernya data URL sendiri)
+    await api('updateFotoProduk', { pin: state.adminForm.pin, produkId: produkId, foto: rapi }, { timeoutMs: 60000 }); // server upload ke Drive lalu simpan link ke Sheet (lebih lama dari tulis cell biasa)
+    p.gambar = rapi; // tampilan langsung pakai hasil kompres lokal: thumbnail Drive kadang belum siap beberapa detik setelah upload. Muat ulang katalog nanti otomatis pakai link Drive dari Sheet.
     showToast('Foto "'+p.nama+'" tersimpan.');
     renderTabContent(); // grid Beranda/Belanja & halaman detail ikut kebarui seketika
   }catch(e){
