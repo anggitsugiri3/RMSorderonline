@@ -1661,6 +1661,15 @@ function jajananKategoriAktif(){
 function jajananChipLabel(c){
   return c==='Semua' ? c : (String(c).replace(/^\s*jajanan\s*[-\u2013:&]*\s*/i,'').trim() || c);
 }
+/** Cari nama kategori server yang cocok dgn kata kunci pintasan Beranda (mis. 'bakar' -> "Bakaran",
+ *  'es teh' -> "Esteh", 'seblak' -> "Jajanan Seblak"). Abaikan spasi & huruf besar/kecil.
+ *  Balik null kalau belum ada kategori yang cocok. */
+function resolveJajananKategori(q){
+  const norm = s=>String(s||'').toLowerCase().replace(/\s+/g,'');
+  const kunci = norm(q);
+  if(!kunci) return null;
+  return categoriesJajanan().find(c=>c!=='Semua' && norm(c).includes(kunci)) || null;
+}
 /** Produk tab Jajanan (terpisah dari Belanja) - semua kategori yang lolos isJajananKategori().
  *  Pencarian cocok ke nama produk ATAU nama kategori, abaikan spasi ("es teh" = kategori "Esteh"),
  *  biar pintasan Beranda (Seblak/Bakaran/Kopi/Es Teh) tetap kena walau nama produknya tidak memuat kata itu. */
@@ -2192,9 +2201,9 @@ function homeEmptyCard(iconName, title, text, btnLabel, btnAction, isErr){
     </div>`;
 }
 
-/* Kartu "Jajanan & Minuman" di Beranda - 6 pintasan jenis jajanan, tiap tap
-   isi state.search dgn kata kunci lalu buka tab Jajanan (filteredJajanan()
-   sudah cocokkan by nama produk, lihat filteredJajanan()). */
+/* Kartu "Jajanan & Minuman" di Beranda - pintasan jenis jajanan. Tiap tap buka tab Jajanan
+   langsung di chip kategori yang cocok dgn `q` (lihat resolveJajananKategori()); pencarian
+   dibiarkan kosong. Fallback ke pencarian `q` cuma kalau kategori server-nya belum ada. */
 const JAJANAN_ITEMS = [
   { key:'seblak',  label:'Seblak',  q:'seblak', icon:'ramen_dining',  bg:'#ffdad7', fg:'#b0001a' },
   { key:'bakaran', label:'Bakaran', q:'bakar',  icon:'outdoor_grill', bg:'#ffe3c2', fg:'#a8460a' },
@@ -4908,11 +4917,18 @@ document.addEventListener('click', function(e){
   else if(a==='close-legal') closeLegal();
   else if(a==='shop-category'){ state.category = t.dataset.category || 'Semua'; setTab('belanja'); }
   else if(a==='jajanan-cat'){
-    state.jajananCategory = 'Semua'; // pintasan Beranda = cari lintas kategori
-    state.search = t.dataset.q || '';
+    // Pintasan Beranda = langsung buka kategori (chip aktif), BUKAN isi kotak pencarian
+    // (sama kayak pintasan kategori di tab Belanja). Kalau belum ada kategori server yang
+    // cocok, baru jatuh ke pencarian kata kunci biar produk tetap ketemu.
+    const q = t.dataset.q || '';
+    const kat = resolveJajananKategori(q);
+    state.jajananCategory = kat || 'Semua';
+    state.search = kat ? '' : q;
     const si = document.getElementById('search-input'); if(si) si.value = state.search;
     const sc = document.getElementById('search-clear'); if(sc) sc.style.display = state.search ? 'flex' : 'none';
     setTab('jajanan');
+    // chip aktif bisa di luar layar kalau kategori banyak -> geser biar kelihatan
+    try{ const on = document.querySelector('#tab-content .chip[data-active="true"]'); if(on && on.scrollIntoView) on.scrollIntoView({inline:'center', block:'nearest'}); }catch(e){}
   }
   else if(a==='open-jajanan'){
     state.jajananCategory = 'Semua';
