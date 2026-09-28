@@ -1546,7 +1546,7 @@ const state = {
   },
   authOpen: false,
   authMode: 'login',      // 'login' | 'daftar' (daftar muncul otomatis kalau nomor belum jadi member)
-  authForm: { wa:'', pin:'', nama:'', alamat:'' },
+  authForm: { wa:'', pin:'', nama:'', alamat:'', email:'' },
   authError: null,
   authSubmitting: false,
   riwayatPelanggan: [],
@@ -3552,12 +3552,12 @@ function hideCheckoutError(){
 /* ================================================================
    AKUN / LOGIN MEMBER + TAMU
    ================================================================
-   Kontrak backend (BELUM ada di GAS kamu sekarang, perlu ditambahin -
-   lihat catatan di akhir chat):
+   Kontrak backend (Lupa PIN: sudah ada di GAS - LupaPinService.js):
      apiLoginPelangganPublik({wa, pin})
        -> data: { terdaftar:boolean, valid:boolean, pelanggan:{id,nama,wa}|null }
-     apiDaftarPelangganPublik({nama, wa, pin})
-       -> data: { pelanggan:{id,nama,wa} }
+     apiDaftarPelangganPublik({nama, wa, pin, email?})
+       -> data: { pelanggan:{id,nama,wa} }   (email opsional, disimpan ke Sheet_Customer.Email
+          hanya kalau masih kosong)
      apiRiwayatPesananPelangganPublik({pelangganId})
        -> data: [ {Kode,Pelanggan,Tipe,Total,Status,CreatedAt,Items:[{nama,qty,harga}]}, ... ]
      apiBuatPesananOnlinePublik(...) ditambah param opsional `pelangganId`
@@ -3565,9 +3565,10 @@ function hideCheckoutError(){
 
      -- Lupa PIN (reset via OTP email, lihat LupaPinBackend.gs) --
      apiKirimOtpLupaPinPublik({wa, email})
-       -> wa & email harus cocok satu baris Sheet_Member (kolom Email baru).
+       -> wa & email harus cocok dengan Sheet_Customer.Email (kolom sudah ada, TIDAK perlu
+          kolom baru) + akun ada di Sheet_PelangganOnline.
        -> generate OTP 6 digit, simpan+expiry 5 menit, kirim via MailApp.
-       -> data: { terkirim:true } | throw Error kalau wa/email gak cocok.
+       -> data: { terkirim:true } | throw Error kalau wa/email gak cocok (1 pesan generik).
      apiVerifikasiOtpLupaPinPublik({wa, otp, pinBaru})
        -> cocokkan OTP & belum kadaluarsa, update PIN, hapus OTP terpakai.
        -> data: { pelanggan:{id,nama,wa} } | throw Error kalau OTP salah/expired.
@@ -3575,7 +3576,7 @@ function hideCheckoutError(){
 function openAuth(){
   state.authOpen = true;
   state.authMode = 'login';
-  state.authForm = { wa:'', pin:'', nama:'', alamat:'' };
+  state.authForm = { wa:'', pin:'', nama:'', alamat:'', email:'' };
   state.authError = null;
   document.getElementById('auth-overlay').setAttribute('data-open','true');
   renderAuthBody();
@@ -3612,13 +3613,14 @@ function renderAuthBody(){
     ${state.authError ? '<div class="auth-error">'+esc(state.authError)+'</div>' : ''}
     ${isDaftar ? '<div class="field"><label for="auth-nama">Nama</label><input id="auth-nama" type="text" placeholder="Nama kamu" value="'+esc(f.nama)+'"></div>' : ''}
     <div class="field"><label for="auth-wa">Nomor WhatsApp</label><input id="auth-wa" type="tel" placeholder="08xx-xxxx-xxxx" value="${esc(f.wa)}"></div>
+    ${isDaftar ? '<div class="field"><label for="auth-email">Email (opsional, buat reset PIN kalau lupa)</label><input id="auth-email" type="email" inputmode="email" autocomplete="email" placeholder="nama@email.com" value="'+esc(f.email)+'"></div>' : ''}
     ${isDaftar ? '<div class="field"><label for="auth-alamat">Alamat Pengantaran (opsional)</label><textarea id="auth-alamat" rows="2" placeholder="Jalan, nomor rumah, RT/RW, patokan">'+esc(f.alamat)+'</textarea></div>' : ''}
     <div class="field"><label for="auth-pin">PIN (4-6 digit)</label><input id="auth-pin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="••••" value="${esc(f.pin)}"></div>
     ${!isDaftar ? '<div class="auth-forgot-row"><button class="link-btn" data-action="set-auth-mode" data-mode="lupapin">Lupa PIN?</button></div>' : ''}
     <button class="submit-btn" id="auth-submit-btn" data-action="submit-auth" ${state.authSubmitting?'disabled':''}>${state.authSubmitting ? 'Memproses...' : (isDaftar ? 'Daftar & Login' : 'Login')}</button>
     <div class="guest-link-row">atau <button class="link-btn" data-action="close-auth">Masuk sebagai Tamu</button></div>
   `;
-  ['nama','wa','alamat','pin'].forEach(key=>{
+  ['nama','wa','email','alamat','pin'].forEach(key=>{
     const elm = document.getElementById('auth-'+key);
     if(!elm) return;
     elm.addEventListener('input', e=>{ state.authForm[key]=e.target.value; });
@@ -3735,7 +3737,9 @@ async function submitAuth(){
     if(state.authMode==='daftar'){
       const nama = f.nama.trim();
       if(!nama) throw new Error('Nama wajib diisi.');
-      const data = await api('apiDaftarPelangganPublik', { nama, wa, pin });
+      const email = (f.email||'').trim();
+      if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Format email tidak valid.');
+      const data = await api('apiDaftarPelangganPublik', { nama, wa, pin, email });
       // Alamat yang diisi saat daftar (atau yang sudah diketik sebagai Tamu) jadi alamat pengantaran member
       // dan langsung tampil di beranda mode "Antar ke Rumah".
       const alamat = (f.alamat || state.form.alamat || '').trim();
