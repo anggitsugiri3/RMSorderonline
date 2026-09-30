@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://script.google.com" crossorigin>
 <link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
 <!-- Ikon Material Symbols (subset 54 ikon). Tambah ikon baru = tambahkan namanya di &icon_names (urut abjad). -->
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=add,add_shopping_cart,arrow_back,arrow_forward,bakery_dining,bolt,call,category,chat,check,check_circle,chevron_right,child_care,cleaning_services,close,cloud_off,confirmation_number,cookie,delete,eco,event_available,favorite,grid_view,grocery,home,info,inventory_2,local_cafe,local_drink,local_fire_department,local_mall,local_offer,local_shipping,location_on,loyalty,medical_services,monetization_on,outdoor_grill,person,price_check,print,ramen_dining,receipt_long,recommend,redeem,remove,remove_shopping_cart,schedule,search,sell,share,shopping_bag,shopping_basket,shopping_cart,skillet,spa,stars,storefront,sync,timer,tune,verified&display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&icon_names=add,add_shopping_cart,arrow_back,arrow_forward,bakery_dining,bolt,call,category,chat,check,check_circle,chevron_right,child_care,cleaning_services,close,cloud_off,confirmation_number,cookie,delete,eco,event_available,expand_more,favorite,grid_view,grocery,home,info,inventory_2,local_cafe,local_drink,local_fire_department,local_mall,local_offer,local_shipping,location_on,loyalty,medical_services,monetization_on,outdoor_grill,person,price_check,print,ramen_dining,receipt_long,recommend,redeem,remove,remove_shopping_cart,schedule,search,sell,share,shopping_bag,shopping_basket,shopping_cart,skillet,spa,stars,storefront,sync,timer,tune,verified&display=block" rel="stylesheet">
 <style>
 /* ============================================================
    DESIGN TOKENS — warna & tipografi khas "warung/kraft paper"
@@ -280,8 +280,8 @@ input,textarea{font-family:inherit}
 .hm-name{margin:2px 0 0;min-height:30px;font-size:12px;font-weight:600;line-height:1.25;color:var(--z-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .hm-price{margin:4px 0 0;font-size:12px;font-weight:800;color:var(--z-red)}
 .hm-old{margin:0;font-size:10px;color:#916f6c;text-decoration:line-through}
-.hm-add{margin-top:8px;width:100%;padding:4px 0;border:none;border-radius:4px;background:var(--z-bg);color:var(--z-red);font-size:12px;font-weight:700;text-align:center;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:background var(--dur),color var(--dur)}
-.hm-add:hover{background:var(--z-red);color:#fff}
+.hm-add{margin-top:10px;width:100%;height:29px;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:#025ea5;color:#fff;font-size:11.5px;font-weight:700;text-align:center}
+.hm-add:active{filter:brightness(.92)}
 .hm-step{margin-top:8px;display:flex;align-items:center;justify-content:space-between;border-radius:4px;background:var(--z-bg)}
 .hm-step button{display:flex;padding:4px 10px;border:none;background:none;color:var(--z-red)}
 .hm-step button:disabled{opacity:.3}
@@ -310,10 +310,6 @@ input,textarea{font-family:inherit}
 .hm-chip .msym{font-size:11px}
 .hm-chip.low{background:var(--z-pink);color:var(--z-red)}
 .hm-chip.out{background:var(--z-bg);color:var(--z-muted)}
-.hm-grid .hm-add{margin-top:10px;padding:6px 0;border-radius:8px;display:flex;align-items:center;justify-content:center;gap:4px}
-.hm-grid .hm-add .msym{font-size:16px}
-.hm-grid .hm-step,.hm-grid .hm-out{margin-top:10px;border-radius:8px}
-.hm-grid .hm-out{padding:7px 0}
 
 /* Kartu status katalog (memuat / gagal / kosong) */
 .hm-empty{margin:0 16px 20px;padding:16px;display:flex;flex-direction:column;align-items:center;text-align:center;background:#fff;border:1px solid var(--z-line);border-radius:16px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
@@ -677,13 +673,16 @@ input,textarea{font-family:inherit}
 .pm-cd-t b{padding:2px 4px;border-radius:4px;background:rgba(255,255,255,.2)}
 .pm-cd-t b:last-child{color:var(--z-gold)}
 @keyframes pm-pulse{50%{opacity:.5}}
-.pm-tabs{display:flex;align-items:center;gap:6px;padding:8px 16px;overflow-x:auto;background:rgba(255,255,255,.95);border-bottom:1px solid var(--z-line);scrollbar-width:none}
+.pm-tabs{display:flex;align-items:stretch;overflow-x:auto;padding:0 4px;background:#fff;border-bottom:1px solid #e6e8ef;scrollbar-width:none}
 .pm-tabs::-webkit-scrollbar{display:none}
-.pm-chip{flex:none;display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:none;border-radius:999px;background:var(--z-bg);color:var(--z-ink);font-size:12px;font-weight:700;white-space:nowrap;transition:background var(--dur),color var(--dur)}
-.pm-chip:hover{background:var(--z-line)}
-.pm-chip[data-active="true"]{background:var(--z-red);color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.05)}
-.pm-chip .msym{font-size:15px}
-.pm-chip[data-active="true"] .msym{font-variation-settings:'FILL' 1}
+.pm-tab{flex:none;display:inline-flex;align-items:center;gap:8px;padding:14px 14px 12px;border:none;border-bottom:3px solid transparent;background:none;color:#9e9e9e;font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer}
+.pm-tab .pm-ic{width:22px;height:22px;flex:none;color:#9e9e9e}
+.pm-tab[data-active="true"]{color:#0c5fae;font-weight:700;border-bottom-color:#0c5fae}
+.pm-tab[data-active="true"] .pm-ic{color:#d91a2a}
+.pm-sub{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:#f7f7f7;scrollbar-width:none}
+.pm-sub::-webkit-scrollbar{display:none}
+.pm-sub-chip{flex:none;padding:8px 14px;border:1px solid #d0d0d0;border-radius:10px;background:#fff;color:#333;font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer}
+.pm-sub-chip[data-active="true"]{border-color:#0c5fae;color:#0c5fae;font-weight:700}
 .pm-sec{padding:12px 16px 0}
 .pm-track{position:relative;overflow:hidden;padding:12px;border-radius:12px;background:linear-gradient(to bottom right,#ffdf99,#f6bf22,#ffdf99);border:1px solid rgba(246,191,34,.5);color:#251a00;box-shadow:0 1px 2px rgba(0,0,0,.05)}
 .pm-track h2{display:flex;align-items:center;gap:6px;margin:0;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:-.01em;color:#251a00}
@@ -715,9 +714,8 @@ input,textarea{font-family:inherit}
 .pm-card-pr b{font-size:12px;font-weight:800;color:var(--z-red)}
 .pm-card-pr s{font-size:10px;color:#916f6c}
 .pm-card-st{margin-top:6px;text-align:right;font-size:9px;color:var(--z-muted)}
-.pm-card-add{margin-top:10px;width:100%;height:32px;display:flex;align-items:center;justify-content:center;gap:4px;border:none;border-radius:8px;background:var(--z-bg);color:var(--z-red);font-size:12px;font-weight:700;box-shadow:0 1px 2px rgba(0,0,0,.05);transition:background var(--dur),color var(--dur)}
-.pm-card-add:hover{background:var(--z-red);color:#fff}
-.pm-card-add .msym{font-size:16px}
+.pm-card-add{margin-top:10px;width:100%;height:29px;display:flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:#025ea5;color:#fff;font-size:11.5px;font-weight:700}
+.pm-card-add:active{filter:brightness(.92)}
 .pm-et{padding:20px 16px 12px}
 .pm-et-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;padding:10px;border-radius:12px;background:linear-gradient(to right,#dee8ff,#d5e3ff);border:1px solid var(--z-line);box-shadow:0 1px 2px rgba(0,0,0,.05)}
 .pm-et-l{display:flex;align-items:center;gap:8px;min-width:0}
@@ -944,6 +942,89 @@ body{background:hsl(var(--paper-deep))}
 .hm-addr-txt b{display:block;font-weight:800;color:var(--z-ink);word-break:break-word}
 .hm-addr-txt span{display:block;color:var(--z-muted);font-size:11px}
 .hm-addr-btn{flex:none;align-self:center;border:1px solid hsl(var(--red));background:#fff;color:hsl(var(--red));border-radius:999px;padding:5px 12px;font-size:11px;font-weight:800;text-decoration:none}
+
+/* ============================================================
+   TAB BELANJA — meniru halaman kategori Alfagift.
+   Ukuran dari screenshot 720px lebar = 360 CSS px (1 CSS px = 2 px gambar).
+   ============================================================ */
+.hdr-back{display:none;color:#fff;width:24px;height:24px;margin-right:12px;flex:none}
+.hdr-back .msym{font-size:24px}
+body[data-cat="1"] .hdr-top,body[data-cat="1"] .store-mark,body[data-cat="1"] #wa-link{display:none}
+body[data-cat="1"] .hdr-back{display:flex}
+body[data-cat="1"] .app{background:#f7f7f7}
+body[data-cat="1"] .app-header{background:#cf0b0c;padding:8px 16px;gap:0;box-shadow:none}
+body[data-cat="1"] .hdr-main{height:37px;gap:0}
+body[data-cat="1"] .search-row{height:37px;border-radius:8px;padding:0 10px;gap:8px;margin-right:18px}
+body[data-cat="1"] .search-row .msym{font-size:20px;color:#8e8e8e}
+body[data-cat="1"] .search-row input{font-size:13px;color:#333}
+body[data-cat="1"] .search-row input::placeholder{color:#8e8e8e}
+body[data-cat="1"] .hdr-actions{gap:0}
+body[data-cat="1"] .icon-btn{width:24px;height:24px;color:#fff}
+body[data-cat="1"] .icon-btn .msym{font-size:24px}
+body[data-cat="1"] .badge-count{top:-7px;right:-9px;min-width:15px;height:15px;padding:0 3px;font-size:9px}
+.bl-top{position:relative;background:#fff;padding:12px 16px 19px}
+.bl-title-row{display:flex;align-items:center;justify-content:space-between;height:26px}
+.bl-title{margin:0;font-size:15px;line-height:26px;font-weight:700;color:#333}
+.bl-more{display:flex;align-items:center;gap:5px;border:0;background:none;padding:0;font-size:12px;font-weight:600;color:#025ea5}
+.bl-more .msym{font-size:18px}
+.bl-menu{position:absolute;right:16px;top:44px;z-index:5;min-width:170px;max-height:60vh;overflow:auto;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.22);padding:4px 0}
+.bl-menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:9px 14px;font-size:12px;color:#333}
+.bl-chips{display:flex;gap:5px;overflow-x:auto;margin:14px -16px 0;padding:0 16px;scrollbar-width:none}
+.bl-chips::-webkit-scrollbar{display:none}
+.bl-chip{flex:none;display:flex;align-items:center;height:34.5px;padding:0 7px;border:1px solid #dcdcdc;border-radius:8px;background:#fff;font-size:11.5px;font-weight:400;color:#333;white-space:nowrap}
+.bl-chip.ic{gap:11px;padding-left:11px}
+.bl-chip .msym{font-size:22px;color:#025ea5}
+.bl-chip.on{border:1.5px solid #025ea5;background:#e8f4fd;color:#025ea5}
+.bl-filter{display:flex;gap:8px;padding:19.5px 16px 20px}
+.bl-f{position:relative;flex:none;display:flex;align-items:center;height:29.5px;border:1px solid #dcdcdc;border-radius:8px;background:#fff;font-size:11.5px;color:#333;padding:0 7.5px;white-space:nowrap}
+.bl-f.on{border-color:#025ea5;color:#025ea5;background:#e8f4fd}
+.bl-f select{appearance:none;-webkit-appearance:none;border:0;background:transparent;outline:0;font-size:11.5px;color:#333;padding:0 18px 0 0;margin:0;height:100%;field-sizing:content}
+.bl-f:has(select)::after{content:"";position:absolute;right:10px;top:50%;margin-top:-2px;border-left:3px solid transparent;border-right:3px solid transparent;border-top:4px solid #333;pointer-events:none}
+.bl-grid{display:flex;align-items:flex-start;gap:8px;padding:0 4.5px 18px}
+.bl-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.bl-card{background:#fff;border:1px solid #eee;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.1);padding:3px 8px 8px;display:flex;flex-direction:column;min-width:0}
+.bl-im{height:121px;margin:0 -8px 4px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.bl-img{width:100%;height:100%;object-fit:contain}
+.bl-emo{font-size:52px;line-height:1}
+.bl-name{font-size:13px;line-height:15.5px;font-weight:400;color:#333;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bl-price{margin-top:3px;font-size:15px;line-height:20px;font-weight:700;color:#333}
+.bl-promo{display:flex;align-items:center;gap:3.5px;margin-top:3.5px}
+.bl-disc{background:#cf0b0c;color:#fff;font-size:9px;font-weight:700;height:12.5px;line-height:12.5px;padding:0 6px;border-radius:3px}
+.bl-old{font-size:8.5px;color:#9a9a9a;text-decoration:line-through}
+.bl-hemat{display:inline-flex;align-items:center;align-self:flex-start;gap:5px;height:17.5px;margin-top:8px;padding:0 4px 0 4px;border-radius:4px;background:#fef7cd;color:#c80e0f;font-size:8.5px;font-weight:700}
+.bl-promo + .bl-hemat{margin-top:4.5px}
+.bl-hemat i{width:7.5px;height:7.5px;border-radius:50%;background:#cf0b0c;color:#fff;font-size:3.5px;font-style:normal;line-height:7.5px;text-align:center}
+.bl-hemat .msym{font-size:10px}
+.bl-inst{display:flex;align-items:center;gap:4px;margin-top:4.5px;line-height:14px;font-size:8.5px;font-weight:600;color:#025ea5}
+.bl-inst .msym{font-size:10px;color:#f26522}
+.bl-add{margin-top:10px;height:29px;border:0;border-radius:6px;background:#025ea5;color:#fff;font-size:11.5px;font-weight:700}
+.bl-add:active{filter:brightness(.92)}
+.bl-card .stock-out{margin-top:10px}
+.bl-step{margin-top:10px}
+/* Sheet pilih voucher (keranjang) */
+.vc-ov{position:fixed;inset:0;z-index:70;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.45)}
+.vc-ov[data-open="true"]{display:flex}
+.vc-sheet{width:100%;max-width:460px;max-height:82vh;display:flex;flex-direction:column;background:#f5f6fa;border-radius:16px 16px 0 0;animation:vcUp .22s ease-out}
+@keyframes vcUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.vc-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#fff;border-radius:16px 16px 0 0;border-bottom:1px solid #e6e8ef}
+.vc-head h3{margin:0;display:flex;align-items:center;gap:6px;font-size:15px;font-weight:800}
+.vc-head h3 .msym{font-size:20px;color:#d9141a}
+.vc-x{border:none;background:none;padding:4px;display:flex;color:#6b7280}
+.vc-list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:12px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.vc-card{display:flex;align-items:stretch;background:#fff;border:1px solid #e6e8ef;border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.vc-card.on{border-color:#0c5fae}
+.vc-l{flex:none;width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 4px;background:#d9141a;color:#fff;text-align:center}
+.vc-l .msym{font-size:22px}
+.vc-l b{font-size:12px;font-weight:800;line-height:1.15}
+.vc-m{flex:1;min-width:0;padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.vc-m strong{font-size:13px;font-weight:700;color:#111c2d}
+.vc-m p{margin:0;font-size:11px;line-height:1.35;color:#6b7280}
+.vc-m code{align-self:flex-start;padding:1px 6px;border:1px dashed #9ca3af;border-radius:4px;font-size:10.5px;font-weight:700;color:#374151}
+.vc-m small{font-size:10px;color:#6b7280}
+.vc-r{flex:none;display:flex;align-items:center;padding:0 12px 0 0}
+.vc-use{border:none;border-radius:6px;padding:7px 14px;background:#025ea5;color:#fff;font-size:11.5px;font-weight:700}
+.vc-use.on{background:#e6e8ef;color:#374151}
+.vc-empty{padding:28px 12px;text-align:center;font-size:12.5px;color:#6b7280}
 </style>
 <!-- BARU (integrasi QRIS ASLI via iPaymu) - iPaymu API Direct cuma balikin payload EMV
      mentah (bukan gambar QR siap pakai kayak Midtrans dulu), jadi gambar QR dirender
@@ -1111,9 +1192,81 @@ function emojiProduk(nama, kategori) {
  * Awas: kalau abis itu admin pencet "Ganti Foto" di app buat produk yang sama, seluruh
  * cell (termasuk galerinya) KETIMPA jadi 1 foto lagi - dua cara ini gak bisa dicampur.
  */
+/* ---- PROMO DISKON dari server kasir ----
+   Dulu diskonPersen dikunci 0 di mapProdukPublik, jadi promo apa pun di server kasir TIDAK PERNAH sampai
+   ke aplikasi order online. Sekarang record katalog dibaca: field promo dikenali dari namanya
+   (mengandung diskon/potongan/promo/hemat). Nominal (Rp) -> diskonNominal, persen -> diskonPersen.
+   Field "harga setelah promo" (mis. HargaPromo) dihitung jadi nominal = HargaJual - nilai itu.
+   Promo yang punya tanggal mulai/selesai dan sudah di luar rentang diabaikan.
+   Cek isi data mentah dari server lewat console: debugPromo() */
+let KATALOG_RAW = [];
+function angkaServer_(v){
+  if (typeof v === 'number') return isFinite(v) ? v : 0;
+  if (typeof v !== 'string') return 0;
+  let t = v.replace(/rp|\s/ig, '');
+  if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(t)) t = t.replace(/\./g, '').replace(',', '.');
+  else t = t.replace(',', '.');
+  const n = Number(t);
+  return isFinite(n) ? n : 0;
+}
+function bacaPromoProduk_(r, harga) {
+  const SKIP = /^(id|nama|kategori|kategorinama|satuan|stok|foto|hargajual|hargabeli|hargapokok)$/i;
+  const now = Date.now();
+  const tgl = v => (typeof v === 'string' && /[-\/T]/.test(v) && !isNaN(Date.parse(v))) ? Date.parse(v) : NaN;
+  let nominal = 0, persen = 0, sumber = '';
+  const pakai = (k, tipe, v) => {
+    if (!(v > 0)) return;
+    if (tipe === 'persen') { if (!persen && v < 100) { persen = v; sumber = sumber || k; } }
+    else if (tipe === 'harga') { if (!nominal && v < harga) { nominal = harga - v; sumber = k; } }
+    else if (!nominal && v < harga) { nominal = v; sumber = k; }
+  };
+  // persen | harga (= harga SETELAH promo, mis. HargaPromo/HargaDiskon/HargaAkhir) | nominal (= potongan Rp, mis. DiskonNominal/PotonganHarga)
+  const tipeKey = k => /persen|percent|pct/i.test(k) ? 'persen' : (/^harga|setelah|akhir|final|(^|[^a-z])net([^a-z]|$)/i.test(k) ? 'harga' : 'nominal');
+  // di luar rentang tanggal promo -> abaikan semua
+  for (const k of Object.keys(r)) {
+    if (!/promo|diskon/i.test(k)) continue;
+    const t = tgl(r[k]);
+    if (isNaN(t)) continue;
+    if (/mulai|awal|start|dari/i.test(k) && t > now) return { nominal: 0, persen: 0, sumber: '' };
+    if (/selesai|akhir|berakhir|sampai|end|expired|kadaluarsa/i.test(k) && t + 86399999 < now) return { nominal: 0, persen: 0, sumber: '' };
+  }
+  for (const k of Object.keys(r)) {
+    if (SKIP.test(k) || !/diskon|potongan|promo|hemat/i.test(k)) continue;
+    const v = r[k];
+    if (v && typeof v === 'object' && !Array.isArray(v)) {           // mis. Promo:{tipe:'NOMINAL', nilai:600}
+      const nilai = angkaServer_(v.nilai != null ? v.nilai : (v.Nilai != null ? v.Nilai : v.value));
+      const tp = String(v.tipe || v.Tipe || v.jenis || v.Jenis || '');
+      pakai(k, /persen|percent|%/i.test(tp) ? 'persen' : 'nominal', nilai);
+      continue;
+    }
+    if (typeof v === 'boolean' || tgl(v) === tgl(v) && !isNaN(tgl(v))) continue;   // flag ya/tidak & tanggal bukan angka diskon
+    pakai(k, tipeKey(k), angkaServer_(v));
+  }
+  return { nominal: nominal, persen: nominal ? Math.max(1, Math.round(nominal / harga * 100)) : persen, sumber: sumber };
+}
+/* Promo dari server kasir (ProdukService.listKatalogPublik): DiskonNominal = potongan pasti
+   per unit (Rp), PromoLabel = teks promo (mis. "Beli 3 Gratis 1"), PromoSelesai = batas
+   berlaku. Katalog di-cache server sampai 5 menit, jadi PromoSelesai dicek lagi di sini. */
+function bacaPromoServer_(r, harga) {
+  const selesai = r.PromoSelesai ? Date.parse(r.PromoSelesai) : NaN;
+  if (!isNaN(selesai) && selesai < Date.now()) return { nominal: 0, persen: 0, sumber: '' };
+  const nominal = Math.min(Math.max(0, Math.round(angkaServer_(r.DiskonNominal))), harga);
+  return { nominal: nominal, persen: nominal ? Math.max(1, Math.round(nominal / harga * 100)) : 0, sumber: nominal ? 'server' : '' };
+}
+function debugPromo() {
+  const r = KATALOG_RAW[0];
+  console.log('Field produk dari server:', r ? Object.keys(r) : '(katalog kosong)');
+  const promo = PRODUCTS.filter(x => x.diskonNominal > 0 || x.diskonPersen > 0);
+  console.log('Produk terbaca punya promo:', promo.length, promo.map(x => ({ nama: x.nama, harga: x.harga, nominal: x.diskonNominal, persen: x.diskonPersen, dariField: x.promoField })));
+  return promo.length;
+}
 function mapProdukPublik(p) {
   const foto = String(p.Foto || '').trim();
   const galeri = foto.includes('|') ? foto.split('|').map(s=>s.trim()).filter(Boolean) : [];
+  const harga = Number(p.HargaJual) || 0;
+  // Server baru mengirim DiskonNominal/DiskonPersen eksplisit; tebakan nama field (bacaPromoProduk_)
+  // tinggal jadi cadangan kalau yang dipakai backend versi lama.
+  const promo = (p.DiskonNominal !== undefined || p.DiskonPersen !== undefined) ? bacaPromoServer_(p, harga) : bacaPromoProduk_(p, harga);
   return {
     id: p.Id,
     nama: p.Nama,
@@ -1124,7 +1277,11 @@ function mapProdukPublik(p) {
     emoji: emojiProduk(p.Nama, p.KategoriNama),
     gambar: galeri[0] || foto || null, // dipakai thumbnail (home/cart/admin) - selalu 1 foto pertama
     galeri: galeri, // dipakai productPhotos() buat galeri swipe di detail - kosong kalau cuma 1 foto
-    diskonPersen: 0,
+    diskonNominal: promo.nominal,   // Rp potongan per item (promo diskon nominal)
+    diskonPersen: promo.persen,     // persen (promo persen), atau hasil hitung dari nominal buat badge/penyaring
+    promoField: promo.sumber,
+    promoJenis: String(p.PromoJenis || ''),   // diskon_persen | diskon_nominal | beli_x_gratis_y | bundling (dipakai tab Promo)
+    promoLabel: String(p.PromoLabel || ''),   // teks promo (juga untuk promo bersyarat: beli X gratis Y, bundling, min. belanja)
     unggulan: false
   };
 }
@@ -1172,6 +1329,7 @@ function simpanKatalogCache_(data) {
 /** Pasang data katalog dari server sebagai PRODUCTS + simpan cache. */
 function terapkanKatalog_(data) {
   data = Array.isArray(data) ? data : [];
+  KATALOG_RAW = data;
   PRODUCTS = data.map(mapProdukPublik);
   katalogTerakhirMs = Date.now();
   simpanKatalogCache_(data);
@@ -1215,7 +1373,7 @@ async function loadKatalog() {
   state.katalogError = null;
   if (!PRODUCTS.length) {
     const cache = bacaKatalogCache_();
-    if (cache) PRODUCTS = cache.data.map(mapProdukPublik);
+    if (cache) { KATALOG_RAW = cache.data; PRODUCTS = cache.data.map(mapProdukPublik); }
   }
   state.katalogLoading = PRODUCTS.length === 0;
   renderTabContent();
@@ -1380,7 +1538,12 @@ function msym(name, cls){ return '<span class="msym'+(cls?' '+cls:'')+'" aria-hi
    HELPER
    ================================================================ */
 function rupiah(n){ return 'Rp' + Math.round(n).toLocaleString('id-ID'); }
-function hargaAkhir(p){ return p.diskonPersen ? Math.round((p.harga*(100-p.diskonPersen)/100)/100)*100 : p.harga; }
+function hargaAkhir(p){
+  if(p.diskonNominal>0) return Math.max(0, p.harga - p.diskonNominal);   // promo diskon nominal (Rp) dari server kasir
+  return p.diskonPersen ? Math.round((p.harga*(100-p.diskonPersen)/100)/100)*100 : p.harga;
+}
+/* Teks badge diskon: promo nominal -> "Rp 600", promo persen -> "13%". */
+function diskonLabel(p){ return p.diskonNominal>0 ? 'Rp '+Math.round(p.diskonNominal).toLocaleString('id-ID') : p.diskonPersen+'%'; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ================================================================
@@ -1501,9 +1664,13 @@ const state = {
   toppingPick: [],   // id produk topping yang lagi dicentang di detail Seblak
   porsi: [],         // catatan tiap porsi seblak + topping-nya ({produkId, toppingIds}), dipakai buat Catatan pesanan
   jajananCategory: 'Semua',   // filter kategori tab Jajanan (terpisah dari state.category milik Belanja)
+  promoTab: 'harga',   // tab jenis promo: harga | gratis | paket | tebus | katalog
   promoKat: 'all',   // filter kategori Katalog Diskon di tab Promo
   tebusError: null,
   tebus: [],   // id produk Tebus Murah yang dipilih (maks. TEBUS_MAX)
+  voucherList: null, voucherLoading: false, voucherErr: '', voucherOpen: false,   // daftar voucher server utk sheet "Pilih"
+  voucherAktif: '',   // kode voucher yang dimasukkan customer di keranjang (divalidasi server)
+  promoSrv: null,     // hasil preview promo dari server kasir (lihat hitungPromoServer_)
   search: '',
   detailId: null,   // id produk yang sedang dibuka di halaman detail
   detailPushed: false,
@@ -1702,7 +1869,14 @@ function belanjaBiasa(){ return cartLines().reduce((s,l)=>s+l.qty*hargaAkhir(l.p
    belanjaSyaratTebus() khusus untuk cek syarat minimal. WAJIB sama dgn server
    (PesananOnlineService._resolveItemsTebus -> KategoriService.isJajananNama). */
 function isJajananLine(l){ const k = l.produk.kategori; return isJajananKategori(k) || isToppingKategori(k); }
-function belanjaSyaratTebus(){ return cartLines().filter(l=>!isJajananLine(l)).reduce((s,l)=>s+l.qty*hargaAkhir(l.produk),0); }
+function belanjaSyaratTebus(){
+  // Sama dgn server (PesananOnlineService._resolveItemsTebus): dihitung SETELAH diskon promo item.
+  // Pakai hasil preview server kalau sudah ada (mencakup beli X gratis Y/bundling), kalau belum pakai estimasi lokal.
+  const ps = promoSrvFresh_();
+  return cartLines().filter(l=>!isJajananLine(l)).reduce((s,l)=>{
+    return s + (ps ? Math.max(0, l.qty*l.produk.harga - (ps.diskonById[l.produk.id]||0)) : l.qty*hargaAkhir(l.produk));
+  },0);
+}
 function tebusMin(){ return TEBUS.length ? Math.min.apply(null, TEBUS.map(t=>t.min)) : TEBUS_MIN_DEFAULT; }
 function tebusEligible(t){ return belanjaSyaratTebus() >= t.min; }
 function tebusPicked(){ return TEBUS.filter(t=>state.tebus.includes(t.id) && tebusEligible(t)); }
@@ -1718,7 +1892,78 @@ function tebusImg(t){
   return p && p.gambar ? '<img alt="'+esc(t.nama)+'" src="'+esc(p.gambar)+'">' : '<span class="ct-emo">🛒</span>';
 }
 function cartCount(){ return cartLines().reduce((s,l)=>s+l.qty,0) + tebusPicked().length; }
-function cartTotal(){ return belanjaBiasa() + tebusPicked().reduce((s,t)=>s+t.harga,0); }
+function cartTotal(){
+  // Total sesudah promo server (item + voucher + member) kalau preview sudah datang; kalau belum, estimasi lokal.
+  const ps = promoSrvFresh_();
+  return (ps ? ps.totalSetelahPromo : belanjaBiasa()) + tebusPicked().reduce((s,t)=>s+t.harga,0);
+}
+
+/* ---- Promo server kasir: preview keranjang (promo item, voucher, member) ----
+   Semua jenis promo yang dibuat di modul Promosi kasir dihitung di SERVER (rule engine kasir yang sama
+   dgn checkout), lalu hasilnya dipakai di sini. Tanpa ini promo bersyarat (beli X gratis Y, bundling,
+   voucher, member) tidak mungkin dihitung akurat di klien. Gagal/lambat = jatuh ke estimasi lokal. */
+let promoTimer_ = null, promoReq_ = 0;
+function kontakPromo_(){
+  return (state.form.wa||'').trim() || (state.auth.status==='member' && state.auth.pelanggan ? String(state.auth.pelanggan.wa||'') : '');
+}
+function promoKey_(){
+  return cartLines().map(l=>l.produk.id+':'+l.qty).sort().join(',')+'|'+(state.voucherAktif||'')+'|'+kontakPromo_();
+}
+function promoSrvFresh_(){ return state.promoSrv && state.promoSrv.key===promoKey_() ? state.promoSrv : null; }
+function jadwalHitungPromo_(){
+  clearTimeout(promoTimer_);
+  if(cartLines().length===0){ state.promoSrv = null; return; }
+  if(promoSrvFresh_()) return;
+  promoTimer_ = setTimeout(hitungPromoServer_, 350);
+}
+function rerenderCartAman_(){
+  if(!state.cartOpen) return;
+  const ae = document.activeElement;
+  // jangan rebut fokus kalau customer lagi mengetik di kolom keranjang (qty/poin/voucher)
+  if(ae && ae.tagName==='INPUT' && ae.closest && ae.closest('#cart-body')){ setTimeout(rerenderCartAman_, 700); return; }
+  renderCartBody();
+}
+async function hitungPromoServer_(){
+  const lines = cartLines(); if(!lines.length) return;
+  const key = promoKey_(), reqId = ++promoReq_;
+  try{
+    const r = await api('apiHitungPromoPublik', {
+      items: lines.map(l=>({ produkId: l.produk.id, qty: l.qty })),
+      voucherKode: state.voucherAktif || '',
+      kontak: kontakPromo_()
+    }, API_READ);
+    if(reqId !== promoReq_) return;   // sudah ada permintaan yang lebih baru
+    const diskonById = {};
+    (r.items||[]).forEach(i=>{ diskonById[i.produkId] = Number(i.diskon)||0; });
+    state.promoSrv = {
+      key: key, diskonById: diskonById,
+      diskonItem: Number(r.diskonItem)||0, diskonVoucher: Number(r.diskonVoucher)||0, diskonMember: Number(r.diskonMember)||0,
+      diskonMemberPersen: Number(r.diskonMemberPersen)||0, memberPromoNama: r.memberPromoNama||'',
+      voucherValid: r.voucherValid, promo: r.promo||[], totalSetelahPromo: Number(r.totalSetelahPromo)||0
+    };
+    pruneTebus();
+    rerenderCartAman_();
+    const ct = document.getElementById('checkout-total-val');   // halaman checkout terbuka: segarkan totalnya juga
+    if(ct) ct.textContent = rupiah(Math.max(0, cartTotal()-estimasiPoinDiskon()));
+  }catch(e){
+    if(reqId === promoReq_) console.warn('apiHitungPromoPublik gagal (pakai estimasi lokal):', e.message);
+  }
+}
+/* Kartu "Kode Voucher" di keranjang disembunyikan dulu. Ganti jadi true untuk memunculkannya lagi. */
+const TAMPIL_VOUCHER = false;
+function voucherHtml_(){
+  if(!TAMPIL_VOUCHER) return '';
+  const ps = promoSrvFresh_(), kode = state.voucherAktif;
+  let msg = '';
+  if(kode){
+    if(!ps) msg = 'Memeriksa kode <b>'+esc(kode)+'</b>...';
+    else if(ps.voucherValid) msg = 'Voucher <b>'+esc(kode)+'</b> terpasang, hemat '+rupiah(ps.diskonVoucher)+'. <button class="link-btn" data-action="voucher-hapus">Hapus</button>';
+    else msg = 'Kode <b>'+esc(kode)+'</b> tidak berlaku atau kuotanya habis. <button class="link-btn" data-action="voucher-hapus">Hapus</button>';
+  }
+  return '<div class="ct-card ct-poin"><h4>'+msym('confirmation_number','fill')+'Kode Voucher</h4>'
+    + '<div class="poin-row"><input id="cart-inp-voucher" type="text" autocapitalize="characters" autocomplete="off" enterkeyhint="go" placeholder="Masukkan kode voucher" value="'+esc(kode||'')+'"><button type="button" class="btn-outline" data-action="voucher-pilih">Pilih</button></div>'
+    + (msg ? '<div class="account-guest-note" style="margin-top:4px">'+msg+'</div>' : '') + '</div>';
+}
 function changeQty(id, delta){
   const p = PRODUCTS.find(p=>p.id===id);
   if(!p) return;
@@ -1815,6 +2060,7 @@ function renderShell(){
         <span class="status-pill" id="status-pill"></span>
       </div>
       <div class="hdr-main">
+        <button class="icon-btn hdr-back" data-action="set-tab" data-tab="beranda" aria-label="Kembali">${msym('arrow_back')}</button>
         <div class="store-mark" id="store-mark">${STORE.logo ? '<img src="'+STORE.logo+'" alt="'+esc(STORE.nama)+'">' : esc(STORE.nama.charAt(0))}</div>
         <div class="search-row">
           ${msym('search')}
@@ -1998,7 +2244,7 @@ function setTab(tab){
   // logout-login lagi. Non-blocking, tampilan lama tetap muncul dulu sambil nunggu.
   if(tab==='pesanan' && state.auth.status==='member') loadRiwayatPelanggan();
   // Tab Jajanan dibuka -> tarik menu & stok terbaru dari server kasir (senyap, non-blocking).
-  if(tab==='jajanan') refreshKatalogSenyap();
+  if(tab==='jajanan' || tab==='belanja' || tab==='promo' || tab==='beranda') refreshKatalogSenyap();
 }
 function setCategory(cat){ state.category = cat; renderTabContent(); }
 function setJajananCategory(cat){ state.jajananCategory = cat; renderTabContent(); }
@@ -2027,7 +2273,7 @@ function productCard(p){
       ${rendahStok ? '<span class="stock-flag">Sisa '+p.stok+'</span>' : ''}
       ${p.diskonPersen
         ? '<div class="price">'+rupiah(hargaAkhir(p))+'</div>'
-          +'<div class="promo-row"><span class="discount-flag">-'+p.diskonPersen+'%</span><span class="price-old">'+rupiah(p.harga)+'</span></div>'
+          +'<div class="promo-row"><span class="discount-flag">-'+diskonLabel(p)+'</span><span class="price-old">'+rupiah(p.harga)+'</span></div>'
           +'<div class="hemat-badge">'+msym('sell')+'<span>Hemat '+rupiah(p.harga-hargaAkhir(p))+'</span>'+msym('chevron_right')+'</div>'
         : '<div class="price">'+rupiah(p.harga)+'</div>'}
       ${habis ? '' : '<div class="instant-tag">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>'}
@@ -2052,6 +2298,8 @@ function emptyState(iconName, text, ctaLabel, ctaTab){
 
 function renderTabContent(){
   const el = document.getElementById('tab-content');
+  document.body.dataset.tab = state.tab;
+  document.body.dataset.cat = (state.tab==='belanja' || state.tab==='jajanan') ? '1' : '';
   // qty berubah -> seluruh tab dirender ulang; simpan posisi scroll baris horizontal biar tidak lompat ke awal
   const hs = el.querySelector('.hm-hscroll');
   const hsLeft = hs ? hs.scrollLeft : 0;
@@ -2147,18 +2395,17 @@ setInterval(function(){
 }, 5000);
 
 function homeAddControl(p, big){
-  if(p.stok<=0) return '<div class="hm-out">Stok habis</div>';
+  if(p.stok<=0) return '<div class="stock-out">Stok habis</div>';
   const qty = state.cart[p.id]||0;
   const id = esc(p.id);
-  if(punyaTopping(p)) return '<button class="hm-add" data-action="open-topping" data-id="'+id+'">'+(big ? msym('add_shopping_cart')+'<span>Pilih Topping'+(qty>0?' ('+qty+')':'')+'</span>' : 'Pilih Topping'+(qty>0?' ('+qty+')':''))+'</button>';
+  if(punyaTopping(p)) return '<button class="hm-add" data-action="open-topping" data-id="'+id+'">Pilih Topping'+(qty>0?' ('+qty+')':'')+'</button>';
   if(qty===0){
-    return '<button class="hm-add" data-action="qty" data-id="'+id+'" data-delta="1">'
-      + (big ? msym('add_shopping_cart')+'<span>+ Keranjang</span>' : '+ Keranjang') + '</button>';
+    return '<button class="hm-add" data-action="qty" data-id="'+id+'" data-delta="1">+ Keranjang</button>';
   }
-  return '<div class="hm-step">'
-    + '<button data-action="qty" data-id="'+id+'" data-delta="-1" aria-label="Kurangi">'+msym('remove')+'</button>'
+  return '<div class="qty-stepper bl-step">'
+    + '<button data-action="qty" data-id="'+id+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button>'
     + '<input type="number" class="qty-input" inputmode="numeric" data-id="'+id+'" value="'+qty+'" min="0" max="'+p.stok+'">'
-    + '<button data-action="qty" data-id="'+id+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+msym('add')+'</button>'
+    + '<button data-action="qty" data-id="'+id+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button>'
     + '</div>';
 }
 
@@ -2180,7 +2427,7 @@ function homeCard(p, grid){
   return `
     <div class="hm-card">
       <div${pAttr(p.id)}>
-        <div class="hm-thumb">${p.diskonPersen ? '<span class="hm-disc">'+p.diskonPersen+'%</span>' : ''}${thumb}</div>
+        <div class="hm-thumb">${p.diskonPersen ? '<span class="hm-disc">'+diskonLabel(p)+'</span>' : ''}${thumb}</div>
         ${chip}
         ${grid ? '' : pkg}
         <h4 class="hm-name">${esc(p.nama)}</h4>
@@ -2400,50 +2647,103 @@ function tabBeranda(){
     </div>`;
 }
 
-function tabBelanja(){
-  const cats = categoriesFromProducts();
-  const list = filteredProducts();
-  const chips = cats.length>1 ? `<div class="h-scroll">${cats.map(c=>`<button class="chip" data-action="set-category" data-category="${esc(c)}" data-active="${c===state.category}">${esc(c)}</button>`).join('')}</div>` : '';
+/* ---------- Tab Belanja: tampilan halaman kategori gaya Alfagift (ukuran diukur dari screenshot 720px = 360 CSS px) ---------- */
+const BL = {b:{sort:'promo', online:false, proses:'', menu:false}, j:{sort:'promo', online:false, proses:'', menu:false}};   // b = Belanja, j = Jajanan
+// Isi ini kalau mau teks promo umum tampil di SEMUA kartu (mis. 'Hemat s/d Rp 20.000'). Kosong = pil hanya muncul di produk diskon, dengan nominal hemat asli.
+const HEMAT_UMUM = '';
+document.addEventListener('change', function(e){
+  const t = e.target;
+  if(t && t.classList && t.classList.contains('bl-sel')){ BL[t.dataset.ctx][t.dataset.k] = t.value; renderTabContent(); }
+});
+function blRp(n){ return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }   // gaya Alfagift: ada spasi setelah Rp
+function blCard(p){
+  const qty = state.cart[p.id]||0;
+  const habis = p.stok<=0;
+  const im = p.gambar
+    ? '<img class="bl-img" data-thumb-src="'+esc(p.gambar)+'" src="'+esc(p.gambar)+'" alt="'+esc(p.nama)+'" loading="lazy">'
+    : '<span class="bl-emo" aria-hidden="true">'+(p.emoji||'🛍️')+'</span>';
+  if(p.gambar) applyTrimmedThumb(p.gambar);
+  const hemat = p.diskonPersen ? 'Hemat '+blRp(p.harga-hargaAkhir(p)) : (p.promoLabel || HEMAT_UMUM);
+  const pill = hemat ? '<div class="bl-hemat"><i>Rp</i><span>'+esc(hemat)+'</span>'+msym('chevron_right')+'</div>' : '';
+  const harga = p.diskonPersen
+    ? '<div class="bl-price">'+blRp(hargaAkhir(p))+'</div><div class="bl-promo"><span class="bl-disc">'+diskonLabel(p)+'</span><span class="bl-old">'+blRp(p.harga)+'</span></div>'
+    : '<div class="bl-price">'+blRp(p.harga)+'</div>';
+  const aksi = habis ? '<div class="stock-out">Stok habis</div>'
+    : punyaTopping(p) ? '<button class="bl-add" data-action="open-topping" data-id="'+esc(p.id)+'">Pilih Topping'+(qty>0?' ('+qty+')':'')+'</button>'
+    : qty===0 ? '<button class="bl-add" data-action="qty" data-id="'+esc(p.id)+'" data-delta="1">+ Keranjang</button>'
+    : '<div class="qty-stepper bl-step"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><input type="number" class="qty-input" inputmode="numeric" data-id="'+esc(p.id)+'" value="'+qty+'" min="0" max="'+p.stok+'"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>';
+  return '<div class="bl-card"'+pAttr(p.id)+'><div class="bl-im">'+im+'</div><div class="bl-name">'+esc(p.nama)+'</div>'+harga+pill
+    + (habis ? '' : '<div class="bl-inst">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>')
+    + aksi+'</div>';
+}
+/* Renderer halaman kategori bersama (dipakai Belanja & Jajanan biar tampilannya identik).
+   cfg: ctx 'b'|'j', judul, semuaLabel, cats (tanpa 'Semua'), aktif, label(c), setAction, list, emptyLoading, emptyError, emptyNone, emptyKat, emptySearch */
+function blPage(cfg){
+  const st = BL[cfg.ctx];
+  let list = cfg.list.slice();
+  if(st.online || st.proses==='instan') list = list.filter(p=>p.stok>0);
+  if(st.sort==='promo') list.sort((a,b)=>(b.diskonPersen?1:0)-(a.diskonPersen?1:0));
+  else if(st.sort==='murah') list.sort((a,b)=>hargaAkhir(a)-hargaAkhir(b));
+  else if(st.sort==='mahal') list.sort((a,b)=>hargaAkhir(b)-hargaAkhir(a));
+  else if(st.sort==='az') list.sort((a,b)=>String(a.nama).localeCompare(String(b.nama)));
+  const chips = '<div class="bl-chips"><button class="bl-chip'+(cfg.aktif==='Semua'?' on':'')+'" data-action="'+cfg.setAction+'" data-category="Semua">'+esc(cfg.semuaChip)+'</button>'
+    + cfg.cats.map(c=>'<button class="bl-chip ic'+(c===cfg.aktif?' on':'')+'" data-action="'+cfg.setAction+'" data-category="'+esc(c)+'">'+msym(homeCatIcon(c))+'<span>'+esc(cfg.label(c))+'</span></button>').join('')+'</div>';
+  const menu = st.menu ? '<div class="bl-menu">'+['Semua'].concat(cfg.cats).map(c=>'<button data-action="bl-pick" data-ctx="'+cfg.ctx+'" data-category="'+esc(c)+'">'+(c==='Semua'?esc(cfg.semuaLabel):esc(cfg.label(c)))+'</button>').join('')+'</div>' : '';
+  const opt = (k,v,l)=>'<option value="'+v+'"'+(st[k]===v?' selected':'')+'>'+l+'</option>';
+  const filter = '<div class="bl-filter">'
+    + '<label class="bl-f"><select class="bl-sel" data-ctx="'+cfg.ctx+'" data-k="sort">'+opt('sort','promo','Rekomendasi Promo')+opt('sort','murah','Harga Terendah')+opt('sort','mahal','Harga Tertinggi')+opt('sort','az','Nama A-Z')+'</select></label>'
+    + '<button class="bl-f'+(st.online?' on':'')+'" data-action="bl-online" data-ctx="'+cfg.ctx+'">Produk Online</button>'
+    + '<label class="bl-f"><select class="bl-sel" data-ctx="'+cfg.ctx+'" data-k="proses">'+opt('proses','','Waktu Proses')+opt('proses','instan','Diproses Instan')+'</select></label></div>';
 
   let body;
   if(state.katalogLoading){
-    body = emptyState('boxEmpty','Memuat katalog produk...','');
+    body = emptyState('boxEmpty',cfg.emptyLoading,'');
   } else if(state.katalogError){
-    body = `<div class="empty-state">${icon('boxEmpty')}<p>Gagal memuat katalog: ${esc(state.katalogError)}</p>
+    body = `<div class="empty-state">${icon('boxEmpty')}<p>${esc(cfg.emptyError)}: ${esc(state.katalogError)}</p>
       <button class="btn-primary" data-action="retry-katalog">Coba Lagi</button></div>`;
-  } else if(PRODUCTS.length===0){
-    body = emptyState('boxEmpty','Katalog belum tersedia. Toko sedang menyiapkan produk untuk dipesan online.','');
+  } else if(cfg.kosong){
+    body = emptyState('boxEmpty',cfg.emptyNone,'');
   } else if(list.length===0){
     body = state.search
-      ? emptyState('search','Produk "'+esc(state.search)+'" tidak ditemukan. Coba kata kunci lain.','')
-      : emptyState('boxEmpty','Belum ada produk di kategori ini.','');
+      ? emptyState('search',cfg.emptySearch,'')
+      : emptyState('boxEmpty',cfg.emptyKat,'');
   } else {
-    body = `<div class="grid-2">${list.map(productCard).join('')}</div>`;
+    const kiri = list.filter((_,i)=>i%2===0).map(blCard).join('');
+    const kanan = list.filter((_,i)=>i%2===1).map(blCard).join('');
+    body = '<div class="bl-grid"><div class="bl-col">'+kiri+'</div><div class="bl-col">'+kanan+'</div></div>';
   }
-  return chips + body;
+  return '<section class="bl-top"><div class="bl-title-row"><h2 class="bl-title">'+esc(cfg.judul)+'</h2><button class="bl-more" data-action="bl-menu" data-ctx="'+cfg.ctx+'">Kategori Lain'+msym('expand_more')+'</button></div>'+menu+chips+'</section>'+filter+body;
+}
+function tabBelanja(){
+  const cats = categoriesFromProducts().filter(c=>c!=='Semua');
+  return blPage({
+    ctx:'b', cats:cats, aktif:state.category, label:c=>c, setAction:'set-category',
+    judul: state.category==='Semua' ? 'Semua Kategori' : state.category,
+    semuaChip:'Semua Produk', semuaLabel:'Semua Kategori',
+    list: filteredProducts(), kosong: PRODUCTS.length===0,
+    emptyLoading:'Memuat katalog produk...', emptyError:'Gagal memuat katalog',
+    emptyNone:'Katalog belum tersedia. Toko sedang menyiapkan produk untuk dipesan online.',
+    emptyKat:'Belum ada produk di kategori ini.',
+    emptySearch:'Produk "'+esc(state.search)+'" tidak ditemukan. Coba kata kunci lain.'
+  });
 }
 
 /* ---------- Tab Jajanan (terpisah dari Belanja - seblak/kopi/es teh/bakaran dll,
-   dibuat/disiapkan pas dipesan, beda ritme dari produk retail di Belanja) ---------- */
+   dibuat/disiapkan pas dipesan, beda ritme dari produk retail di Belanja).
+   Tampilan = sama persis dengan Belanja lewat blPage(). ---------- */
 function tabJajanan(){
-  const cats = categoriesJajanan();
+  const cats = categoriesJajanan().filter(c=>c!=='Semua');
   const aktif = jajananKategoriAktif();
-  const list = filteredJajanan();
-  const chips = cats.length>1 ? `<div class="h-scroll">${cats.map(c=>`<button class="chip" data-action="set-jajanan-category" data-category="${esc(c)}" data-active="${c===aktif}">${esc(jajananChipLabel(c))}</button>`).join('')}</div>` : '';
-  let body;
-  if(state.katalogLoading){
-    body = emptyState('boxEmpty','Memuat menu jajanan...','');
-  } else if(state.katalogError){
-    body = `<div class="empty-state">${icon('boxEmpty')}<p>Gagal memuat menu: ${esc(state.katalogError)}</p>
-      <button class="btn-primary" data-action="retry-katalog">Coba Lagi</button></div>`;
-  } else if(list.length===0){
-    body = state.search
-      ? emptyState('search','Menu "'+esc(state.search)+'" tidak ditemukan. Coba kata kunci lain.','')
-      : emptyState('boxEmpty', aktif==='Semua' ? 'Menu jajanan belum tersedia.' : 'Belum ada menu di kategori ini.','');
-  } else {
-    body = `<div class="grid-2">${list.map(productCard).join('')}</div>`;
-  }
-  return chips + body;
+  return blPage({
+    ctx:'j', cats:cats, aktif:aktif, label:jajananChipLabel, setAction:'set-jajanan-category',
+    judul: aktif==='Semua' ? 'Jajanan' : jajananChipLabel(aktif),
+    semuaChip:'Semua Menu', semuaLabel:'Semua Jajanan',
+    list: filteredJajanan(), kosong:false,
+    emptyLoading:'Memuat menu jajanan...', emptyError:'Gagal memuat menu',
+    emptyNone:'Menu jajanan belum tersedia.',
+    emptyKat: aktif==='Semua' ? 'Menu jajanan belum tersedia.' : 'Belum ada menu di kategori ini.',
+    emptySearch:'Menu "'+esc(state.search)+'" tidak ditemukan. Coba kata kunci lain.'
+  });
 }
 
 /* ---------- Tab Promo (gaya PromoJSMScreen) ---------- */
@@ -2486,12 +2786,47 @@ function promoHeroHtml(){
   </section>`;
 }
 
-function promoChipsHtml(diskon){
-  const cats = Array.from(new Set(diskon.map(p=>p.kategori)));
+/* Tab jenis promo (gaya Alfagift): ikon + label, aktif biru + garis bawah. */
+const pmStar = (x,y,s) => 'M'+x+' '+(y-s)+'Q'+x+' '+y+' '+(x+s)+' '+y+'Q'+x+' '+y+' '+x+' '+(y+s)+'Q'+x+' '+y+' '+(x-s)+' '+y+'Q'+x+' '+y+' '+x+' '+(y-s)+'Z';
+const PM_ICONS = {
+  rp: '<circle cx="12" cy="12" r="7.5"/><circle cx="19" cy="12" r="3.6"/><circle cx="17" cy="17" r="3.6"/><circle cx="12" cy="19" r="3.6"/><circle cx="7" cy="17" r="3.6"/><circle cx="5" cy="12" r="3.6"/><circle cx="7" cy="7" r="3.6"/><circle cx="12" cy="5" r="3.6"/><circle cx="17" cy="7" r="3.6"/><text x="12" y="15" text-anchor="middle" font-size="8" font-weight="700" font-family="Roboto,Arial,sans-serif" fill="#fff">Rp</text>',
+  gift: '<rect x="3" y="8" width="16" height="3.5" rx="1"/><rect x="4" y="12.5" width="14" height="8.5" rx="1"/><rect x="10" y="8" width="2" height="13" fill="#fff"/><path d="M11 8C9 8 6.5 7 6.5 5.3S9 3.5 11 8zM11 8c2 0 4.5-1 4.5-2.7S13 3.5 11 8z"/><path d="'+pmStar(20.5,4,2.2)+'"/><path d="'+pmStar(2.6,21,1.3)+'"/>',
+  box: '<g stroke="#fff" stroke-width=".9" stroke-linejoin="round"><path fill-opacity=".72" d="M12 2.5L20.5 7 12 11.5 3.5 7z"/><path d="M3.5 7L12 11.5V21.5L3.5 17z"/><path d="M20.5 7L12 11.5V21.5L20.5 17z"/></g>',
+  pct: '<circle cx="11" cy="13" r="8.5"/><text x="11" y="17" text-anchor="middle" font-size="11" font-weight="700" font-family="Roboto,Arial,sans-serif" fill="#fff">%</text><path d="'+pmStar(19.5,4.5,3)+'"/><path d="'+pmStar(22,10,1.4)+'"/><path d="'+pmStar(2.5,21.5,1.5)+'"/>',
+  cat: '<rect x="4.5" y="2" width="15" height="20" rx="2.2"/><path fill="#fff" d="M8 8.5h3.6V15H8zM12.4 8.5H16V15h-3.6z"/><rect x="10" y="18" width="4" height="1.4" rx=".7" fill="#fff"/>'
+};
+const PM_TABS = [
+  {id:'harga', label:'Harga Spesial', ic:'rp'},
+  {id:'gratis', label:'Gratis Produk', ic:'gift'},
+  {id:'paket', label:'Paket', ic:'box'},
+  {id:'tebus', label:'Tebus Murah', ic:'pct'},
+  {id:'katalog', label:'E-Catalog', ic:'cat'}
+];
+
+function promoChipsHtml(){
+  const aktif = PM_TABS.some(t=>t.id===state.promoTab) ? state.promoTab : 'harga';
+  return '<nav class="pm-tabs" aria-label="Jenis Promo">' + PM_TABS.map(t =>
+    '<button class="pm-tab" data-action="set-promo-tab" data-tab="'+t.id+'" data-active="'+(t.id===aktif)+'">'
+    + '<svg class="pm-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'+PM_ICONS[t.ic]+'</svg><span>'+t.label+'</span></button>'
+  ).join('') + '</nav>';
+}
+
+/* Produk per tab: jenis promo dari server kasir (PromoJenis/PromoLabel). E-Catalog = gabungan semua produk berpromo. */
+function promoListFor_(tab){
+  const h = p => p.diskonPersen>0;
+  const g = p => p.promoJenis==='beli_x_gratis_y' || /gratis/i.test(p.promoLabel);
+  const k = p => p.promoJenis==='bundling' || /^paket/i.test(p.promoLabel);
+  const f = tab==='harga' ? h : tab==='gratis' ? g : tab==='paket' ? k : (p => h(p)||g(p)||k(p));
+  return PRODUCTS.filter(f);
+}
+
+/* Filter kategori produk (kotak outline, di bawah tab). Hanya muncul kalau ada >1 kategori. */
+function promoSubHtml(list){
+  const cats = Array.from(new Set(list.map(p=>p.kategori)));
+  if(cats.length<2) return '';
   const aktif = cats.includes(state.promoKat) ? state.promoKat : 'all';
-  const chip = (id,label,ic) => '<button class="pm-chip" data-action="set-promo-kat" data-kat="'+esc(id)+'" data-active="'+(id===aktif)+'">'+msym(ic)+'<span>'+esc(label)+'</span></button>';
-  return '<nav class="pm-tabs" aria-label="Kategori Promo">'
-    + chip('all','Semua Promo','stars') + cats.map(c=>chip(c,c,homeCatIcon(c))).join('') + '</nav>';
+  const chip = (id,label) => '<button class="pm-sub-chip" data-action="set-promo-kat" data-kat="'+esc(id)+'" data-active="'+(id===aktif)+'">'+esc(label)+'</button>';
+  return '<div class="pm-sub">'+chip('all','Semua')+cats.map(c=>chip(c,c)).join('')+'</div>';
 }
 
 function promoTrackerHtml(){
@@ -2512,27 +2847,24 @@ function promoTrackerHtml(){
   </section>`;
 }
 
-function promoCatalogHtml(diskon){
-  const cats = Array.from(new Set(diskon.map(p=>p.kategori)));
-  const aktif = cats.includes(state.promoKat) ? state.promoKat : 'all';
-  const list = aktif==='all' ? diskon : diskon.filter(p=>p.kategori===aktif);
+function promoCatalogHtml(list, judul){
   const card = p => {
     const qty = state.cart[p.id]||0, habis = p.stok<=0;
     const im = p.gambar ? '<img alt="'+esc(p.nama)+'" src="'+esc(p.gambar)+'">' : (p.emoji||'🛍️');
     const act = habis ? '<div class="stock-out" style="margin-top:10px">Stok habis</div>'
       : (qty===0
-        ? '<button class="pm-card-add" data-action="qty" data-id="'+esc(p.id)+'" data-delta="1">'+msym('add_shopping_cart')+'<span>+ Keranjang</span></button>'
+        ? '<button class="pm-card-add" data-action="qty" data-id="'+esc(p.id)+'" data-delta="1">+ Keranjang</button>'
         : '<div class="qty-stepper"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><input type="number" class="qty-input" inputmode="numeric" data-id="'+esc(p.id)+'" value="'+qty+'" min="0" max="'+p.stok+'"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>');
     return `<article class="pm-card"><div${pAttr(p.id)}>
-        <div class="pm-card-im">${im}<i>Hemat ${p.diskonPersen}%</i></div>
+        <div class="pm-card-im">${im}<i>${p.diskonPersen>0 ? 'Hemat '+diskonLabel(p) : esc(p.promoLabel||'Promo')}</i></div>
         <h3>${esc(p.nama)}</h3>
-        <div class="pm-card-pr"><b>${rupiah(hargaAkhir(p))}</b><s>${rupiah(p.harga)}</s></div>
+        <div class="pm-card-pr"><b>${rupiah(hargaAkhir(p))}</b>${p.diskonPersen>0 ? '<s>'+rupiah(p.harga)+'</s>' : ''}</div>
         ${habis ? '' : '<div class="instant-tag">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>'}
         <div class="pm-card-st">Sisa ${p.stok}</div>
       </div>${act}</article>`;
   };
   return `<section class="pm-cat">
-    <div class="pm-cat-head"><h2><i></i>Katalog Diskon</h2><span>${list.length} Produk</span></div>
+    <div class="pm-cat-head"><h2><i></i>${esc(judul)}</h2><span>${list.length} Produk</span></div>
     <div class="pm-grid">${list.map(card).join('')}</div>
   </section>`;
 }
@@ -2579,19 +2911,21 @@ function promoFootHtml(){
 }
 
 function tabPromo(){
-  const diskon = PRODUCTS.filter(p=>p.diskonPersen>0);
-  const parts = [promoHeroHtml()];
-  if(diskon.length) parts.push(promoChipsHtml(diskon));
-  if(TEBUS.length) parts.push(promoTrackerHtml());
-  else if(state.tebusError) parts.push('<section class="pm-sec"><div class="tb-empty">Gagal memuat produk tebus: '+esc(state.tebusError)
-    +'<br><small>Server: …'+esc(BACKEND_URL.slice(-14))+'</small> <button class="link-btn" data-action="retry-tebus">Coba lagi</button></div></section>');
-  if(diskon.length) parts.push(promoCatalogHtml(diskon));
-  if(TEBUS.length) parts.push(promoEtalaseHtml());
-  const adaIsi = diskon.length>0 || TEBUS.length>0;
-  if(!adaIsi && !state.tebusError){
-    parts.push(state.katalogLoading
-      ? emptyState('boxEmpty','Memuat promo...','')
-      : emptyState('ticket','Belum ada promo aktif saat ini. Pantau terus, ya!',''));
+  const tab = PM_TABS.some(t=>t.id===state.promoTab) ? state.promoTab : 'harga';
+  const parts = [promoHeroHtml(), promoChipsHtml()];
+  let adaIsi = false;
+  if(tab==='tebus'){
+    if(TEBUS.length){ parts.push(promoTrackerHtml(), promoEtalaseHtml()); adaIsi = true; }
+    else if(state.tebusError) parts.push('<section class="pm-sec"><div class="tb-empty">Gagal memuat produk tebus: '+esc(state.tebusError)
+      +'<br><small>Server: …'+esc(BACKEND_URL.slice(-14))+'</small> <button class="link-btn" data-action="retry-tebus">Coba lagi</button></div></section>');
+    else parts.push(state.katalogLoading ? emptyState('boxEmpty','Memuat promo...','') : emptyState('ticket','Belum ada promo Tebus Murah saat ini.',''));
+  } else {
+    const all = promoListFor_(tab);
+    const aktifKat = new Set(all.map(p=>p.kategori)).has(state.promoKat) ? state.promoKat : 'all';
+    const list = aktifKat==='all' ? all : all.filter(p=>p.kategori===aktifKat);
+    const judul = {harga:'Harga Spesial', gratis:'Gratis Produk', paket:'Paket', katalog:'E-Catalog'}[tab];
+    if(all.length){ parts.push(promoSubHtml(all), promoCatalogHtml(list, judul)); adaIsi = true; }
+    else parts.push(state.katalogLoading ? emptyState('boxEmpty','Memuat promo...','') : emptyState('ticket','Belum ada promo '+judul+' saat ini. Pantau terus, ya!',''));
   }
   if(adaIsi) parts.push(promoFootHtml());
   return '<div class="pm">'+parts.join('')+'</div>';
@@ -3013,10 +3347,12 @@ function renderCartBody(){
   if(state.poinMember && Number(state.form.poinDigunakan) > poinMaks()) state.form.poinDigunakan = poinMaks()>0 ? String(poinMaks()) : '';
   const picked = tebusPicked();
   const asliReg = lines.reduce((sum,l)=>sum+l.qty*l.produk.harga,0);
-  const diskonProduk = Math.max(0, asliReg-belanjaBiasa());
+  const ps = promoSrvFresh_();
+  const diskonProduk = ps ? ps.diskonItem : Math.max(0, asliReg-belanjaBiasa());
+  const diskonVoucher = ps ? ps.diskonVoucher : 0, diskonMember = ps ? ps.diskonMember : 0;
   const hematTebusVal = picked.reduce((sum,t)=>sum+Math.max(0,t.asli-t.harga),0);
   const asli = asliReg + picked.reduce((sum,t)=>sum+t.asli,0);
-  const hemat = diskonProduk + hematTebusVal + estimasiPoinDiskon();
+  const hemat = diskonProduk + diskonVoucher + diskonMember + hematTebusVal + estimasiPoinDiskon();
   const pg = porsiGrup_();
   const qb = (id,d,ic,dis)=>'<button data-action="qty" data-id="'+id+'" data-delta="'+d+'" '+(dis?'disabled ':'')+'aria-label="'+(d>0?'Tambah':'Kurangi')+'">'+msym(ic)+'</button>';
   body.innerHTML = `
@@ -3025,7 +3361,7 @@ function renderCartBody(){
       const p = l.produk;
       const img = p.gambar ? '<img alt="'+esc(p.nama)+'" src="'+esc(p.gambar)+'">' : '<span class="ct-emo">'+(p.emoji||msym('shopping_bag'))+'</span>';
       return `<div class="ct-item">
-        <div class="ct-img"${pAttr(p.id)}>${img}${p.diskonPersen?'<i>-'+p.diskonPersen+'%</i>':''}</div>
+        <div class="ct-img"${pAttr(p.id)}>${img}${p.diskonPersen?'<i>-'+diskonLabel(p)+'</i>':''}</div>
         <div class="ct-info">
           <div${pAttr(p.id)}>
             ${p.satuan?'<span class="ct-pkg">per '+esc(p.satuan)+'</span>':''}
@@ -3054,11 +3390,15 @@ function renderCartBody(){
         </div>
       </div>`).join('')}
     ${tebusSectionHtml()}
+    ${voucherHtml_()}
     ${cartPoinHtml()}
-    <div class="ct-card" id="ct-sum" data-base="${diskonProduk+hematTebusVal}">
+    <div class="ct-card" id="ct-sum" data-base="${diskonProduk+diskonVoucher+diskonMember+hematTebusVal}">
       <h4>Ringkasan Pembayaran</h4>
       <div class="ct-row"><span>Subtotal Produk (${n} item)</span><b>${rupiah(asli)}</b></div>
       ${diskonProduk>0?'<div class="ct-row red"><span>'+msym('sell')+'Diskon Promo Produk</span><b>-'+rupiah(diskonProduk)+'</b></div>':''}
+      ${ps && ps.promo.length ? '<div class="ct-row" style="flex-direction:column;align-items:flex-start;gap:2px;font-size:12px;opacity:.8">'+ps.promo.filter(u=>u.jenis!=='voucher'&&u.jenis!=='member').map(u=>'<span>• '+esc(u.nama)+' — '+esc(u.manfaat)+'</span>').join('')+'</div>' : ''}
+      ${diskonVoucher>0?'<div class="ct-row red"><span>'+msym('confirmation_number')+'Voucher '+esc(state.voucherAktif)+'</span><b>-'+rupiah(diskonVoucher)+'</b></div>':''}
+      ${diskonMember>0?'<div class="ct-row red"><span>'+msym('loyalty')+'Diskon Member ('+ps.diskonMemberPersen+'%)</span><b>-'+rupiah(diskonMember)+'</b></div>':''}
       ${hematTebusVal>0?'<div class="ct-row gold"><span>'+msym('redeem')+'Hemat Tebus Murah</span><b>-'+rupiah(hematTebusVal)+'</b></div>':''}
       <div class="ct-row red" id="ct-poin-row"${estimasiPoinDiskon()>0?'':' style="display:none"'}><span>${msym('monetization_on')}Tukar Poin (<span id="ct-poin-n">${poinTerpakai().toLocaleString('id-ID')}</span> Poin)</span><b id="ct-poin-val">-${rupiah(estimasiPoinDiskon())}</b></div>
       <div class="ct-total">
@@ -3072,7 +3412,73 @@ function renderCartBody(){
     </div>`;
   const pi = document.getElementById('cart-inp-poin');
   if(pi) pi.addEventListener('input', e=>{ state.form.poinDigunakan = e.target.value; updateCartPoinDisplay(); });
+  const vi = document.getElementById('cart-inp-voucher');
+  if(vi) vi.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); terapkanVoucher_(); } });
   updateCartPoinDisplay();
+  jadwalHitungPromo_();   // ambil angka promo terbaru dari server kasir (no-op kalau sudah segar)
+}
+
+/* ---- Sheet "Pilih" voucher: daftar voucher aktif dari server kasir (apiVoucherPublik) ---- */
+async function loadVoucher_(){
+  state.voucherLoading = true; state.voucherErr = ''; renderVoucherSheet_();
+  try{
+    const r = await api('apiVoucherPublik', {}, API_READ);
+    const arr = Array.isArray(r) ? r : (r && Array.isArray(r.data) ? r.data : []);
+    state.voucherList = arr.filter(v=>v && v.kode);
+  }catch(e){
+    console.warn('apiVoucherPublik gagal:', e);
+    state.voucherErr = e.message || 'tidak diketahui';
+  }
+  state.voucherLoading = false; renderVoucherSheet_();
+}
+function voucherSheetEl_(){
+  let el = document.getElementById('vc-ov');
+  if(!el){
+    el = document.createElement('div'); el.id = 'vc-ov'; el.className = 'vc-ov'; el.setAttribute('data-open','false');
+    el.addEventListener('click', function(e){ if(e.target===el) closeVoucherSheet_(); });
+    document.body.appendChild(el);
+  }
+  return el;
+}
+function renderVoucherSheet_(){
+  if(!state.voucherOpen) return;
+  const el = voucherSheetEl_();
+  const list = state.voucherList || [];
+  let body;
+  if(state.voucherLoading && !list.length) body = '<div class="vc-empty">Memuat voucher...</div>';
+  else if(state.voucherErr && !list.length) body = '<div class="vc-empty">Gagal memuat voucher: '+esc(state.voucherErr)+'<br><button class="link-btn" data-action="voucher-muat">Coba lagi</button></div>';
+  else if(!list.length) body = '<div class="vc-empty">Belum ada voucher aktif saat ini.</div>';
+  else body = list.map(function(v){
+    const on = state.voucherAktif===v.kode;
+    const sampai = v.selesai ? new Date(v.selesai).toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}) : '';
+    return '<div class="vc-card'+(on?' on':'')+'"><div class="vc-l">'+msym('confirmation_number','fill')+'<b>Potongan '+rupiah(v.nilai)+'</b></div>'
+      + '<div class="vc-m"><strong>'+esc(v.nama||('Voucher '+v.kode))+'</strong>'
+      + (v.deskripsi ? '<p>'+esc(v.deskripsi)+'</p>' : '')
+      + '<code>'+esc(v.kode)+'</code>'
+      + '<small>'+(sampai?'Berlaku s/d '+esc(sampai)+' · ':'')+'Sisa '+Number(v.sisaKuota)+'x pakai</small></div>'
+      + '<div class="vc-r"><button type="button" class="vc-use'+(on?' on':'')+'" data-action="voucher-pilih-kode" data-kode="'+esc(v.kode)+'">'+(on?'Dipakai':'Pakai')+'</button></div></div>';
+  }).join('');
+  el.innerHTML = '<div class="vc-sheet" role="dialog" aria-label="Pilih voucher"><div class="vc-head"><h3>'+msym('confirmation_number','fill')+'Pilih Voucher</h3>'
+    + '<button type="button" class="vc-x" data-action="voucher-tutup" aria-label="Tutup">'+msym('close')+'</button></div><div class="vc-list">'+body+'</div></div>';
+  el.setAttribute('data-open','true');
+}
+function openVoucherSheet_(){
+  state.voucherOpen = true; renderVoucherSheet_();
+  loadVoucher_();   // selalu segarkan: kuota/masa berlaku bisa berubah
+}
+function closeVoucherSheet_(){
+  state.voucherOpen = false;
+  const el = document.getElementById('vc-ov'); if(el) el.setAttribute('data-open','false');
+}
+function pilihVoucher_(kode){
+  state.voucherAktif = String(kode||'').toUpperCase(); state.promoSrv = null;
+  closeVoucherSheet_(); renderCartBody();
+}
+function terapkanVoucher_(){
+  const i = document.getElementById('cart-inp-voucher');
+  state.voucherAktif = i ? i.value.trim().toUpperCase() : '';
+  state.promoSrv = null;
+  renderCartBody();
 }
 
 /* ================================================================
@@ -3420,6 +3826,7 @@ function isSubmitEnabled(){
   return !!(nama && wa && (state.method!=='antar' || alamat) && (state.payment!=='va' || state.vaBank) && (poinTerpakai()===0 || poinWaOk()));
 }
 function updateSubmitEnabled(){
+  jadwalHitungPromo_();   // nomor WA bisa mengubah diskon member -> minta angka promo terbaru (didebounce)
   const btn = document.getElementById('submit-order-btn');
   if(!btn) return;
   btn.disabled = !isSubmitEnabled();
@@ -3465,7 +3872,10 @@ async function submitOrder(){
       // Fitur Tukar Poin (BARU) - server tetap validasi ulang saldo & resolve Member
       // dari `kontak` di atas (lihat PesananOnlineService._resolvePoinRedeem), angka di
       // sini murni permintaan customer. 0 kalau bukan member/tidak diisi (jalur biasa).
-      poinDigunakan: poinPakai
+      poinDigunakan: poinPakai,
+      // Voucher divalidasi ulang server. Kalau preview sudah bilang kode ini tidak berlaku, jangan kirim
+      // (server menolak kode salah dengan error, supaya total tidak beda diam-diam).
+      voucherKode: (function(){ const p = promoSrvFresh_(); return p && p.voucherValid===false ? '' : (state.voucherAktif||''); })()
     });
     // `saved` datang dari PesananOnlineModel.toClientObject (server) - dipakai
     // apa adanya buat struk (Kode resmi, Items sudah dihitung ulang server,
@@ -3502,6 +3912,7 @@ async function submitOrder(){
       statusBayar: saved.StatusBayar || '',
       statusMentah: saved.Status || 'BARU',
       diskonPoin: saved.DiskonPoin || 0,
+      diskonPromo: saved.DiskonPromo || 0,
       petugasNama: saved.PetugasNama || ''
     };
     state.orders.push(order);
@@ -3514,6 +3925,7 @@ async function submitOrder(){
     // Tamu: dikosongin kayak semula.
     if(order.metode==='antar') simpanAlamatMember_(order.alamat);   // alamat terakhir jadi default pesanan berikutnya (member)
     state.form = { nama:'', wa:'', alamat:'', catatan:'', poinDigunakan:'' };
+    state.voucherAktif = ''; state.promoSrv = null;
     isiIdentitasForm_();
     if(order.metode==='antar' && state.auth.status!=='member') state.form.alamat = order.alamat;   // Tamu: ingat di sesi ini
     state.method = 'ambil';
@@ -4211,6 +4623,7 @@ async function loadRiwayatPelanggan(){
       bayar: o.MetodeBayar || 'COD',
       statusBayar: o.StatusBayar || '',
       diskonPoin: o.DiskonPoin || 0,
+      diskonPromo: o.DiskonPromo || 0,
       petugasNama: o.PetugasNama || '',
       qrisQrString: o.QrisQrString || '',
       qrisExpiredAt: o.QrisExpiredAt || '',
@@ -4491,6 +4904,7 @@ function openReceiptOrder(order){
         <h3>Daftar Belanjaan:</h3>
         ${o.items.map(it=>`<div class="trk-row trk-item"><span>${esc(it.nama)}<small>${it.qty} x ${rupiah(it.harga)}</small></span><span>${rupiah(it.harga*it.qty)}</span></div>`).join('')}
         <div class="trk-row" style="margin-top:10px"><span>Subtotal Belanja</span><span>${rupiah(sub)}</span></div>
+        ${o.diskonPromo>0 ? `<div class="trk-row"><span>Diskon Promo</span><span>-${rupiah(o.diskonPromo)}</span></div>` : ''}
         ${o.diskonPoin>0 ? `<div class="trk-row"><span>Diskon Poin</span><span>-${rupiah(o.diskonPoin)}</span></div>` : ''}
         <div class="trk-row"><span>Ongkos Kirim</span><span>GRATIS</span></div>
         <div class="trk-row trk-total"><span>Total Pembayaran</span><span>${rupiah(o.total)}</span></div>
@@ -4565,6 +4979,7 @@ function printStrukPos_(){
     + row('No', esc(o.nomor)) + row('Tgl', esc(o.waktu||'')) + row('a.n.', esc(o.nama)) + row('Tipe', antar?'Diantar':'Ambil di Toko') + '<hr>'
     + o.items.map(it => '<div>'+esc(it.nama)+'</div>'+row(it.qty+' x '+rupiah(it.harga), rupiah(it.harga*it.qty))).join('')
     + '<hr>' + row('Subtotal', rupiah(sub))
+    + (o.diskonPromo>0 ? row('Diskon Promo', '-'+rupiah(o.diskonPromo)) : '')
     + (o.diskonPoin>0 ? row('Diskon Poin', '-'+rupiah(o.diskonPoin)) : '')
     + row('TOTAL', rupiah(o.total), true) + row('Bayar', esc(trkBayarLabel_(o)))
     + '<hr>' + code128Svg_(o.nomor) + '<div class="c">'+esc(o.nomor)+'</div><div class="c">Terima kasih sudah belanja!</div>'
@@ -4726,6 +5141,7 @@ function detailPromoHtml(p){
   const card = (title, ic, body) => '<div class="dt-pcard"><div class="dt-pcard-h"><i class="dt-rp">'+msym('sell','fill')+'</i><b>'+title+'</b></div>'
     + '<div class="dt-pcard-b"><i class="dt-rp sm">'+msym(ic,'fill')+'</i>'+body+'</div></div>';
   if(p.diskonPersen>0) cards.push(card('Harga Spesial','sell','<div><b>Beli 1: '+homeRp(hargaAkhir(p))+'/'+sat+'</b><small>Minimal pembelian 1 '+sat+'</small></div>'));
+  else if(p.promoLabel) cards.push(card('Promo','sell','<div><b>'+esc(p.promoLabel)+'</b><small>Berlaku otomatis di keranjang</small></div>'));
   const t = TEBUS.find(x=>String(x.id)===String(p.id));
   if(t){
     const b = belanjaSyaratTebus(), on = state.tebus.includes(t.id), id = esc(t.id);
@@ -4797,7 +5213,7 @@ function renderDetailBody(p){
     <section class="dt-info">
       <div class="dt-tags"><span class="dt-ship">${msym(antar?'local_shipping':'storefront','fill')}${antar?'Antar ke Rumah':'Ambil di Toko'}</span><span class="dt-stok ${cls}">${st}</span></div>
       <div class="dt-namerow"><h1>${esc(p.nama)}</h1><button class="dt-fav" id="dt-fav" data-action="toggle-fav" data-id="${esc(p.id)}" aria-label="Favorit">${msym('favorite', isFav(p.id)?'fill':'')}</button></div>
-      <div class="dt-pricerow"><b>${homeRp(hargaAkhir(p))}</b>${p.diskonPersen ? '<i>'+p.diskonPersen+'%</i><s>'+homeRp(p.harga)+'</s>' : ''}</div>
+      <div class="dt-pricerow"><b>${homeRp(hargaAkhir(p))}</b>${p.diskonPersen ? '<i>'+diskonLabel(p)+'</i><s>'+homeRp(p.harga)+'</s>' : ''}</div>
     </section>
     <section class="dt-promo" id="dt-promo"></section>
     <section class="dt-sec" id="dt-topping"></section>
@@ -4857,6 +5273,8 @@ document.addEventListener('click', function(e){
   if(a==='set-tab') setTab(t.dataset.tab);
   else if(a==='set-category'){ setCategory(t.dataset.category); }
   else if(a==='set-jajanan-category'){ setJajananCategory(t.dataset.category); }
+  else if(a==='set-promo-tab'){ state.promoTab = t.dataset.tab; state.promoKat = 'all'; renderTabContent();
+    const on = document.querySelector('.pm-tab[data-active="true"]'); if(on) on.scrollIntoView({inline:'center', block:'nearest'}); }
   else if(a==='set-promo-kat'){ state.promoKat = t.dataset.kat; renderTabContent(); }
   else if(a==='qty') changeQty(t.dataset.id, parseInt(t.dataset.delta,10));
   else if(a==='open-topping') openProduct(t.dataset.id);
@@ -4910,11 +5328,20 @@ document.addEventListener('click', function(e){
   else if(a==='admin-jj-img-del'){ delete state.adminForm.jajananIcons[t.dataset.key]; renderAdminBody(); }
   else if(a==='retry-poin') loadPoinMember();
   else if(a==='poin-pakai-nomor'){ state.form.wa = state.auth.pelanggan.wa; const w = document.getElementById('inp-wa'); if(w) w.value = state.form.wa; updateSubmitEnabled(); renderPoinSection(); }
+  else if(a==='voucher-pakai') terapkanVoucher_();
+  else if(a==='voucher-pilih') openVoucherSheet_();
+  else if(a==='voucher-pilih-kode') pilihVoucher_(t.dataset.kode);
+  else if(a==='voucher-tutup') closeVoucherSheet_();
+  else if(a==='voucher-muat') loadVoucher_();
+  else if(a==='voucher-hapus'){ state.voucherAktif = ''; state.promoSrv = null; renderCartBody(); }
   else if(a==='poin-pakai-semua'){ state.form.poinDigunakan = String(poinMaks()); ['cart-inp-poin','inp-poin'].forEach(id=>{ const i = document.getElementById(id); if(i) i.value = state.form.poinDigunakan; }); updateCartPoinDisplay(); updatePoinDisplay(); }
   else if(a==='open-member-barcode') openMemberBarcode();
   else if(a==='close-member-barcode') closeMemberBarcode();
   else if(a==='open-legal') openLegal(t.dataset.legal);
   else if(a==='close-legal') closeLegal();
+  else if(a==='bl-menu'){ BL[t.dataset.ctx].menu=!BL[t.dataset.ctx].menu; renderTabContent(); }
+  else if(a==='bl-online'){ BL[t.dataset.ctx].online=!BL[t.dataset.ctx].online; renderTabContent(); }
+  else if(a==='bl-pick'){ const c=t.dataset.category||'Semua'; BL[t.dataset.ctx].menu=false; if(t.dataset.ctx==='j') state.jajananCategory=c; else state.category=c; renderTabContent(); }
   else if(a==='shop-category'){ state.category = t.dataset.category || 'Semua'; setTab('belanja'); }
   else if(a==='jajanan-cat'){
     // Pintasan Beranda = langsung buka kategori (chip aktif), BUKAN isi kotak pencarian
@@ -4928,7 +5355,7 @@ document.addEventListener('click', function(e){
     const sc = document.getElementById('search-clear'); if(sc) sc.style.display = state.search ? 'flex' : 'none';
     setTab('jajanan');
     // chip aktif bisa di luar layar kalau kategori banyak -> geser biar kelihatan
-    try{ const on = document.querySelector('#tab-content .chip[data-active="true"]'); if(on && on.scrollIntoView) on.scrollIntoView({inline:'center', block:'nearest'}); }catch(e){}
+    try{ const on = document.querySelector('#tab-content .bl-chip.on'); if(on && on.scrollIntoView) on.scrollIntoView({inline:'center', block:'nearest'}); }catch(e){}
   }
   else if(a==='open-jajanan'){
     state.jajananCategory = 'Semua';
@@ -4948,7 +5375,7 @@ document.addEventListener('click', function(e){
   else if(a==='home-member'){ if(state.auth.status==='member') setTab('akun'); else openAuth(); }
 });
 document.addEventListener('keydown', function(e){
-  if(e.key==='Escape'){ closeCart(); closeCheckout(); closeReceipt(); closeAuth(); closeAdmin(); closeMemberBarcode(); closeLegal(); closeProfil_(); closeProduct(); }
+  if(e.key==='Escape'){ if(state.voucherOpen){ closeVoucherSheet_(); return; } closeCart(); closeCheckout(); closeReceipt(); closeAuth(); closeAdmin(); closeMemberBarcode(); closeLegal(); closeProfil_(); closeProduct(); }
   else if(e.key==='Enter' && e.target.classList && e.target.classList.contains('qty-input')) e.target.blur();
 });
 /* Input qty diketik langsung: commit saat blur/Enter (event "change"), bukan tiap ketik,
