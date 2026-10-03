@@ -995,6 +995,25 @@ body[data-cat="1"] .badge-count{top:-7px;right:-9px;min-width:15px;height:15px;p
 .bl-promo + .bl-hemat{margin-top:4.5px}
 .bl-hemat i{width:7.5px;height:7.5px;border-radius:50%;background:#cf0b0c;color:#fff;font-size:3.5px;font-style:normal;line-height:7.5px;text-align:center}
 .bl-hemat .msym{font-size:10px}
+/* Badge promo bersyarat "Beli X Gratis Y" - hijau supaya beda dari merah/kuning (diskon harga) */
+.gratis-tag{display:inline-flex;align-items:center;gap:3px;align-self:flex-start;max-width:100%;margin-top:6px;padding:3px 8px;border-radius:999px;background:#e3f6e8;color:#157a35;font-size:10.5px;font-weight:700;line-height:1.2}
+.gratis-tag .msym{font-size:13px;color:#157a35}
+.gratis-tag span:not(.msym){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pm-card .gratis-tag{margin-top:5px;padding:2px 7px;font-size:10px}
+.ct-info .gratis-tag{margin-top:4px;padding:2px 8px;border-radius:10px;font-size:10px}
+.ct-info .gratis-tag span:not(.msym){white-space:normal;overflow:visible}
+.gratis-tag.on{background:#157a35;color:#fff}
+.gratis-tag.on .msym{color:#fff}
+.dt-br{flex-basis:100%;height:0}
+.dt-pricerow{flex-wrap:wrap}
+.dt-pricerow .gratis-tag{margin-top:0;font-size:12px;padding:4px 10px}
+.hm-gratis{position:absolute;left:4px;right:4px;bottom:4px;z-index:1;display:flex;align-items:center;gap:3px;padding:2px 5px;border-radius:4px;background:#157a35;color:#fff;font-size:9px;font-weight:800;line-height:1.3}
+.hm-gratis .msym{font-size:11px}
+.hm-gratis span:not(.msym){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hm-grid .hm-gratis{left:6px;right:6px;bottom:6px;font-size:10px}
+.bl-hemat.gr{max-width:100%;background:#e3f6e8;color:#157a35}
+.bl-hemat.gr span:not(.msym){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl-hemat + .bl-hemat{margin-top:4.5px}
 .bl-inst{display:flex;align-items:center;gap:4px;margin-top:4.5px;line-height:14px;font-size:8.5px;font-weight:600;color:#025ea5}
 .bl-inst .msym{font-size:10px;color:#f26522}
 .bl-add{margin-top:10px;height:29px;border:0;border-radius:6px;background:#025ea5;color:#fff;font-size:11.5px;font-weight:700}
@@ -1267,6 +1286,10 @@ function mapProdukPublik(p) {
   // Server baru mengirim DiskonNominal/DiskonPersen eksplisit; tebakan nama field (bacaPromoProduk_)
   // tinggal jadi cadangan kalau yang dipakai backend versi lama.
   const promo = (p.DiskonNominal !== undefined || p.DiskonPersen !== undefined) ? bacaPromoServer_(p, harga) : bacaPromoProduk_(p, harga);
+  // Promo sudah lewat (katalog server di-cache s/d 5 menit): label/jenis ikut dikosongkan, bukan cuma diskonnya,
+  // supaya badge "Beli X Gratis Y" tidak nongol untuk promo yang sudah selesai.
+  const selesaiMs = p.PromoSelesai ? Date.parse(p.PromoSelesai) : NaN;
+  const promoMasihAktif = isNaN(selesaiMs) || selesaiMs >= Date.now();
   return {
     id: p.Id,
     nama: p.Nama,
@@ -1280,8 +1303,8 @@ function mapProdukPublik(p) {
     diskonNominal: promo.nominal,   // Rp potongan per item (promo diskon nominal)
     diskonPersen: promo.persen,     // persen (promo persen), atau hasil hitung dari nominal buat badge/penyaring
     promoField: promo.sumber,
-    promoJenis: String(p.PromoJenis || ''),   // diskon_persen | diskon_nominal | beli_x_gratis_y | bundling (dipakai tab Promo)
-    promoLabel: String(p.PromoLabel || ''),   // teks promo (juga untuk promo bersyarat: beli X gratis Y, bundling, min. belanja)
+    promoJenis: promoMasihAktif ? String(p.PromoJenis || '') : '',   // diskon_persen | diskon_nominal | beli_x_gratis_y | bundling (dipakai tab Promo)
+    promoLabel: promoMasihAktif ? String(p.PromoLabel || '') : '',   // teks promo, bisa gabungan "Diskon Rp600 + Beli 3 Gratis 1" (lihat promoGratis/promoLain)
     unggulan: false
   };
 }
@@ -1544,6 +1567,47 @@ function hargaAkhir(p){
 }
 /* Teks badge diskon: promo nominal -> "Rp 600", promo persen -> "13%". */
 function diskonLabel(p){ return p.diskonNominal>0 ? 'Rp '+Math.round(p.diskonNominal).toLocaleString('id-ID') : p.diskonPersen+'%'; }
+/* Promo bersyarat "Beli X Gratis Y". Server kirim PromoLabel GABUNGAN semua promo produk
+   (mis. "Diskon Rp600 + Beli 3 Gratis 1"). Dipecah per segmen supaya bagian gratisnya
+   tampil sendiri di semua kartu, tidak tertutup badge "Hemat Rp ...". */
+function promoSegs_(p){ return String(p.promoLabel||'').split(/\s+\+\s+/).map(function(s){ return s.trim(); }).filter(Boolean); }
+function promoGratis(p){ return promoSegs_(p).filter(function(s){ return /gratis/i.test(s); }).join(' + '); }   // "Beli 3 Gratis 1" atau ''
+function promoLain(p){ return promoSegs_(p).filter(function(s){ return !/gratis/i.test(s); }).join(' + '); }    // sisa label non-gratis (Paket, Diskon min. belanja)
+function gratisTag(p, cls){
+  const g = promoGratis(p);
+  return g ? '<div class="'+cls+'">'+msym('redeem','fill')+'<span>'+esc(g)+'</span></div>' : '';
+}
+/* ---- Hitungan lokal promo "Beli X Gratis Y" (instan, tanpa nunggu server) ----
+   Salinan rumus engine kasir/server (PromotionService._matchItemLevel blok BELI_X_GRATIS_Y): tiap produk
+   dihitung INDEPENDEN dan berlaku kelipatan. 1 paket = beli (dibayar) + gratis, jadi butuh (beli + gratis)
+   unit di keranjang -> sets = floor(qty / (beli + gratis)); unit gratis = sets * gratis. Beli 3 Gratis 1:
+   qty 4 -> 1 gratis, qty 8 -> 2 gratis. Potongan = unit gratis x HARGA NORMAL. Beberapa aturan pada satu
+   produk menumpuk, total potongan baris dibatasi subtotal baris. Angka dari server (apiHitungPromoPublik)
+   tetap jadi acuan akhir begitu datang. */
+function aturanGratis_(p){
+  return promoSegs_(p).map(function(s){
+    const m = s.match(/beli\s+(\d+)\s+gratis\s+(\d+)/i);
+    return m ? { beli: Math.max(1, Number(m[1])||1), gratis: Number(m[2])||0 } : null;
+  }).filter(Boolean);
+}
+function unitGratis(p, qty){   // jumlah unit gratis untuk qty di keranjang (sudah dibatasi qty)
+  const n = aturanGratis_(p).reduce(function(s,a){ return s + Math.floor(qty/(a.beli+a.gratis))*a.gratis; }, 0);
+  return Math.min(n, qty);
+}
+function subtotalLokal(p, qty){   // subtotal baris setelah diskon harga + unit gratis (estimasi lokal)
+  return Math.max(0, qty*hargaAkhir(p) - unitGratis(p, qty)*p.harga);
+}
+/* Status promo gratis di baris keranjang: sudah kena -> "Gratis N ... hemat Rp ...", belum -> "tambah N lagi". */
+function gratisStatusHtml(p, qty){
+  const ar = aturanGratis_(p).filter(function(a){ return a.gratis>0; });
+  if(!ar.length) return '';
+  const sat = esc(p.satuan || 'Pcs'), free = unitGratis(p, qty);
+  if(free>0) return '<div class="gratis-tag on">'+msym('check_circle','fill')+'<span>Gratis '+free+' '+sat+' · hemat '+rupiah(free*p.harga)+'</span></div>';
+  // belum ada aturan yang terpenuhi -> qty < (beli + gratis) di semua aturan; pilih yang paling dekat
+  const sisa = function(a){ return a.beli + a.gratis - qty; };
+  const a0 = ar.reduce(function(x,y){ return sisa(y) < sisa(x) ? y : x; });
+  return '<div class="gratis-tag">'+msym('redeem','fill')+'<span>Tambah '+sisa(a0)+' lagi, dapat gratis '+a0.gratis+' ('+esc('Beli '+a0.beli+' Gratis '+a0.gratis)+')</span></div>';
+}
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* ================================================================
@@ -1863,7 +1927,7 @@ function mapTebus(t){
     asli:Number(t.produkHargaNormal)||0, min:Number(t.minBelanja)||TEBUS_MIN_DEFAULT,
     selesai: t.tanggalSelesai ? (new Date(t.tanggalSelesai).getTime()||0) : 0 };  // ms epoch, 0 = tidak diketahui
 }
-function belanjaBiasa(){ return cartLines().reduce((s,l)=>s+l.qty*hargaAkhir(l.produk),0); }
+function belanjaBiasa(){ return cartLines().reduce((s,l)=>s+subtotalLokal(l.produk,l.qty),0); }   // termasuk potongan Beli X Gratis Y (lokal, instan)
 /* Jajanan & topping (seblak/bakaran/kopi/es teh/topping/...) TIDAK dihitung ke syarat Tebus Murah -
    cuma belanjaan retail biasa. belanjaBiasa() tetap total SEMUA item (dipakai total bayar);
    belanjaSyaratTebus() khusus untuk cek syarat minimal. WAJIB sama dgn server
@@ -1874,7 +1938,7 @@ function belanjaSyaratTebus(){
   // Pakai hasil preview server kalau sudah ada (mencakup beli X gratis Y/bundling), kalau belum pakai estimasi lokal.
   const ps = promoSrvFresh_();
   return cartLines().filter(l=>!isJajananLine(l)).reduce((s,l)=>{
-    return s + (ps ? Math.max(0, l.qty*l.produk.harga - (ps.diskonById[l.produk.id]||0)) : l.qty*hargaAkhir(l.produk));
+    return s + (ps ? Math.max(0, l.qty*l.produk.harga - (ps.diskonById[l.produk.id]||0)) : subtotalLokal(l.produk,l.qty));
   },0);
 }
 function tebusMin(){ return TEBUS.length ? Math.min.apply(null, TEBUS.map(t=>t.min)) : TEBUS_MIN_DEFAULT; }
@@ -2276,6 +2340,7 @@ function productCard(p){
           +'<div class="promo-row"><span class="discount-flag">-'+diskonLabel(p)+'</span><span class="price-old">'+rupiah(p.harga)+'</span></div>'
           +'<div class="hemat-badge">'+msym('sell')+'<span>Hemat '+rupiah(p.harga-hargaAkhir(p))+'</span>'+msym('chevron_right')+'</div>'
         : '<div class="price">'+rupiah(p.harga)+'</div>'}
+      ${gratisTag(p,'gratis-tag')}
       ${habis ? '' : '<div class="instant-tag">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>'}
       ${habis
         ? '<div class="stock-out">Stok habis</div>'
@@ -2427,7 +2492,7 @@ function homeCard(p, grid){
   return `
     <div class="hm-card">
       <div${pAttr(p.id)}>
-        <div class="hm-thumb">${p.diskonPersen ? '<span class="hm-disc">'+diskonLabel(p)+'</span>' : ''}${thumb}</div>
+        <div class="hm-thumb">${p.diskonPersen ? '<span class="hm-disc">'+diskonLabel(p)+'</span>' : ''}${thumb}${promoGratis(p) ? '<span class="hm-gratis">'+msym('redeem','fill')+'<span>'+esc(promoGratis(p))+'</span></span>' : ''}</div>
         ${chip}
         ${grid ? '' : pkg}
         <h4 class="hm-name">${esc(p.nama)}</h4>
@@ -2663,8 +2728,10 @@ function blCard(p){
     ? '<img class="bl-img" data-thumb-src="'+esc(p.gambar)+'" src="'+esc(p.gambar)+'" alt="'+esc(p.nama)+'" loading="lazy">'
     : '<span class="bl-emo" aria-hidden="true">'+(p.emoji||'🛍️')+'</span>';
   if(p.gambar) applyTrimmedThumb(p.gambar);
-  const hemat = p.diskonPersen ? 'Hemat '+blRp(p.harga-hargaAkhir(p)) : (p.promoLabel || HEMAT_UMUM);
-  const pill = hemat ? '<div class="bl-hemat"><i>Rp</i><span>'+esc(hemat)+'</span>'+msym('chevron_right')+'</div>' : '';
+  const hemat = p.diskonPersen ? 'Hemat '+blRp(p.harga-hargaAkhir(p)) : (promoLain(p) || HEMAT_UMUM);
+  const gr = promoGratis(p);   // "Beli 3 Gratis 1" - pil hijau sendiri, tidak ketimpa "Hemat Rp ..."
+  const pill = (hemat ? '<div class="bl-hemat"><i>Rp</i><span>'+esc(hemat)+'</span>'+msym('chevron_right')+'</div>' : '')
+    + (gr ? '<div class="bl-hemat gr">'+msym('redeem','fill')+'<span>'+esc(gr)+'</span></div>' : '');
   const harga = p.diskonPersen
     ? '<div class="bl-price">'+blRp(hargaAkhir(p))+'</div><div class="bl-promo"><span class="bl-disc">'+diskonLabel(p)+'</span><span class="bl-old">'+blRp(p.harga)+'</span></div>'
     : '<div class="bl-price">'+blRp(p.harga)+'</div>';
@@ -2847,18 +2914,24 @@ function promoTrackerHtml(){
   </section>`;
 }
 
-function promoCatalogHtml(list, judul){
+function promoCatalogHtml(list, judul, tab){
   const card = p => {
     const qty = state.cart[p.id]||0, habis = p.stok<=0;
+    // Badge gambar: tab Gratis Produk -> "Beli 3 Gratis 1" (bukan "Hemat Rp ..."). Tab lain: diskon dulu,
+    // bagian gratis tetap tampil lewat pil hijau di bawah harga (kecuali sudah jadi badge).
+    const gr = promoGratis(p);
+    const lencana = (tab==='gratis' && gr) ? gr : (p.diskonPersen>0 ? 'Hemat '+diskonLabel(p) : (promoLain(p) || gr || 'Promo'));
+    const pilGratis = gr && lencana!==gr ? gratisTag(p,'gratis-tag') : '';
     const im = p.gambar ? '<img alt="'+esc(p.nama)+'" src="'+esc(p.gambar)+'">' : (p.emoji||'🛍️');
     const act = habis ? '<div class="stock-out" style="margin-top:10px">Stok habis</div>'
       : (qty===0
         ? '<button class="pm-card-add" data-action="qty" data-id="'+esc(p.id)+'" data-delta="1">+ Keranjang</button>'
         : '<div class="qty-stepper"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="-1" aria-label="Kurangi">'+icon('minus')+'</button><input type="number" class="qty-input" inputmode="numeric" data-id="'+esc(p.id)+'" value="'+qty+'" min="0" max="'+p.stok+'"><button data-action="qty" data-id="'+esc(p.id)+'" data-delta="1" '+(qty>=p.stok?'disabled':'')+' aria-label="Tambah">'+icon('plus')+'</button></div>');
     return `<article class="pm-card"><div${pAttr(p.id)}>
-        <div class="pm-card-im">${im}<i>${p.diskonPersen>0 ? 'Hemat '+diskonLabel(p) : esc(p.promoLabel||'Promo')}</i></div>
+        <div class="pm-card-im">${im}<i>${esc(lencana)}</i></div>
         <h3>${esc(p.nama)}</h3>
         <div class="pm-card-pr"><b>${rupiah(hargaAkhir(p))}</b>${p.diskonPersen>0 ? '<s>'+rupiah(p.harga)+'</s>' : ''}</div>
+        ${pilGratis}
         ${habis ? '' : '<div class="instant-tag">'+msym('bolt','fill')+'<span>Diproses Instan</span></div>'}
         <div class="pm-card-st">Sisa ${p.stok}</div>
       </div>${act}</article>`;
@@ -2924,7 +2997,7 @@ function tabPromo(){
     const aktifKat = new Set(all.map(p=>p.kategori)).has(state.promoKat) ? state.promoKat : 'all';
     const list = aktifKat==='all' ? all : all.filter(p=>p.kategori===aktifKat);
     const judul = {harga:'Harga Spesial', gratis:'Gratis Produk', paket:'Paket', katalog:'E-Catalog'}[tab];
-    if(all.length){ parts.push(promoSubHtml(all), promoCatalogHtml(list, judul)); adaIsi = true; }
+    if(all.length){ parts.push(promoSubHtml(all), promoCatalogHtml(list, judul, tab)); adaIsi = true; }
     else parts.push(state.katalogLoading ? emptyState('boxEmpty','Memuat promo...','') : emptyState('ticket','Belum ada promo '+judul+' saat ini. Pantau terus, ya!',''));
   }
   if(adaIsi) parts.push(promoFootHtml());
@@ -3368,6 +3441,7 @@ function renderCartBody(){
             <h5>${esc(p.nama)}</h5>
             ${(()=>{ const gs = pg.filter(x=>x.produkId===p.id); return gs.some(x=>x.toppings.length) ? '<div class="ct-top">'+gs.map(x=>esc(x.qty+'x '+(x.toppings.length?x.toppings.join(', '):'tanpa topping'))).join('<br>')+'</div>' : ''; })()}
             <div class="ct-pr"><b>${rupiah(hargaAkhir(p))}</b>${p.diskonPersen?'<s>'+rupiah(p.harga)+'</s>':''}</div>
+            ${gratisStatusHtml(p, l.qty)}
           </div>
           <div class="ct-act">
             <button class="ct-del" data-action="qty" data-id="${p.id}" data-delta="-9999" aria-label="Hapus produk">${msym('delete')}</button>
@@ -5141,7 +5215,14 @@ function detailPromoHtml(p){
   const card = (title, ic, body) => '<div class="dt-pcard"><div class="dt-pcard-h"><i class="dt-rp">'+msym('sell','fill')+'</i><b>'+title+'</b></div>'
     + '<div class="dt-pcard-b"><i class="dt-rp sm">'+msym(ic,'fill')+'</i>'+body+'</div></div>';
   if(p.diskonPersen>0) cards.push(card('Harga Spesial','sell','<div><b>Beli 1: '+homeRp(hargaAkhir(p))+'/'+sat+'</b><small>Minimal pembelian 1 '+sat+'</small></div>'));
-  else if(p.promoLabel) cards.push(card('Promo','sell','<div><b>'+esc(p.promoLabel)+'</b><small>Berlaku otomatis di keranjang</small></div>'));
+  else if(promoLain(p)) cards.push(card('Promo','sell','<div><b>'+esc(promoLain(p))+'</b><small>Berlaku otomatis di keranjang</small></div>'));
+  // Gratis bersyarat (Beli X Gratis Y): satu kartu per aturan, dengan penjelasan syarat. Engine hitung per kelipatan.
+  promoSegs_(p).filter(function(s){ return /gratis/i.test(s); }).forEach(function(s){
+    const m = s.match(/beli\s+(\d+)\s+gratis\s+(\d+)/i);
+    const ket = m ? 'Ambil '+(Number(m[1])+Number(m[2]))+' '+sat+', bayar '+m[1]+' '+sat+' (gratis '+m[2]+'). Berlaku kelipatan, otomatis dihitung di keranjang'
+                  : 'Berlaku otomatis di keranjang';
+    cards.push(card('Gratis Produk','redeem','<div><b>'+esc(s)+'</b><small>'+ket+'</small></div>'));
+  });
   const t = TEBUS.find(x=>String(x.id)===String(p.id));
   if(t){
     const b = belanjaSyaratTebus(), on = state.tebus.includes(t.id), id = esc(t.id);
@@ -5213,7 +5294,7 @@ function renderDetailBody(p){
     <section class="dt-info">
       <div class="dt-tags"><span class="dt-ship">${msym(antar?'local_shipping':'storefront','fill')}${antar?'Antar ke Rumah':'Ambil di Toko'}</span><span class="dt-stok ${cls}">${st}</span></div>
       <div class="dt-namerow"><h1>${esc(p.nama)}</h1><button class="dt-fav" id="dt-fav" data-action="toggle-fav" data-id="${esc(p.id)}" aria-label="Favorit">${msym('favorite', isFav(p.id)?'fill':'')}</button></div>
-      <div class="dt-pricerow"><b>${homeRp(hargaAkhir(p))}</b>${p.diskonPersen ? '<i>'+diskonLabel(p)+'</i><s>'+homeRp(p.harga)+'</s>' : ''}</div>
+      <div class="dt-pricerow"><b>${homeRp(hargaAkhir(p))}</b>${p.diskonPersen ? '<i>'+diskonLabel(p)+'</i><s>'+homeRp(p.harga)+'</s>' : ''}${promoGratis(p) ? '<span class="dt-br"></span>'+gratisTag(p,'gratis-tag') : ''}</div>
     </section>
     <section class="dt-promo" id="dt-promo"></section>
     <section class="dt-sec" id="dt-topping"></section>
