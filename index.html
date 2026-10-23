@@ -3224,8 +3224,9 @@ function tabAkun(){
 
 /* ================================================================
    LEGAL — Syarat & Ketentuan + Kebijakan Refund
-   (item 2 & 3 daftar kelengkapan verifikasi iPaymu: FAQ sudah ada di
-   atas (tabAkun), dua ini nyusul supaya toko lolos review iPaymu)
+   (item 2 & 3 daftar kelengkapan verifikasi payment gateway: FAQ sudah ada di
+   atas (tabAkun), dua ini nyusul supaya toko lolos review gateway - dulu iPaymu,
+   sekarang WeselAja)
    ================================================================ */
 const LEGAL_UPDATED = '14 Agustus 2026'; // BARU: ganti tanggal tiap isi kebijakan ini diubah
 
@@ -3251,7 +3252,7 @@ const LEGAL_CONTENT = {
       <h3>4. Pembayaran</h3>
       <ul>
         <li><strong>Bayar di Tempat</strong> — dibayar tunai saat barang diambil/diterima.</li>
-        <li><strong>QRIS</strong> — dibayar via QR dinamis yang diproses melalui payment gateway iPaymu; status pembayaran terverifikasi otomatis, tidak perlu kirim bukti transfer manual.</li>
+        <li><strong>QRIS &amp; Virtual Account</strong> — dibayar via QR dinamis atau nomor Virtual Account yang diproses melalui payment gateway WeselAja (PT Xtra Pembayaran Aman); status pembayaran terverifikasi otomatis, tidak perlu kirim bukti transfer manual.</li>
         ${STORE.metodePembayaran.length ? `<li>Metode lain yang tersedia: ${esc(STORE.metodePembayaran.join(', '))}.</li>` : ''}
       </ul>
       <h3>5. Pengambilan &amp; Pengantaran</h3>
@@ -3291,7 +3292,7 @@ const LEGAL_CONTENT = {
       </ol>
       <h3>4. Metode &amp; Waktu Pengembalian Dana</h3>
       <ul>
-        <li><strong>Pembayaran QRIS (iPaymu)</strong> — dana dikembalikan ke rekening/e-wallet sumber pembayaran, estimasi 3–7 hari kerja setelah klaim disetujui.</li>
+        <li><strong>Pembayaran QRIS / Virtual Account (WeselAja)</strong> — dana dikembalikan ke rekening/e-wallet sumber pembayaran, estimasi 3–7 hari kerja setelah klaim disetujui.</li>
         <li><strong>Bayar di Tempat</strong> — dikembalikan tunai saat serah terima barang pengganti, atau transfer bank sesuai kesepakatan dengan toko.</li>
         <li>Alternatif lain (di luar refund tunai) adalah penggantian barang atau kompensasi Poin Member, sesuai kesepakatan pemesan dan toko.</li>
       </ul>
