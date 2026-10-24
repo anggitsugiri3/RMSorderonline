@@ -475,6 +475,15 @@ input,textarea{font-family:inherit}
 .retention-notice{font-size:12.5px;color:hsl(var(--ink));line-height:1.5;border:1px solid hsl(var(--green));background:hsl(var(--green)/.07);border-radius:12px;padding:11px 14px;margin-bottom:12px}
 .qris-timer{font-family:var(--f-sans);font-size:13px;font-weight:700;color:hsl(var(--green));background:hsl(var(--green)/.1);border-radius:999px;padding:5px 14px;display:inline-block;margin-bottom:10px}
 .qris-timer[data-expired="true"]{color:hsl(var(--red));background:hsl(var(--red)/.1)}
+/* Kotak bayar setelah LUNAS: QR/VA diganti logo ceklis hijau. Keadaan dasar = sudah tampil penuh,
+   animasi cuma "from" -> aman kalau prefers-reduced-motion mematikan animation. */
+.pay-done{padding:12px 0 6px;text-align:center}
+.pay-done-ic{width:84px;height:84px;margin:0 auto 12px;display:block;overflow:visible}
+.pay-done-ic circle{fill:hsl(var(--green));transform-box:fill-box;transform-origin:center;animation:pay-pop .45s cubic-bezier(.2,1.4,.4,1) both}
+.pay-done-ic path{fill:none;stroke:#fff;stroke-width:6;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:52;stroke-dashoffset:0;animation:pay-draw .4s .25s ease-out both}
+.pay-done-t{font-family:var(--f-sans);font-weight:700;font-size:17px;color:hsl(var(--green));margin-bottom:4px}
+@keyframes pay-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes pay-draw{from{stroke-dashoffset:52}to{stroke-dashoffset:0}}
 .btn-outline{border:1px solid hsl(var(--paper-line));border-radius:10px;padding:9px 14px;font-size:12.5px;font-weight:600;background:hsl(var(--card));color:hsl(var(--ink))}
 .btn-outline.danger{border-color:hsl(var(--red));color:hsl(var(--red))}
 .account-actions{display:flex;gap:8px;margin-top:12px}
@@ -4956,9 +4965,32 @@ function trkLiveHtml_(o){
   return `<div class="trk-card"><div class="trk-eta">${msym('bolt','fill')}${etaTxt}</div><div class="trk-steps">${steps}</div></div>${kurir}`;
 }
 
+/** Isi kotak bayar kalau sudah LUNAS: logo ceklis hijau (SVG inline, tidak tergantung font ikon/CDN). */
+function trkPaidHtml_(o){
+  const via = o.bayar==='QRIS' ? 'QRIS' : 'Virtual Account '+esc(VA_BANK_NAMES[o.vaBank]||o.vaBank||'');
+  return '<div class="pay-done" role="status" aria-live="polite">'
+    +'<svg class="pay-done-ic" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="40"/><path d="M25 43l12 12 23-25"/></svg>'
+    +'<div class="pay-done-t">Pembayaran diterima</div>'
+    +'<div class="qris-total">'+rupiah(o.total)+'</div>'
+    +'<div class="qris-note">Lunas via '+via+'. Terima kasih, pembayaranmu sudah terverifikasi.</div>'
+    +'</div>';
+}
+/** Ganti kotak QR/VA yang lagi tampil jadi ceklis + hentikan timer hitung mundur. */
+function trkShowPaid_(o){
+  stopQrisCountdown_();
+  stopPaymentPolling();
+  const box = document.getElementById('trk-pay');
+  if(box && box.getAttribute('data-paid') !== 'true'){
+    box.setAttribute('data-paid','true');
+    box.innerHTML = trkPaidHtml_(o);
+  }
+}
+
 function trkPayBoxHtml_(o){
   const isQris = o.bayar==='QRIS', isVa = o.bayar==='VA';
   if(!isQris && !isVa) return '';
+  // Sudah lunas (struk dibuka lagi dari riwayat) -> langsung ceklis, tanpa QR/VA/timer.
+  if(o.statusBayar==='PAID') return '<div class="trk-card"><div class="qris-box" id="trk-pay" data-paid="true">'+trkPaidHtml_(o)+'</div></div>';
   const waBayar = `<a class="wa-btn" href="https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Halo, saya mau bayar untuk pesanan '+o.nomor+' senilai '+rupiah(o.total)+'.')}" target="_blank" rel="noopener">${icon('whatsapp')} Hubungi Toko lewat WhatsApp</a>`;
   const bank = esc(VA_BANK_NAMES[o.vaBank]||o.vaBank);
   const inner = isQris
@@ -5029,8 +5061,10 @@ function openReceiptOrder(order){
   document.getElementById('receipt-overlay').setAttribute('data-open','true');
   document.body.style.overflow = 'hidden';
 
-  if(o.bayar==='QRIS' && o.qrisQrString) renderQrisCanvas_(o.qrisQrString);
-  if((o.bayar==='QRIS' && o.qrisQrString) || (o.bayar==='VA' && o.vaNumber)) startQrisCountdown_(o.createdAtMs);
+  if(o.statusBayar !== 'PAID'){
+    if(o.bayar==='QRIS' && o.qrisQrString) renderQrisCanvas_(o.qrisQrString);
+    if((o.bayar==='QRIS' && o.qrisQrString) || (o.bayar==='VA' && o.vaNumber)) startQrisCountdown_(o.createdAtMs);
+  }
   startTrackPolling_(o);
 }
 
@@ -5056,9 +5090,10 @@ async function trkPoll_(o){
   o.statusBayar = bayarBaru;
   if(berubah){ const l = document.getElementById('trk-live'); if(l) l.innerHTML = trkLiveHtml_(o); }
   if(bayarBerubah || berubah){ const b = document.getElementById('trk-bayar'); if(b) b.textContent = trkBayarLabel_(o); }
+  if(bayarBaru==='PAID' && (o.bayar==='QRIS' || o.bayar==='VA')) trkShowPaid_(o);
   const badge = document.getElementById('qris-status-badge');
   if(badge){
-    if(bayarBaru==='PAID'){ badge.textContent = 'Pembayaran diterima ✓'; badge.style.color = 'hsl(var(--green))'; }
+    if(bayarBaru==='PAID'){ /* kotak sudah diganti ceklis oleh trkShowPaid_ */ }
     else if(bayarBaru==='EXPIRED'){ badge.textContent = 'Kedaluwarsa - hubungi toko lewat WhatsApp.'; badge.style.color = 'hsl(var(--red))'; }
     else if(bayarBaru==='FAILED'){ badge.textContent = 'Pembayaran gagal - hubungi toko lewat WhatsApp.'; badge.style.color = 'hsl(var(--red))'; }
   }
@@ -5197,8 +5232,9 @@ function startPaymentPolling(kode){
     if(!badge) { stopPaymentPolling(); return; } // struk sudah ditutup/beda pesanan
 
     if(result.statusBayar === 'PAID'){
-      badge.textContent = 'Pembayaran diterima ✓';
-      badge.style.color = 'hsl(var(--green,#16a34a))';
+      const ro = state.receiptOrder;
+      if(ro && ro.nomor === kode){ ro.statusBayar = 'PAID'; trkShowPaid_(ro); }
+      else { badge.textContent = 'Pembayaran diterima ✓'; badge.style.color = 'hsl(var(--green,#16a34a))'; }
       stopPaymentPolling();
     } else if(result.statusBayar === 'EXPIRED'){
       badge.textContent = 'Kode QR kedaluwarsa - hubungi toko lewat WhatsApp.';
