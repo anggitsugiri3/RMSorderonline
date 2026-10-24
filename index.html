@@ -3584,10 +3584,13 @@ function qrisBox(){
   </div>`;
 }
 
-// BARU (metode bayar Virtual Account via iPaymu) - daftar bank HARUS sinkron manual
-// sama VA_BANKS (server, Constants.js) - server tetap validasi ulang kode bank yang
-// dikirim, daftar di sini murni buat tampilan dropdown.
-const VA_BANKS = { bca:'BCA', bni:'BNI', bri:'BRI', mandiri:'Mandiri', permata:'Permata' };
+// Metode bayar Virtual Account (WeselAja) - daftar bank HARUS sinkron manual sama VA_BANKS
+// (server, Constants.js) - server tetap validasi ulang kode bank yang dikirim, daftar di sini
+// murni buat tombol pilihan bank. 5 bank besar yang channel VA-nya aktif di akun WeselAja.
+const VA_BANKS = { bri:'BRI', mandiri:'Mandiri', bni:'BNI', cimb:'CIMB Niaga', bsi:'BSI' };
+// Nama tampilan untuk struk/riwayat: termasuk kode bank lama (pesanan yang dibuat sebelum
+// daftar di atas diganti) supaya struk lama tetap tampil 'BCA', bukan kode mentah 'bca'.
+const VA_BANK_NAMES = Object.assign({ bca:'BCA', permata:'Permata' }, VA_BANKS);
 function setVaBank(bank){ state.vaBank = bank; renderCheckoutBody(); }
 
 // BARU (fitur Tukar Poin checkout, mirror POSPage_RP_PER_POIN_REDEEM) - rasio TETAP
@@ -4924,7 +4927,7 @@ function trkPayBoxHtml_(o){
   const isQris = o.bayar==='QRIS', isVa = o.bayar==='VA';
   if(!isQris && !isVa) return '';
   const waBayar = `<a class="wa-btn" href="https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Halo, saya mau bayar untuk pesanan '+o.nomor+' senilai '+rupiah(o.total)+'.')}" target="_blank" rel="noopener">${icon('whatsapp')} Hubungi Toko lewat WhatsApp</a>`;
-  const bank = esc(VA_BANKS[o.vaBank]||o.vaBank);
+  const bank = esc(VA_BANK_NAMES[o.vaBank]||o.vaBank);
   const inner = isQris
     ? (!o.qrisQrString ? '<div class="qris-missing">Gagal membuat kode QRIS otomatis untuk pesanan ini. Bayar lewat transfer manual, lalu kirim bukti ke WhatsApp toko.</div>'+waBayar : `
       <div id="qris-timer" class="qris-timer"></div>
@@ -4945,7 +4948,7 @@ function trkPayBoxHtml_(o){
 }
 
 function trkBayarLabel_(o){
-  const nama = o.bayar==='QRIS' ? 'QRIS' : (o.bayar==='VA' ? 'VA '+(VA_BANKS[o.vaBank]||o.vaBank) : 'Bayar di Tempat');
+  const nama = o.bayar==='QRIS' ? 'QRIS' : (o.bayar==='VA' ? 'VA '+(VA_BANK_NAMES[o.vaBank]||o.vaBank) : 'Bayar di Tempat');
   let s;
   if(o.statusBayar==='PAID' || (o.bayar==='COD' && trkStatus_(o)==='SELESAI')) s = 'Lunas';
   else if(o.statusBayar==='EXPIRED' || o.statusBayar==='FAILED') s = 'Gagal/Kedaluwarsa';
