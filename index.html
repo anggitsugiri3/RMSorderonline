@@ -3616,6 +3616,30 @@ const RP_PER_POIN_REDEEM = 1;
  */
 /* Nomor WA dibandingkan setelah dinormalisasi (08xx = 628xx) - dulu harus persis sama teksnya. */
 function waKey(w){ let d = String(w||'').replace(/\D/g,''); if(d.startsWith('0')) d = '62'+d.slice(1); return d; }
+/* FIX iPhone: QRIS gagal dibuat di iPhone tapi jalan di Android. Beda-nya di teks yang dikirim ke server:
+   iOS menyelipkan karakter siluman (kontrol arah teks U+202A/U+202C dari Kontak/paste, zero-width, NBSP,
+   strip Unicode U+2011) dan Smart Punctuation (petik lengkung ’ “ ” , em-dash). trim() TIDAK membuang
+   semuanya, jadi `kontak`/`pelanggan` sampai ke server (lalu ke gateway WeselAja) dalam bentuk yang bisa ditolak
+   -> chargeQris gagal diam-diam -> QrisQrString kosong. Semua teks input pelanggan dibersihkan lewat 2 fungsi ini sebelum dikirim. */
+function bersihInput_(v){
+  return String(v==null ? '' : v)
+    .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u2064\uFEFF\u00AD]/g, '')   // zero-width & kontrol arah teks
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '')          // karakter kontrol (newline & tab dibiarkan)
+    .replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, ' ')          // spasi aneh -> spasi biasa
+    .replace(/[\u2010-\u2015\u2212]/g, '-')                                   // strip Unicode -> '-'
+    .replace(/[\u2018\u2019\u201A\u201B\u02BC]/g, "'")                       // petik tunggal lengkung -> '
+    .replace(/[\u201C\u201D\u201E\u201F]/g, '"')                             // petik ganda lengkung -> "
+    .replace(/\u2026/g, '...')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
+}
+/** Nomor WA -> 08xxxxxxxxxx polos (buang spasi/strip/kurung; +62 / 62 diganti 0). */
+function bersihWa_(v){
+  let d = bersihInput_(v).replace(/[^\d+]/g, '');
+  if(d.startsWith('+62')) d = '0' + d.slice(3);
+  else if(d.startsWith('62')) d = '0' + d.slice(2);
+  return d.replace(/\+/g, '');
+}
 /* ================================================================
    ALAMAT — Antar ke Rumah = alamat konsumen (member: tersimpan per akun di perangkat ini),
    Ambil di Toko = alamat toko. Satu sumber: state.form.alamat (dipakai juga di checkout).
@@ -3945,12 +3969,12 @@ async function submitOrder(){
       if(btn) btn.textContent = 'Mengirim...';
     }
     const saved = await api('apiBuatPesananOnlinePublik', {
-      pelanggan: state.form.nama.trim(),
-      kontak: poinPakai>0 ? state.auth.pelanggan.wa : state.form.wa.trim(),  // server cari member lewat `kontak` -> pakai format nomor member persis saat tukar poin
+      pelanggan: bersihInput_(state.form.nama),
+      kontak: poinPakai>0 ? state.auth.pelanggan.wa : bersihWa_(state.form.wa),  // server cari member lewat `kontak` -> pakai format nomor member persis saat tukar poin
       tipe: state.method==='antar' ? 'Delivery' : 'Pickup',
-      alamat: state.method==='antar' ? state.form.alamat.trim() : '',
+      alamat: state.method==='antar' ? bersihInput_(state.form.alamat) : '',
       items: lines.map(l=>({ produkId: l.produk.id, qty: l.qty })).concat(tebusPicked().map(t=>({ produkId: t.id, qty: 1, tebus: true }))),  // harga tebus dihitung ulang server (PesananOnlineService._resolveItemsTebus)
-      catatan: [state.form.catatan.trim(), porsiCatatan_(), lokasi ? lokasiLine_(lokasi) : ''].filter(Boolean).join('\n'),
+      catatan: [bersihInput_(state.form.catatan), porsiCatatan_(), lokasi ? lokasiLine_(lokasi) : ''].filter(Boolean).join('\n'),
       // Kalau lagi masuk sebagai member, pesanan dipasang ke akun ini biar
       // muncul di Riwayat Pesanan server. Tamu = null (behavior lama).
       pelangganId: state.auth.status==='member' ? state.auth.pelanggan.id : null,
