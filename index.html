@@ -431,6 +431,8 @@ input,textarea{font-family:inherit}
 .qris-total{font-family:var(--f-sans);font-weight:700;font-size:16px;margin-bottom:6px}
 .qris-note{font-size:11.5px;color:hsl(var(--ink-soft));line-height:1.6}
 .qris-missing{font-size:12px;color:hsl(var(--red));line-height:1.6}
+.pay-spin{display:inline-block;width:14px;height:14px;border:2px solid hsl(var(--paper-line));border-top-color:hsl(var(--red));border-radius:50%;animation:payspin .8s linear infinite;vertical-align:-2px;margin-right:6px}
+@keyframes payspin{to{transform:rotate(360deg)}}
 
 .field{margin-bottom:12px}
 .field label{display:block;font-size:12px;font-weight:600;color:hsl(var(--ink-soft));margin-bottom:5px}
@@ -439,6 +441,9 @@ input,textarea{font-family:inherit}
 
 .checkout-summary{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed hsl(var(--paper-line));padding-top:12px;margin-top:4px;font-family:var(--f-sans)}
 .checkout-summary .val{font-weight:700;font-size:17px;color:hsl(var(--red))}
+.fee-rows{display:flex;flex-direction:column;gap:5px;margin:2px 0 10px;font-family:var(--f-sans);font-size:12.5px;color:hsl(var(--ink-soft))}
+.fee-rows>div{display:flex;justify-content:space-between;gap:10px}
+.fee-rows small{opacity:.8}
 .submit-btn{width:100%;margin-top:14px;border:none;border-radius:12px;padding:13px;background:hsl(var(--gold));color:hsl(var(--gold-ink));font-weight:700;font-size:14px}
 .submit-btn:disabled{opacity:.45;cursor:not-allowed}
 .submit-hint{font-size:11px;color:hsl(var(--ink-soft));text-align:center;margin-top:8px;line-height:1.5}
@@ -2025,8 +2030,8 @@ async function hitungPromoServer_(){
     };
     pruneTebus();
     rerenderCartAman_();
-    const ct = document.getElementById('checkout-total-val');   // halaman checkout terbuka: segarkan totalnya juga
-    if(ct) ct.textContent = rupiah(Math.max(0, cartTotal()-estimasiPoinDiskon()));
+    const ct = document.getElementById('checkout-total-val');   // halaman checkout terbuka: segarkan totalnya juga (+ rincian biaya layanan)
+    if(ct) updatePoinDisplay();
   }catch(e){
     if(reqId === promoReq_) console.warn('apiHitungPromoPublik gagal (pakai estimasi lokal):', e.message);
   }
@@ -3056,7 +3061,7 @@ function tabPesanan(){
             </div>
             <div class="order-meta">${esc(o.waktu)} · ${o.jumlahItem} item · ${o.metode==='ambil'?'Ambil di toko':'Diantar'}</div>
             <div class="order-items">${o.items.map(it=>esc(it.qty+'x '+it.nama)).join(', ')}</div>
-            <div class="order-total">${rupiah(o.total)}</div>
+            <div class="order-total">${rupiah(totalBayarOrder_(o))}</div>
             ${o.belumBayar ? '<div class="order-meta" style="color:hsl(var(--red));font-weight:600;margin-top:4px">Ketuk untuk lanjutkan pembayaran</div>' : ''}
           </button>
           ${bisaBatal ? `<button class="btn-outline danger order-cancel-btn" data-action="batalkan-pesanan-member" data-order-index="${idx}">Batalkan Pesanan</button>` : ''}
@@ -3093,7 +3098,7 @@ function tabPesanan(){
           </div>
           <div class="order-meta">${esc(o.waktu)} · ${o.jumlahItem} item · ${o.metode==='ambil'?'Ambil di toko':'Diantar'}</div>
           <div class="order-items">${o.items.map(it=>esc(it.qty+'x '+it.nama)).join(', ')}</div>
-          <div class="order-total">${rupiah(o.total)}</div>
+          <div class="order-total">${rupiah(totalBayarOrder_(o))}</div>
           ${belumBayar ? '<div class="order-meta" style="color:hsl(var(--red));font-weight:600;margin-top:4px">Ketuk untuk lanjutkan pembayaran</div>' : ''}
         </button>
         ${bisaBatal ? `<button class="btn-outline danger order-cancel-btn" data-action="batalkan-pesanan-tamu" data-order-index="${idx}">Batalkan Pesanan</button>` : ''}
@@ -3196,7 +3201,7 @@ function riwayatPelangganSection(){
           <span class="order-status">${esc(o.status)}</span>
         </div>
         <div class="order-meta">${esc(o.waktu)} · ${o.jumlahItem} item · ${o.metode==='ambil'?'Ambil di toko':'Diantar'}</div>
-        <div class="order-total">${rupiah(o.total)}</div>
+        <div class="order-total">${rupiah(totalBayarOrder_(o))}</div>
       </div>`).join('');
   }
   return `
@@ -3270,7 +3275,7 @@ const LEGAL_CONTENT = {
       <h3>4. Pembayaran</h3>
       <ul>
         <li><strong>Bayar di Tempat</strong> — dibayar tunai saat barang diambil/diterima.</li>
-        <li><strong>QRIS &amp; Virtual Account</strong> — dibayar via QR dinamis atau nomor Virtual Account yang diproses melalui payment gateway WeselAja (PT Xtra Pembayaran Aman); status pembayaran terverifikasi otomatis, tidak perlu kirim bukti transfer manual.</li>
+        <li><strong>QRIS &amp; Virtual Account</strong> — dibayar via QR dinamis atau nomor Virtual Account yang diproses melalui payment gateway WeselAja (PT Xtra Pembayaran Aman); status pembayaran terverifikasi otomatis, tidak perlu kirim bukti transfer manual. Pembayaran QRIS dan Virtual Account dikenakan biaya layanan yang ditambahkan ke total tagihan dan ditampilkan sebelum kamu mengirim pesanan.</li>
         ${STORE.metodePembayaran.length ? `<li>Metode lain yang tersedia: ${esc(STORE.metodePembayaran.join(', '))}.</li>` : ''}
       </ul>
       <h3>5. Pengambilan &amp; Pengantaran</h3>
@@ -3597,7 +3602,7 @@ function qrisBox(){
   // sebelum submit). Jadi di dialog checkout ini cuma info, QR beneran muncul di struk
   // (openReceiptOrder) begitu pesanan berhasil dikirim.
   return `<div class="qris-box">
-    <div class="qris-total js-net-total">${rupiah(netTotal())}</div>
+    <div class="qris-total js-net-total">${rupiah(totalBayar())}</div>
     <div class="qris-note">Kode QR pembayaran (khusus buat pesanan ini) akan muncul di struk setelah kamu klik "Kirim Pesanan". Scan pakai aplikasi bank/e-wallet apa saja - pembayaran terverifikasi otomatis, tidak perlu kirim bukti manual.</div>
   </div>`;
 }
@@ -3610,6 +3615,39 @@ const VA_BANKS = { bri:'BRI', mandiri:'Mandiri', bni:'BNI', cimb:'CIMB Niaga', b
 // daftar di atas diganti) supaya struk lama tetap tampil 'BCA', bukan kode mentah 'bca'.
 const VA_BANK_NAMES = Object.assign({ bca:'BCA', permata:'Permata' }, VA_BANKS);
 function setVaBank(bank){ state.vaBank = bank; renderCheckoutBody(); }
+
+// BARU (biaya layanan pembayaran online) - tarif fee WeselAja yang dibebankan ke pelanggan di atas
+// Total belanja. Ini ESTIMASI tampilan di checkout: server (Constants.js BIAYA_LAYANAN_PEMBAYARAN +
+// PaymentFeeService.hitungBiayaLayanan) menghitung ulang & jadi sumber kebenaran (struk pakai angka
+// server). Tarif & rumus HARUS sama persis dengan server - ganti DUA-DUANYA.
+// bps = basis point (1 bps = 0,01%; 0,7% = 70). biaya = CEIL(total x bps / 10000) + flat, lalu dibulatkan ke atas ke Rp100.
+// QRIS = 0,7% + Rp500 | VA = Rp4.000 flat. COD = tanpa biaya.
+const BIAYA_LAYANAN = {
+  QRIS: { label:'QRIS',            bps:70, flat:500  },
+  VA:   { label:'Virtual Account', bps:0,  flat:4000 }
+};
+// Dibulatkan KE ATAS ke kelipatan ini (Rp100: 798/799 jadi 800, 801 jadi 900). 1 = tanpa pembulatan.
+// Sama dengan BIAYA_LAYANAN_PEMBULATAN di server (Constants.js).
+const BIAYA_PEMBULATAN = 100;
+function biayaLayanan_(metode, total){
+  const t = BIAYA_LAYANAN[metode], dasar = Math.round(Number(total)||0);
+  if(!t || dasar<=0) return 0;
+  const mentah = Math.floor((dasar*t.bps + 9999)/10000) + t.flat;
+  const unit = BIAYA_PEMBULATAN > 1 ? Math.floor(BIAYA_PEMBULATAN) : 1;
+  return Math.floor((mentah + unit - 1)/unit) * unit;
+}
+function payMetodeKey_(){ return state.payment==='qris' ? 'QRIS' : (state.payment==='va' ? 'VA' : 'COD'); }
+function payFee(){ return biayaLayanan_(payMetodeKey_(), netTotal()); }
+function totalBayar(){ return netTotal() + payFee(); }
+/** Nominal yang HARUS dibayar sebuah pesanan = belanja + biaya layanan (`biaya` 0 untuk COD & pesanan lama). */
+function totalBayarOrder_(o){ return (Number(o.total)||0) + (Number(o.biaya)||0); }
+function feeBoxHtml_(){
+  const t = BIAYA_LAYANAN[payMetodeKey_()]; if(!t) return '';
+  return '<div class="fee-rows">'
+    + '<div><span>Subtotal belanja</span><span id="fee-sub">'+rupiah(netTotal())+'</span></div>'
+    + '<div><span>Biaya layanan '+t.label+'</span><span id="fee-val">'+rupiah(payFee())+'</span></div>'
+    + '</div>';
+}
 
 // BARU (fitur Tukar Poin checkout, mirror POSPage_RP_PER_POIN_REDEEM) - rasio TETAP
 // di-hardcode di client, murni estimasi tampilan sebelum "Kirim Pesanan" - server
@@ -3869,8 +3907,10 @@ function renderPoinSection(){
  * ketik di #inp-poin) - pola sama alasan renderPoinSection() di atas, hindari fokus
  * input hilang. */
 function updatePoinDisplay(){
-  const net = rupiah(netTotal());
+  const net = rupiah(totalBayar());   // belanja + biaya layanan QRIS/VA (COD = belanja saja)
   document.querySelectorAll('#checkout-total-val,.js-net-total').forEach(el=>{ el.textContent = net; });
+  const feeSub = document.getElementById('fee-sub'); if(feeSub) feeSub.textContent = rupiah(netTotal());
+  const feeVal = document.getElementById('fee-val'); if(feeVal) feeVal.textContent = rupiah(payFee());
   const hintEl = document.getElementById('poin-hint');
   if(hintEl){
     const dipakai = poinTerpakai(), maks = poinMaks().toLocaleString('id-ID');
@@ -3885,7 +3925,7 @@ function vaBox(){
     <div class="method-toggle" style="flex-wrap:wrap">
       ${Object.keys(VA_BANKS).map(b=>`<button class="method-btn" data-action="set-va-bank" data-bank="${b}" data-active="${state.vaBank===b}">${VA_BANKS[b]}</button>`).join('')}
     </div>
-    <div class="qris-total js-net-total" style="margin-top:8px">${rupiah(netTotal())}</div>
+    <div class="qris-total js-net-total" style="margin-top:8px">${rupiah(totalBayar())}</div>
     <div class="qris-note">Nomor VA (khusus buat pesanan ini) akan muncul di struk setelah kamu klik "Kirim Pesanan". Transfer sejumlah tagihan persis - pembayaran terverifikasi otomatis, tidak perlu kirim bukti manual.</div>
   </div>`;
 }
@@ -3916,7 +3956,8 @@ function renderCheckoutBody(){
     </div>
     ${state.payment==='qris' ? qrisBox() : ''}
     ${state.payment==='va' ? vaBox() : ''}
-    <div class="checkout-summary"><span>Total (${n} item)</span><span class="val" id="checkout-total-val">${rupiah(Math.max(0,cartTotal()-estimasiPoinDiskon()))}</span></div>
+    ${feeBoxHtml_()}
+    <div class="checkout-summary"><span>Total (${n} item)</span><span class="val" id="checkout-total-val">${rupiah(totalBayar())}</span></div>
     <button class="submit-btn" id="submit-order-btn" data-action="submit-order" ${isSubmitEnabled()?'':'disabled'}>Kirim Pesanan</button>
     <div class="submit-hint">Toko akan mengonfirmasi pesananmu lewat WhatsApp ke nomor yang kamu isi.</div>
   `;
@@ -4011,6 +4052,7 @@ async function submitOrder(){
       items: (saved.Items || []).map(it=>({ nama: it.nama, qty: it.qty, harga: it.harga })),
       jumlahItem: (saved.Items || []).reduce((s,it)=>s+it.qty,0),
       total: saved.Total != null ? saved.Total : cartTotal(),
+      biaya: Number(saved.BiayaLayanan) || 0,   // biaya layanan QRIS/VA (angka server), di luar `total` belanja
       waktu: new Date().toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}),
       // Timestamp mentah (bukan string terformat `waktu` di atas) - dipakai hitung
       // countdown 24 jam QRIS/VA di openReceiptOrder (mulai sejak pesanan diklik/dibuat,
@@ -4737,6 +4779,7 @@ async function loadRiwayatPelanggan(){
       items: (o.Items||[]).map(it=>({ nama: it.nama, qty: it.qty, harga: it.harga })),
       jumlahItem: (o.Items||[]).reduce((s,it)=>s+it.qty,0),
       total: o.Total,
+      biaya: Number(o.BiayaLayanan) || 0,
       statusMentah: o.Status,
       status: orderStatusLabel(o.Status, o.MetodeBayar, o.StatusBayar),
       belumBayar: orderBelumBayar(o.MetodeBayar, o.StatusBayar),
@@ -4971,7 +5014,7 @@ function trkPaidHtml_(o){
   return '<div class="pay-done" role="status" aria-live="polite">'
     +'<svg class="pay-done-ic" viewBox="0 0 84 84" aria-hidden="true"><circle cx="42" cy="42" r="40"/><path d="M25 43l12 12 23-25"/></svg>'
     +'<div class="pay-done-t">Pembayaran diterima</div>'
-    +'<div class="qris-total">'+rupiah(o.total)+'</div>'
+    +'<div class="qris-total">'+rupiah(totalBayarOrder_(o))+'</div>'
     +'<div class="qris-note">Lunas via '+via+'. Terima kasih, pembayaranmu sudah terverifikasi.</div>'
     +'</div>';
 }
@@ -4991,25 +5034,112 @@ function trkPayBoxHtml_(o){
   if(!isQris && !isVa) return '';
   // Sudah lunas (struk dibuka lagi dari riwayat) -> langsung ceklis, tanpa QR/VA/timer.
   if(o.statusBayar==='PAID') return '<div class="trk-card"><div class="qris-box" id="trk-pay" data-paid="true">'+trkPaidHtml_(o)+'</div></div>';
-  const waBayar = `<a class="wa-btn" href="https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Halo, saya mau bayar untuk pesanan '+o.nomor+' senilai '+rupiah(o.total)+'.')}" target="_blank" rel="noopener">${icon('whatsapp')} Hubungi Toko lewat WhatsApp</a>`;
+  const waBayar = `<a class="wa-btn" href="https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Halo, saya mau bayar untuk pesanan '+o.nomor+' senilai '+rupiah(totalBayarOrder_(o))+'.')}" target="_blank" rel="noopener">${icon('whatsapp')} Hubungi Toko lewat WhatsApp</a>`;
   const bank = esc(VA_BANK_NAMES[o.vaBank]||o.vaBank);
   const inner = isQris
-    ? (!o.qrisQrString ? '<div class="qris-missing">Gagal membuat kode QRIS otomatis untuk pesanan ini. Bayar lewat transfer manual, lalu kirim bukti ke WhatsApp toko.</div>'+waBayar : `
+    ? (!o.qrisQrString ? payRecoverHtml_(o, 'QRIS') : `
       <div id="qris-timer" class="qris-timer"></div>
       <div id="qris-canvas" style="width:240px;max-width:100%;margin:0 auto 10px;background:#fff;border-radius:8px;overflow:hidden"></div>
-      <div class="qris-total">${rupiah(o.total)}</div>
+      <div class="qris-total">${rupiah(totalBayarOrder_(o))}</div>${o.biaya>0 ? `<div class="qris-note">Termasuk biaya layanan ${rupiah(o.biaya)}</div>` : ''}
       <div id="qris-status-badge" class="qris-note" style="font-weight:600">Menunggu pembayaran...</div>
       <div class="qris-note">Scan pakai aplikasi bank/e-wallet apa saja. Status otomatis berubah begitu pembayaran terverifikasi.</div>
       <button class="btn-outline" data-action="download-qris" data-order-nomor="${esc(o.nomor)}" style="width:100%;margin-top:10px">${icon('download')} Unduh QR</button>`)
-    : (!o.vaNumber ? '<div class="qris-missing">Gagal membuat nomor Virtual Account otomatis. Bayar lewat transfer manual, lalu kirim bukti ke WhatsApp toko.</div>'+waBayar : `
+    : (!o.vaNumber ? payRecoverHtml_(o, 'Virtual Account') : `
       <div id="qris-timer" class="qris-timer"></div>
       <div class="qris-note" style="font-weight:600">Transfer Virtual Account ${bank}</div>
       <div class="font-mono" style="font-size:20px;font-weight:700;letter-spacing:1px;margin:8px 0">${esc(o.vaNumber)}</div>
       <button class="btn-outline" data-action="copy-va-number" data-va-number="${esc(o.vaNumber)}" style="width:100%;margin-bottom:8px">Salin Nomor VA</button>
-      <div class="qris-total">${rupiah(o.total)}</div>
+      <div class="qris-total">${rupiah(totalBayarOrder_(o))}</div>${o.biaya>0 ? `<div class="qris-note">Termasuk biaya layanan ${rupiah(o.biaya)}</div>` : ''}
       <div id="qris-status-badge" class="qris-note" style="font-weight:600">Menunggu pembayaran...</div>
       <div class="qris-note">Transfer persis sesuai tagihan lewat ATM/mobile banking ${bank}. Status otomatis berubah begitu terverifikasi.</div>`);
   return '<div class="trk-card"><div class="qris-box" id="trk-pay">'+inner+'</div></div>';
+}
+
+/* ================================================================
+   PEMULIHAN KODE BAYAR (QRIS/VA) - FIX "QR tidak muncul di iPhone, kadang-kadang".
+   Kalau charge ke gateway gagal saat checkout, server tetap menyimpan pesanan tapi struk
+   datang TANPA kode. Dulu customer cuma disuruh WhatsApp. Sekarang struk otomatis minta
+   server membuat ulang kodenya (idempotent, aman diulang) dan menampilkannya begitu jadi.
+   ================================================================ */
+function waBayarBtn_(o){
+  return `<a class="wa-btn" href="https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent('Halo, saya mau bayar untuk pesanan '+o.nomor+' senilai '+rupiah(totalBayarOrder_(o))+'.')}" target="_blank" rel="noopener">${icon('whatsapp')} Hubungi Toko lewat WhatsApp</a>`;
+}
+/** Perlu dipulihkan = QRIS/VA belum lunas/kedaluwarsa, pesanan masih BARU, <24 jam, dan kodenya kosong. */
+function perluPulih_(o){
+  if(o.bayar!=='QRIS' && o.bayar!=='VA') return false;
+  if(o.bayar==='QRIS' ? o.qrisQrString : o.vaNumber) return false;
+  const st = String(o.statusBayar||'');
+  if(st==='PAID' || st==='EXPIRED' || st==='FAILED') return false;
+  if(trkStatus_(o)!=='BARU') return false;
+  return (Date.now() - (o.createdAtMs || Date.now())) < 24*60*60*1000;
+}
+/** Isi (dalam) kotak bayar saat kode kosong. pesan===undefined -> loading (kalau masih bisa dipulihkan); string -> gagal + tombol ulang. */
+function payRecoverInner_(o, jenis, pesan){
+  if(pesan===undefined && perluPulih_(o)){
+    return '<div class="qris-note" style="font-weight:600"><span class="pay-spin"></span>Sedang membuat kode '+jenis+'...</div>'
+      + '<div class="qris-note">Mohon tunggu sebentar, jangan tutup halaman ini.</div>';
+  }
+  const bisaUlang = perluPulih_(o);
+  return '<div class="qris-missing">Kode '+jenis+' belum bisa dibuat'+(pesan ? ' ('+esc(pesan)+')' : '')+'. '
+    + (bisaUlang ? 'Coba buat ulang, atau bayar' : 'Bayar')+' lewat transfer manual, lalu kirim bukti ke WhatsApp toko.</div>'
+    + (bisaUlang ? '<button class="btn-outline" data-action="retry-pay" style="width:100%;margin:10px 0">Coba Buat Ulang Kode '+jenis+'</button>' : '')
+    + waBayarBtn_(o);
+}
+function payRecoverHtml_(o, jenis, pesan){ return '<div id="pay-recover">'+payRecoverInner_(o, jenis, pesan)+'</div>'; }
+/** Pasang ulang kotak bayar setelah kode didapat (QR digambar, timer jalan). */
+function tampilUlangPayBox_(o){
+  const box = document.getElementById('trk-pay');
+  const card = box ? box.closest('.trk-card') : null;
+  if(!card || state.receiptOrder!==o) return;
+  stopQrisCountdown_();
+  card.outerHTML = trkPayBoxHtml_(o);
+  if(o.statusBayar!=='PAID'){
+    if(o.bayar==='QRIS' && o.qrisQrString) renderQrisCanvas_(o.qrisQrString);
+    if((o.bayar==='QRIS' && o.qrisQrString) || (o.bayar==='VA' && o.vaNumber)) startQrisCountdown_(o.createdAtMs);
+  }
+}
+/** Terapkan data kode bayar dari server (hasil buat-ulang atau polling) ke objek pesanan. */
+function terapkanKodeBayar_(o, r){
+  if(!r) return false;
+  const ada = o.bayar==='QRIS' ? !!r.qrisQrString : !!r.vaNumber;
+  if(!ada) return false;
+  o.qrisQrString = r.qrisQrString || o.qrisQrString || '';
+  o.qrisExpiredAt = r.qrisExpiredAt || o.qrisExpiredAt || '';
+  o.vaNumber = r.vaNumber || o.vaNumber || '';
+  o.vaExpiredAt = r.vaExpiredAt || o.vaExpiredAt || '';
+  if(r.statusBayar) o.statusBayar = r.statusBayar;
+  state.orders = state.orders.map(x => x.nomor===o.nomor ? Object.assign(x, { qrisQrString:o.qrisQrString, qrisExpiredAt:o.qrisExpiredAt, vaNumber:o.vaNumber, vaExpiredAt:o.vaExpiredAt, statusBayar:o.statusBayar }) : x);
+  saveGuestOrders();
+  return true;
+}
+/** Minta server buat ulang kode bayar. auto=true: dipanggil otomatis saat struk dibuka (3 percobaan). */
+async function pulihkanPembayaran_(o, auto){
+  if(state.pulihBusy===o.nomor) return;
+  state.pulihBusy = o.nomor;
+  const jenis = o.bayar==='QRIS' ? 'QRIS' : 'Virtual Account';
+  const tampil = html => { const el = document.getElementById('pay-recover'); if(el && state.receiptOrder===o) el.innerHTML = html; };
+  const loading = '<div class="qris-note" style="font-weight:600"><span class="pay-spin"></span>Sedang membuat kode '+jenis+'...</div><div class="qris-note">Mohon tunggu sebentar, jangan tutup halaman ini.</div>';
+  const MAX = auto ? 3 : 2;
+  let hasil = null, pesan = '';
+  try{
+    for(let i=0; i<MAX && !hasil; i++){
+      if(state.receiptOrder!==o) return;                       // struk ditutup - berhenti
+      if(i>0) await new Promise(r => setTimeout(r, 1500*i));
+      tampil(loading);
+      try{
+        const r = await api('apiBuatUlangPembayaranPesanan', { kode:o.nomor }, { retries:1, timeoutMs:30000 });
+        if(terapkanKodeBayar_(o, r)) hasil = r;
+      }catch(e){
+        pesan = (e && e.message) || '';
+        if(/sudah diproses|tidak ditemukan|bukan pembayaran/i.test(pesan)) break;   // tidak akan membaik kalau diulang
+      }
+    }
+  } finally {
+    state.pulihBusy = null;
+  }
+  if(state.receiptOrder!==o) return;
+  if(hasil) tampilUlangPayBox_(o);
+  else tampil(payRecoverInner_(o, jenis, pesan || 'koneksi tidak stabil'));
 }
 
 function trkBayarLabel_(o){
@@ -5050,7 +5180,8 @@ function openReceiptOrder(order){
         ${o.diskonPromo>0 ? `<div class="trk-row"><span>Diskon Promo</span><span>-${rupiah(o.diskonPromo)}</span></div>` : ''}
         ${o.diskonPoin>0 ? `<div class="trk-row"><span>Diskon Poin</span><span>-${rupiah(o.diskonPoin)}</span></div>` : ''}
         <div class="trk-row"><span>Ongkos Kirim</span><span>GRATIS</span></div>
-        <div class="trk-row trk-total"><span>Total Pembayaran</span><span>${rupiah(o.total)}</span></div>
+        ${o.biaya>0 ? `<div class="trk-row"><span>Biaya Layanan ${o.bayar==='QRIS' ? 'QRIS' : 'Virtual Account'}</span><span>${rupiah(o.biaya)}</span></div>` : ''}
+        <div class="trk-row trk-total"><span>Total Pembayaran</span><span>${rupiah(totalBayarOrder_(o))}</span></div>
         <div class="trk-row"><span>Metode Bayar</span><span id="trk-bayar">${esc(trkBayarLabel_(o))}</span></div>
       </div>
       ${poin>0 ? `<div class="trk-poin">${msym('stars','fill')}Poin Diperoleh<em>+${poin} Poin*</em></div><div class="trk-hint" style="text-align:left">*Estimasi, masuk ke saldo setelah pesanan selesai.</div>` : ''}
@@ -5065,6 +5196,7 @@ function openReceiptOrder(order){
     if(o.bayar==='QRIS' && o.qrisQrString) renderQrisCanvas_(o.qrisQrString);
     if((o.bayar==='QRIS' && o.qrisQrString) || (o.bayar==='VA' && o.vaNumber)) startQrisCountdown_(o.createdAtMs);
   }
+  if(perluPulih_(o)) pulihkanPembayaran_(o, true);   // kode bayar kosong (charge awal gagal) -> buat ulang otomatis
   startTrackPolling_(o);
 }
 
@@ -5088,6 +5220,7 @@ async function trkPoll_(o){
   if(stBaru) o.statusMentah = stBaru;
   if(r.petugasNama) o.petugasNama = r.petugasNama;
   o.statusBayar = bayarBaru;
+  if(bayarBaru!=='PAID' && (o.bayar==='QRIS' ? !o.qrisQrString : (o.bayar==='VA' && !o.vaNumber)) && terapkanKodeBayar_(o, r)) tampilUlangPayBox_(o);
   if(berubah){ const l = document.getElementById('trk-live'); if(l) l.innerHTML = trkLiveHtml_(o); }
   if(bayarBerubah || berubah){ const b = document.getElementById('trk-bayar'); if(b) b.textContent = trkBayarLabel_(o); }
   if(bayarBaru==='PAID' && (o.bayar==='QRIS' || o.bayar==='VA')) trkShowPaid_(o);
@@ -5127,7 +5260,8 @@ function printStrukPos_(){
     + '<hr>' + row('Subtotal', rupiah(sub))
     + (o.diskonPromo>0 ? row('Diskon Promo', '-'+rupiah(o.diskonPromo)) : '')
     + (o.diskonPoin>0 ? row('Diskon Poin', '-'+rupiah(o.diskonPoin)) : '')
-    + row('TOTAL', rupiah(o.total), true) + row('Bayar', esc(trkBayarLabel_(o)))
+    + (o.biaya>0 ? row('Biaya Layanan', rupiah(o.biaya)) : '')
+    + row('TOTAL', rupiah(totalBayarOrder_(o)), true) + row('Bayar', esc(trkBayarLabel_(o)))
     + '<hr>' + code128Svg_(o.nomor) + '<div class="c">'+esc(o.nomor)+'</div><div class="c">Terima kasih sudah belanja!</div>'
     + '</body></html>');
   w.document.close(); w.focus();
@@ -5491,6 +5625,7 @@ document.addEventListener('click', function(e){
   else if(a==='batalkan-pesanan-member') batalkanPesananMember(t.dataset.orderIndex);
   else if(a==='batalkan-pesanan-tamu') batalkanPesananTamu(t.dataset.orderIndex);
   else if(a==='download-qris') downloadQrisImage_(t.dataset.orderNomor);
+  else if(a==='retry-pay'){ if(state.receiptOrder) pulihkanPembayaran_(state.receiptOrder, false); }
   else if(a==='copy-va-number') copyVaNumber_(t.dataset.vaNumber);
   else if(a==='clear-search') clearSearch();
   else if(a==='retry-katalog') loadKatalog();
